@@ -13,6 +13,7 @@
   color: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .app-header h1 {
@@ -27,13 +28,37 @@
   opacity: 0.9;
 }
 
+.header-actions {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.admin-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.admin-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
 .app-main {
   display: grid;
   gap: 2rem;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.status-card, .info-card, .next-steps {
+.status-card, .info-card, .next-steps, .admin-info-card {
   background: white;
   border: 1px solid #e1e5e9;
   border-radius: 8px;
@@ -41,10 +66,28 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.status-card h2, .info-card h2, .next-steps h2 {
+.status-card h2, .info-card h2, .next-steps h2, .admin-info-card h2 {
   margin: 0 0 1rem 0;
   color: #2d3748;
   font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-info-card {
+  border-left: 4px solid #667eea;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.admin-info-card h2 {
+  color: #667eea;
+}
+
+.admin-info-card p {
+  margin: 1rem 0 0 0;
+  padding: 0.75rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 6px;
+  color: #4c51bf;
   font-weight: 600;
 }
 
@@ -88,5 +131,14 @@
 
   .app-main {
     grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    position: static;
+    margin-top: 1rem;
+  }
+
+  .admin-button {
+    width: 100%;
   }
 }

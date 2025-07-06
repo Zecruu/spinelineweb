@@ -2,15 +2,19 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  // Support both ObjectId and String clinic references
   clinicId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed, // Can be ObjectId or String
     ref: 'Clinic',
-    required: [true, 'Clinic ID is required'],
     index: true
+  },
+  // Support both old and new user structures
+  name: {
+    type: String,
+    trim: true
   },
   username: {
     type: String,
-    required: [true, 'Username is required'],
     trim: true,
     minlength: [3, 'Username must be at least 3 characters'],
     maxlength: [30, 'Username cannot exceed 30 characters']
@@ -22,10 +26,13 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
+  // Support both password field names
   password: {
     type: String,
-    required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters']
+  },
+  passwordHash: {
+    type: String
   },
   role: {
     type: String,
@@ -33,8 +40,8 @@ const userSchema = new mongoose.Schema({
     required: [true, 'User role is required']
   },
   profile: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     phone: String,
     licenseNumber: String, // For doctors
     specialization: String, // For doctors
@@ -54,6 +61,28 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  // Support existing user fields from production
+  isNpiVerified: {
+    type: Boolean,
+    default: false
+  },
+  notificationSettings: {
+    emailAlerts: { type: Boolean, default: true },
+    newPatientAlerts: { type: Boolean, default: true },
+    flaggedPatientAlerts: { type: Boolean, default: true },
+    appointmentReminders: { type: Boolean, default: true },
+    systemUpdates: { type: Boolean, default: false }
+  },
+  autoSign: {
+    type: Boolean,
+    default: false
+  },
+  defaultPreferences: {
+    defaultDuration: { type: Number, default: 15 },
+    defaultVisitType: { type: String, default: 'Follow-Up' },
+    defaultTemplate: { type: String, default: '' },
+    autoSaveNotes: { type: Boolean, default: true }
+  },
   lastLogin: Date,
   passwordResetToken: String,
   passwordResetExpires: Date
@@ -62,18 +91,39 @@ const userSchema = new mongoose.Schema({
 });
 
 // Compound index for clinic-scoped queries
-userSchema.index({ clinicId: 1, email: 1 }, { unique: true });
-userSchema.index({ clinicId: 1, username: 1 }, { unique: true });
+userSchema.index({ clinicId: 1, email: 1 }, { unique: true, sparse: true });
+userSchema.index({ clinicId: 1, username: 1 }, { unique: true, sparse: true });
 userSchema.index({ clinicId: 1, role: 1 });
 userSchema.index({ clinicId: 1, isActive: 1 });
+userSchema.index({ email: 1 }); // For global email lookups
+
+// Virtual to get display name
+userSchema.virtual('displayName').get(function() {
+  if (this.name) return this.name;
+  if (this.profile?.firstName && this.profile?.lastName) {
+    return `${this.profile.firstName} ${this.profile.lastName}`;
+  }
+  return this.username || this.email;
+});
+
+// Virtual to get the password field (either password or passwordHash)
+userSchema.virtual('hashedPassword').get(function() {
+  return this.password || this.passwordHash;
+});
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
+  // Handle both password and passwordHash fields
+  const passwordField = this.password || this.passwordHash;
+  if (!this.isModified('password') && !this.isModified('passwordHash')) return next();
+
   try {
     const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+    const hashedPassword = await bcrypt.hash(passwordField, salt);
+
+    // Set both fields for compatibility
+    this.password = hashedPassword;
+    this.passwordHash = hashedPassword;
     next();
   } catch (error) {
     next(error);
@@ -82,7 +132,8 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  const hashedPassword = this.password || this.passwordHash;
+  return await bcrypt.compare(candidatePassword, hashedPassword);
 };
 
 // Set default permissions based on role
