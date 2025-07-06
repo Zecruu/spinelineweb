@@ -474,4 +474,183 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Get monthly appointments for calendar view
+router.get('/calendar/:year/:month', async (req, res) => {
+  try {
+    const { year, month } = req.params;
+    const { visitType } = req.query;
+
+    let query = {
+      clinicId: req.clinicId,
+      status: { $ne: 'cancelled' }
+    };
+
+    // Add visit type filter if specified
+    if (visitType && visitType !== 'all') {
+      query.visitType = visitType;
+    }
+
+    const startOfMonth = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const endOfMonth = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59);
+    query.date = { $gte: startOfMonth, $lte: endOfMonth };
+
+    const appointments = await Appointment.find(query)
+      .populate('patientId', 'firstName lastName recordNumber')
+      .sort({ date: 1, time: 1 });
+
+    // Group appointments by date
+    const appointmentsByDate = {};
+    appointments.forEach(apt => {
+      const dateKey = apt.date.toISOString().split('T')[0];
+      if (!appointmentsByDate[dateKey]) {
+        appointmentsByDate[dateKey] = [];
+      }
+      appointmentsByDate[dateKey].push(apt);
+    });
+
+    // Calculate daily counts
+    const dailyCounts = {};
+    Object.keys(appointmentsByDate).forEach(date => {
+      dailyCounts[date] = appointmentsByDate[date].length;
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        appointments: appointmentsByDate,
+        dailyCounts,
+        month: parseInt(month),
+        year: parseInt(year),
+        totalAppointments: appointments.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get monthly appointments error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch monthly appointments'
+    });
+  }
+});
+
+// Get daily appointments for day view
+router.get('/daily/:date', async (req, res) => {
+  try {
+    const { date } = req.params;
+    const appointmentDate = new Date(date);
+
+    const appointments = await Appointment.getDailyAppointments(req.clinicId, appointmentDate);
+
+    // Group appointments by time slot
+    const timeSlots = {};
+    appointments.forEach(apt => {
+      if (!timeSlots[apt.time]) {
+        timeSlots[apt.time] = [];
+      }
+      timeSlots[apt.time].push(apt);
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        date: date,
+        appointments,
+        timeSlots,
+        totalAppointments: appointments.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get daily appointments error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch daily appointments'
+    });
+  }
+});
+
+// Check for scheduling conflicts
+router.post('/check-conflicts', async (req, res) => {
+  try {
+    const { date, time, duration, excludeId } = req.body;
+
+    const conflicts = await Appointment.checkConflicts(
+      req.clinicId,
+      date,
+      time,
+      duration,
+      excludeId
+    );
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        hasConflicts: conflicts.length > 0,
+        conflicts,
+        conflictCount: conflicts.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Check conflicts error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to check scheduling conflicts'
+    });
+  }
+});
+
+// Reschedule appointment
+router.post('/:id/reschedule', async (req, res) => {
+  try {
+    const { newDate, newTime, reason } = req.body;
+
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      clinicId: req.clinicId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Appointment not found'
+      });
+    }
+
+    // Check for conflicts at new time
+    const conflicts = await Appointment.checkConflicts(
+      req.clinicId,
+      newDate,
+      newTime,
+      appointment.appointmentLength || 30,
+      appointment._id
+    );
+
+    if (conflicts.length > 0) {
+      return res.status(409).json({
+        status: 'error',
+        message: 'Time slot conflicts with existing appointment',
+        conflicts
+      });
+    }
+
+    await appointment.reschedule(newDate, newTime, reason, req.user._id);
+    await appointment.populate('patientId', 'firstName lastName recordNumber phone email');
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Appointment rescheduled successfully',
+      data: { appointment }
+    });
+
+  } catch (error) {
+    console.error('Reschedule appointment error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to reschedule appointment'
+    });
+  }
+});
+
 module.exports = router;

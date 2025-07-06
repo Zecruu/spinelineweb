@@ -36,12 +36,14 @@ const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
 const patientRoutes = require('./routes/patients');
 const appointmentRoutes = require('./routes/appointments');
+const appointmentHistoryRoutes = require('./routes/appointmentHistory');
 const ledgerRoutes = require('./routes/ledger');
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/appointment-history', appointmentHistoryRoutes);
 app.use('/api/ledger', ledgerRoutes);
 
 // Health check route

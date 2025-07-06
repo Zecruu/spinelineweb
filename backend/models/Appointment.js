@@ -36,15 +36,54 @@ const appointmentSchema = new mongoose.Schema({
   // Visit Information
   type: {
     type: String,
-    enum: ['new', 'regular', 're-eval', 'walk-in', 'follow-up', 'consultation'],
+    enum: ['new', 'regular', 're-eval', 'walk-in', 'follow-up', 'consultation', 'decompression'],
     required: [true, 'Visit type is required'],
     default: 'regular'
   },
   visitType: {
     type: String,
-    enum: ['New', 'Regular', 'Re-Eval', 'Walk-In', 'Follow-Up', 'Consultation'],
+    enum: ['New', 'Regular', 'Re-Eval', 'Walk-In', 'Follow-Up', 'Consultation', 'Decompression'],
     required: [true, 'Visit type display name is required'],
     default: 'Regular'
+  },
+
+  // Scheduling Specific Fields
+  color: {
+    type: String,
+    enum: ['blue', 'green', 'white', 'yellow', 'red', 'purple', 'orange'],
+    default: 'blue'
+  },
+  appointmentLength: {
+    type: Number,
+    default: 30, // minutes
+    min: 15,
+    max: 240
+  },
+  isRecurring: {
+    type: Boolean,
+    default: false
+  },
+  recurringPattern: {
+    frequency: {
+      type: String,
+      enum: ['daily', 'weekly', 'bi-weekly', 'monthly'],
+      default: 'weekly'
+    },
+    interval: {
+      type: Number,
+      default: 1,
+      min: 1
+    },
+    endDate: Date,
+    daysOfWeek: [{
+      type: Number,
+      min: 0,
+      max: 6 // 0 = Sunday, 6 = Saturday
+    }],
+    maxOccurrences: {
+      type: Number,
+      min: 1
+    }
   },
 
   // Status Management
@@ -368,12 +407,121 @@ appointmentSchema.statics.getAppointmentsByStatus = function(clinicId, status, d
   const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
-  
+
   return this.find({
     clinicId,
     status,
     date: { $gte: startOfDay, $lt: endOfDay }
   }).populate('patientId', 'firstName lastName recordNumber phone email');
+};
+
+// Static method to get monthly appointments for calendar
+appointmentSchema.statics.getMonthlyAppointments = function(clinicId, year, month) {
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59);
+
+  return this.find({
+    clinicId,
+    date: { $gte: startOfMonth, $lte: endOfMonth },
+    status: { $ne: 'cancelled' }
+  }).populate('patientId', 'firstName lastName recordNumber');
+};
+
+// Static method to get daily appointments for day view
+appointmentSchema.statics.getDailyAppointments = function(clinicId, date) {
+  const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  return this.find({
+    clinicId,
+    date: { $gte: startOfDay, $lt: endOfDay },
+    status: { $ne: 'cancelled' }
+  })
+  .populate('patientId', 'firstName lastName recordNumber phone email')
+  .sort({ time: 1 });
+};
+
+// Static method to check for scheduling conflicts
+appointmentSchema.statics.checkConflicts = function(clinicId, date, time, duration = 30, excludeId = null) {
+  const appointmentDate = new Date(date);
+  const [hours, minutes] = time.split(':').map(Number);
+
+  const startTime = new Date(appointmentDate);
+  startTime.setHours(hours, minutes, 0, 0);
+
+  const endTime = new Date(startTime);
+  endTime.setMinutes(endTime.getMinutes() + duration);
+
+  const query = {
+    clinicId,
+    date: appointmentDate,
+    status: { $nin: ['cancelled', 'no-show'] }
+  };
+
+  if (excludeId) {
+    query._id = { $ne: excludeId };
+  }
+
+  return this.find(query).then(appointments => {
+    return appointments.filter(apt => {
+      const [aptHours, aptMinutes] = apt.time.split(':').map(Number);
+      const aptStart = new Date(apt.date);
+      aptStart.setHours(aptHours, aptMinutes, 0, 0);
+
+      const aptEnd = new Date(aptStart);
+      aptEnd.setMinutes(aptEnd.getMinutes() + (apt.appointmentLength || 30));
+
+      // Check for overlap
+      return (startTime < aptEnd && endTime > aptStart);
+    });
+  });
+};
+
+// Method to reschedule appointment
+appointmentSchema.methods.reschedule = function(newDate, newTime, reason, changedBy) {
+  const AppointmentHistory = require('./AppointmentHistory');
+
+  const previousValues = {
+    date: this.date,
+    time: this.time,
+    clinicId: this.clinicId,
+    patientId: this.patientId
+  };
+
+  const newValues = {
+    date: newDate,
+    time: newTime,
+    clinicId: this.clinicId,
+    patientId: this.patientId
+  };
+
+  // Log the change
+  AppointmentHistory.logChange(
+    this._id,
+    'reschedule',
+    previousValues,
+    newValues,
+    changedBy,
+    reason,
+    {
+      rescheduleDetails: {
+        originalDate: this.date,
+        originalTime: this.time,
+        newDate: newDate,
+        newTime: newTime,
+        rescheduleReason: 'patient-request',
+        initiatedBy: 'staff'
+      }
+    }
+  );
+
+  // Update appointment
+  this.date = newDate;
+  this.time = newTime;
+  this.lastModifiedBy = changedBy;
+
+  return this.save();
 };
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

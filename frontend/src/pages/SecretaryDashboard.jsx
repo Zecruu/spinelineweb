@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TodaysPatients from './TodaysPatients';
+import SchedulingSystem from './SchedulingSystem';
 import './SecretaryDashboard.css';
 
 const SecretaryDashboard = ({ token, user, onLogout }) => {
@@ -241,10 +242,10 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
             👥 Patient Management
           </button>
           <button
-            className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
-            onClick={() => setActiveTab('appointments')}
+            className={`nav-item ${activeTab === 'schedule' ? 'active' : ''}`}
+            onClick={() => setActiveTab('schedule')}
           >
-            📅 Appointments
+            📅 Schedule
           </button>
           <button
             className={`nav-item ${activeTab === 'billing' ? 'active' : ''}`}
@@ -286,11 +287,8 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
             <TodaysPatients token={token} user={user} />
           )}
           {activeTab === 'patients' && renderPatientManagement()}
-          {activeTab === 'appointments' && (
-            <div className="coming-soon">
-              <h2>📅 Appointments</h2>
-              <p>Appointment management coming soon...</p>
-            </div>
+          {activeTab === 'schedule' && (
+            <SchedulingSystem token={token} user={user} />
           )}
           {activeTab === 'billing' && (
             <div className="coming-soon">
