@@ -1,144 +1,42 @@
-.app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-}
-
-.app-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.app-header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 3rem;
-  font-weight: 700;
-}
-
-.app-header p {
+/* Global App Styles */
+.App {
+  width: 100%;
+  height: 100vh;
   margin: 0;
+  padding: 0;
+  background: #0f172a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  color: #f1f5f9;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(59, 130, 246, 0.3);
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-screen p {
   font-size: 1.2rem;
-  opacity: 0.9;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
-.header-actions {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-}
-
-.admin-button {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-}
-
-.admin-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-1px);
-}
-
-.app-main {
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.status-card, .info-card, .next-steps, .admin-info-card {
-  background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.status-card h2, .info-card h2, .next-steps h2, .admin-info-card h2 {
-  margin: 0 0 1rem 0;
-  color: #2d3748;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.admin-info-card {
-  border-left: 4px solid #667eea;
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-}
-
-.admin-info-card h2 {
-  color: #667eea;
-}
-
-.admin-info-card p {
-  margin: 1rem 0 0 0;
-  padding: 0.75rem;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 6px;
-  color: #4c51bf;
-  font-weight: 600;
-}
-
-.status-item {
-  margin: 0.75rem 0;
-  padding: 0.5rem;
-  background: #f7fafc;
-  border-radius: 4px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 0.9rem;
-}
-
-.info-card ul {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.info-card li {
-  margin: 0.5rem 0;
-  color: #4a5568;
-}
-
-.next-steps ol {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.next-steps li {
-  margin: 0.5rem 0;
-  color: #4a5568;
-}
-
-@media (max-width: 768px) {
-  .app {
-    padding: 1rem;
-  }
-
-  .app-header h1 {
-    font-size: 2rem;
-  }
-
-  .app-main {
-    grid-template-columns: 1fr;
-  }
-
-  .header-actions {
-    position: static;
-    margin-top: 1rem;
-  }
-
-  .admin-button {
-    width: 100%;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

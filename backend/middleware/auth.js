@@ -23,16 +23,26 @@ const authenticateToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Find user and attach to request
-    const user = await User.findById(decoded.userId).populate('clinicId');
-    if (!user || !user.isActive) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid or inactive user'
-      });
+    // For regular users, find user and attach to request
+    if (decoded.userId !== 'admin') {
+      const user = await User.findById(decoded.userId);
+      if (!user || !user.isActive) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Invalid or inactive user'
+        });
+      }
+      req.user = user;
+    } else {
+      // For admin users, use decoded data
+      req.user = {
+        _id: 'admin',
+        role: 'admin',
+        isAdmin: true,
+        email: decoded.email
+      };
     }
 
-    req.user = user;
     req.token = token;
     next();
   } catch (error) {
@@ -180,10 +190,77 @@ const authenticateAdmin = async (req, res, next) => {
   }
 };
 
+// Role-based middleware factory
+const requireRole = (roles) => {
+  return async (req, res, next) => {
+    try {
+      // First authenticate the token
+      await authenticateToken(req, res, () => {});
+
+      if (!req.user) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Authentication required'
+        });
+      }
+
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({
+          status: 'error',
+          message: 'Insufficient permissions'
+        });
+      }
+
+      next();
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Authorization error'
+      });
+    }
+  };
+};
+
+// Clinic-scoped middleware (ensures user can only access their clinic's data)
+const clinicScopedMiddleware = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Authentication required'
+      });
+    }
+
+    // Skip clinic scoping for admin users
+    if (req.user.role === 'admin' || req.user.isAdmin) {
+      return next();
+    }
+
+    // Attach clinic info to request for easy access
+    req.clinicId = req.user.clinicId;
+
+    if (!req.clinicId) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'User not associated with a clinic'
+      });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+};
+
 module.exports = {
   generateToken,
   authenticateToken,
   requireAdmin,
   adminLogin,
-  authenticateAdmin
+  authenticateAdmin,
+  requireRole,
+  clinicScopedMiddleware
 };

@@ -33,7 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
+const patientRoutes = require('./routes/patients');
+
 app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/patients', patientRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
