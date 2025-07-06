@@ -3,15 +3,17 @@ import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import UserLogin from './pages/UserLogin'
 import SecretaryDashboard from './pages/SecretaryDashboard'
+import PatientCheckout from './pages/PatientCheckout'
 import './App.css'
 
 function App() {
-  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'admin-dashboard'
+  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'admin-dashboard', 'patient-checkout'
   const [userToken, setUserToken] = useState(null)
   const [userData, setUserData] = useState(null)
   const [adminToken, setAdminToken] = useState(null)
   const [adminUser, setAdminUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [checkoutAppointmentId, setCheckoutAppointmentId] = useState(null)
 
   // Check for existing sessions on app load
   useEffect(() => {
@@ -50,9 +52,14 @@ function App() {
           localStorage.removeItem('adminUser')
         }
       } else {
-        // Check URL for admin route
-        if (window.location.pathname === '/admin') {
+        // Check URL for different routes
+        const path = window.location.pathname;
+        if (path === '/admin') {
           setCurrentView('admin-login')
+        } else if (path.startsWith('/secretary/checkout/')) {
+          const appointmentId = path.split('/').pop();
+          setCheckoutAppointmentId(appointmentId);
+          setCurrentView('patient-checkout');
         } else {
           setCurrentView('user-login')
         }
@@ -132,6 +139,14 @@ function App() {
           token={adminToken}
           user={adminUser}
           onLogout={handleAdminLogout}
+        />
+      )}
+
+      {currentView === 'patient-checkout' && (
+        <PatientCheckout
+          token={userToken}
+          user={userData}
+          appointmentId={checkoutAppointmentId}
         />
       )}
     </div>

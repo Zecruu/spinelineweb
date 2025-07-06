@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import TodaysPatients from './TodaysPatients';
 import './SecretaryDashboard.css';
 
 const SecretaryDashboard = ({ token, user, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('patients');
+  const [activeTab, setActiveTab] = useState('todays-patients');
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -227,25 +228,31 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
         </div>
 
         <nav className="sidebar-nav">
-          <button 
+          <button
+            className={`nav-item ${activeTab === 'todays-patients' ? 'active' : ''}`}
+            onClick={() => setActiveTab('todays-patients')}
+          >
+            📋 Today's Patients
+          </button>
+          <button
             className={`nav-item ${activeTab === 'patients' ? 'active' : ''}`}
             onClick={() => setActiveTab('patients')}
           >
             👥 Patient Management
           </button>
-          <button 
+          <button
             className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
             onClick={() => setActiveTab('appointments')}
           >
             📅 Appointments
           </button>
-          <button 
+          <button
             className={`nav-item ${activeTab === 'billing' ? 'active' : ''}`}
             onClick={() => setActiveTab('billing')}
           >
             💰 Billing
           </button>
-          <button 
+          <button
             className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
             onClick={() => setActiveTab('reports')}
           >
@@ -275,6 +282,9 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
         </header>
 
         <div className="content-area">
+          {activeTab === 'todays-patients' && (
+            <TodaysPatients token={token} user={user} />
+          )}
           {activeTab === 'patients' && renderPatientManagement()}
           {activeTab === 'appointments' && (
             <div className="coming-soon">
