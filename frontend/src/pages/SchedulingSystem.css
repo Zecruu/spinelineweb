@@ -194,6 +194,57 @@
   border-color: #10b981;
 }
 
+.calendar-day.past-date {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.calendar-day.past-date:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: transparent;
+}
+
+/* Color-coded calendar backgrounds */
+.calendar-day.bg-blue {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.calendar-day.bg-green {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.calendar-day.bg-orange {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.calendar-day.bg-purple {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.calendar-day.bg-yellow {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.calendar-day.bg-red {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.dominant-type {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
 .day-number {
   color: #f1f5f9;
   font-weight: 600;
@@ -422,6 +473,162 @@
   min-height: 80px;
 }
 
+.time-dropdown {
+  background: rgba(51, 65, 85, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #f1f5f9;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.time-dropdown:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Patient Search Styles */
+.patient-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.patient-search-input {
+  width: 100%;
+  background: rgba(51, 65, 85, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #f1f5f9;
+  font-size: 1rem;
+}
+
+.patient-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.search-result-item {
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item .patient-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.search-result-item .patient-details {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.selected-patient-info {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.selected-patient-info h4 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.patient-card {
+  background: rgba(51, 65, 85, 0.5);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.patient-card .patient-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.patient-card .patient-details {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.btn-add-patient {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-add-patient:hover {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+.color-preview {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.color-dot.blue { background: #3b82f6; }
+.color-dot.green { background: #10b981; }
+.color-dot.orange { background: #f97316; }
+.color-dot.purple { background: #8b5cf6; }
+.color-dot.yellow { background: #f59e0b; }
+.color-dot.red { background: #ef4444; }
+.color-dot.white { background: #94a3b8; }
+
 /* Appointment Summary */
 .appointment-summary {
   background: rgba(15, 23, 42, 0.8);
@@ -465,6 +672,42 @@
 .summary-type {
   color: #94a3b8;
   font-weight: 500;
+}
+
+.summary-color {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-patient {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.confirmation-patient h4 {
+  color: #f1f5f9;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.confirmation-patient p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.summary-notes {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+  font-size: 0.9rem;
 }
 
 /* Day View Styles */
@@ -787,4 +1030,185 @@
 
 .btn-cancel-apt:hover {
   background: rgba(239, 68, 68, 0.3);
+}
+
+/* Day Modal Styles */
+.day-modal {
+  max-width: 700px;
+  max-height: 90vh;
+}
+
+.day-appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.no-appointments {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.appointment-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  align-items: center;
+}
+
+.appointment-time {
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.appointment-details {
+  flex: 1;
+}
+
+.appointment-details .patient-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.appointment-details .visit-type {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.appointment-details .appointment-notes {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit-small,
+.btn-reschedule-small,
+.btn-cancel-small {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit-small {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.btn-edit-small:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+.btn-reschedule-small {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.btn-reschedule-small:hover {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.btn-cancel-small {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.btn-cancel-small:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.status-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.btn-checkin {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn-checkin:hover {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+/* Reschedule Modal Styles */
+.reschedule-info {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.reschedule-info h4 {
+  color: #f1f5f9;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.reschedule-info p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.reschedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reschedule-input {
+  background: rgba(51, 65, 85, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #f1f5f9;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.reschedule-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }

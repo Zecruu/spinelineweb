@@ -2,7 +2,10 @@
 .todays-patients {
   padding: 2rem;
   background: #0f172a;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -68,7 +71,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 1.5rem;
-  height: calc(100vh - 200px);
+  flex: 1;
+  min-height: 0;
 }
 
 .patient-table-container {
@@ -78,6 +82,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
+  min-height: 300px;
 }
 
 .table-header {
@@ -375,26 +381,49 @@
 }
 
 /* Responsive Design */
+@media (min-width: 1920px) {
+  .patient-table-container {
+    min-height: 400px;
+  }
+}
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+  .patient-table-container {
+    min-height: 350px;
+  }
+}
+
+@media (min-width: 1401px) and (max-width: 1599px) {
+  .patient-table-container {
+    min-height: 300px;
+  }
+}
 @media (max-width: 1400px) {
   .tables-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
+  }
+
+  .patient-table-container {
+    min-height: 280px;
   }
 }
 
 @media (max-width: 768px) {
   .todays-patients {
     padding: 1rem;
+    height: 100vh;
+    overflow: hidden;
   }
-  
+
   .tables-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
-    height: auto;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
   }
-  
+
   .patient-table-container {
-    min-height: 300px;
+    min-height: 200px;
   }
   
   .page-header {

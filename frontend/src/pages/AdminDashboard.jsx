@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Settings from './Settings';
 import './AdminDashboard.css';
 
 const AdminDashboard = ({ token, user, onLogout }) => {
@@ -588,6 +589,12 @@ const AdminDashboard = ({ token, user, onLogout }) => {
         >
           👥 Manage Users
         </button>
+        <button
+          className={`nav-button ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          ⚙️ Settings
+        </button>
       </nav>
 
       <main className="admin-main">
@@ -619,6 +626,9 @@ const AdminDashboard = ({ token, user, onLogout }) => {
         {activeTab === 'create-user' && renderCreateUser()}
         {activeTab === 'manage-clinics' && renderManageClinics()}
         {activeTab === 'manage-users' && renderManageUsers()}
+        {activeTab === 'settings' && (
+          <Settings token={token} user={user} />
+        )}
       </main>
     </div>
   );

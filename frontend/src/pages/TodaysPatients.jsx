@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import './TodaysPatients.css';
 
 const TodaysPatients = ({ token, user }) => {
+  // Color mapping for appointment colors
+  const colorMap = {
+    blue: '#3b82f6',
+    green: '#10b981',
+    yellow: '#f59e0b',
+    red: '#ef4444',
+    purple: '#8b5cf6',
+    orange: '#f97316',
+    white: '#f8fafc'
+  };
   const [appointments, setAppointments] = useState({
     scheduled: [],
     checkedIn: [],
@@ -140,33 +150,40 @@ const TodaysPatients = ({ token, user }) => {
                 <td colSpan="4" className="no-data">No scheduled patients</td>
               </tr>
             ) : (
-              appointments.scheduled.map(appointment => (
-                <tr 
-                  key={appointment._id} 
-                  className="patient-row"
-                  onClick={() => handlePatientSelect(appointment)}
-                >
-                  <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                  <td className="time">{formatTime(appointment.time)}</td>
-                  <td className="visit-type">
-                    <span className={`visit-badge ${appointment.visitType?.toLowerCase()}`}>
-                      {appointment.visitType || 'Regular'}
-                    </span>
-                  </td>
-                  <td className="actions">
-                    <button 
-                      className="btn-action btn-checkin"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCheckIn(appointment._id);
-                      }}
-                    >
-                      Check In
-                    </button>
-                    <button className="btn-action btn-edit">Edit</button>
-                  </td>
-                </tr>
-              ))
+              appointments.scheduled.map(appointment => {
+                const hexColor = colorMap[appointment.color] || colorMap.blue;
+                return (
+                  <tr
+                    key={appointment._id}
+                    className="patient-row"
+                    onClick={() => handlePatientSelect(appointment)}
+                    style={{
+                      borderLeft: `4px solid ${hexColor}`,
+                      backgroundColor: `${hexColor}08`
+                    }}
+                  >
+                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
+                    <td className="time">{formatTime(appointment.time)}</td>
+                    <td className="visit-type">
+                      <span className={`visit-badge ${appointment.visitType?.toLowerCase()}`}>
+                        {appointment.visitType || 'Regular'}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button
+                        className="btn-action btn-checkin"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCheckIn(appointment._id);
+                        }}
+                      >
+                        Check In
+                      </button>
+                      <button className="btn-action btn-edit">Edit</button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -199,30 +216,37 @@ const TodaysPatients = ({ token, user }) => {
                 <td colSpan="3" className="no-data">No checked-in patients</td>
               </tr>
             ) : (
-              appointments.checkedIn.map(appointment => (
-                <tr 
-                  key={appointment._id} 
-                  className="patient-row"
-                  onClick={() => handlePatientSelect(appointment)}
-                >
-                  <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                  <td className="time">{formatDateTime(appointment.checkInTime)}</td>
-                  <td className="actions">
-                    <button
-                      className="btn-action btn-checkout"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Navigate to checkout page
-                        window.history.pushState({}, '', `/secretary/checkout/${appointment._id}`);
-                        window.location.reload();
-                      }}
-                    >
-                      Checkout
-                    </button>
-                    <button className="btn-action btn-view">View</button>
-                  </td>
-                </tr>
-              ))
+              appointments.checkedIn.map(appointment => {
+                const hexColor = colorMap[appointment.color] || colorMap.blue;
+                return (
+                  <tr
+                    key={appointment._id}
+                    className="patient-row"
+                    onClick={() => handlePatientSelect(appointment)}
+                    style={{
+                      borderLeft: `4px solid ${hexColor}`,
+                      backgroundColor: `${hexColor}08`
+                    }}
+                  >
+                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
+                    <td className="time">{formatDateTime(appointment.checkInTime)}</td>
+                    <td className="actions">
+                      <button
+                        className="btn-action btn-checkout"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Navigate to checkout page
+                          window.history.pushState({}, '', `/secretary/checkout/${appointment._id}`);
+                          window.location.reload();
+                        }}
+                      >
+                        Checkout
+                      </button>
+                      <button className="btn-action btn-view">View</button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -253,24 +277,31 @@ const TodaysPatients = ({ token, user }) => {
                 <td colSpan="4" className="no-data">No checked-out patients</td>
               </tr>
             ) : (
-              appointments.checkedOut.map(appointment => (
-                <tr 
-                  key={appointment._id} 
-                  className="patient-row"
-                  onClick={() => handlePatientSelect(appointment)}
-                >
-                  <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                  <td className="time">{formatDateTime(appointment.checkOutTime)}</td>
-                  <td className="payment">
-                    <span className={`payment-badge ${appointment.paymentMethod}`}>
-                      {appointment.paymentMethod || 'N/A'}
-                    </span>
-                  </td>
-                  <td className="balance">
-                    ${((appointment.totalAmount || 0) - (appointment.amountPaid || 0)).toFixed(2)}
-                  </td>
-                </tr>
-              ))
+              appointments.checkedOut.map(appointment => {
+                const hexColor = colorMap[appointment.color] || colorMap.blue;
+                return (
+                  <tr
+                    key={appointment._id}
+                    className="patient-row"
+                    onClick={() => handlePatientSelect(appointment)}
+                    style={{
+                      borderLeft: `4px solid ${hexColor}`,
+                      backgroundColor: `${hexColor}08`
+                    }}
+                  >
+                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
+                    <td className="time">{formatDateTime(appointment.checkOutTime)}</td>
+                    <td className="payment">
+                      <span className={`payment-badge ${appointment.paymentMethod}`}>
+                        {appointment.paymentMethod || 'N/A'}
+                      </span>
+                    </td>
+                    <td className="balance">
+                      ${((appointment.totalAmount || 0) - (appointment.amountPaid || 0)).toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

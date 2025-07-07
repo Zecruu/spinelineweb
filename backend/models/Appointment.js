@@ -36,13 +36,13 @@ const appointmentSchema = new mongoose.Schema({
   // Visit Information
   type: {
     type: String,
-    enum: ['new', 'regular', 're-eval', 'walk-in', 'follow-up', 'consultation', 'decompression'],
+    enum: ['new', 'regular', 're-eval', 'walk-in', 'follow-up', 'consultation', 'decompression', 'chiropractic', 'evaluation'],
     required: [true, 'Visit type is required'],
     default: 'regular'
   },
   visitType: {
     type: String,
-    enum: ['New', 'Regular', 'Re-Eval', 'Walk-In', 'Follow-Up', 'Consultation', 'Decompression'],
+    enum: ['New', 'Regular', 'Re-Eval', 'Walk-In', 'Follow-Up', 'Consultation', 'Decompression', 'Chiropractic', 'Evaluation'],
     required: [true, 'Visit type display name is required'],
     default: 'Regular'
   },

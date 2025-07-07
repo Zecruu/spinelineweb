@@ -8,10 +8,79 @@ const router = express.Router();
 router.use(authenticateToken);
 router.use(clinicScopedMiddleware);
 
+
 // Get all patients for the user's clinic
 router.get('/', async (req, res) => {
   try {
-    const { page = 1, limit = 20, search, status = 'active' } = req.query;
+    const { page = 1, limit = 20, search, status = 'active', searchField } = req.query;
+
+    // If this is a search request with searchField, handle it as a search
+    if (search && searchField) {
+      console.log('=== PATIENT SEARCH REQUEST ===');
+      console.log('Search request received:', req.query);
+      console.log('User clinic ID:', req.clinicId);
+
+      if (search.trim().length < 2) {
+        console.log('Search term too short or empty');
+        return res.json({
+          status: 'success',
+          data: { patients: [] }
+        });
+      }
+
+      // Build search query based on field filter
+      let searchQuery = { clinicId: req.clinicId };
+      const searchTerm = search.trim();
+
+      if (searchField === 'all') {
+        const searchRegex = new RegExp(searchTerm, 'i');
+        searchQuery.$or = [
+          { firstName: searchRegex },
+          { lastName: searchRegex },
+          { email: searchRegex },
+          { phone: searchRegex },
+          { recordNumber: searchRegex }
+        ];
+      } else {
+        // Search specific field
+        const searchRegex = new RegExp(searchTerm, 'i');
+        switch (searchField) {
+          case 'recordNumber':
+            searchQuery.recordNumber = searchRegex;
+            break;
+          case 'firstName':
+            searchQuery.firstName = searchRegex;
+            break;
+          case 'lastName':
+            searchQuery.lastName = searchRegex;
+            break;
+          default:
+            searchQuery.$or = [
+              { firstName: searchRegex },
+              { lastName: searchRegex }
+            ];
+        }
+      }
+
+      // Only return active patients for search
+      searchQuery.status = { $ne: 'deleted' };
+
+      console.log('Final search query:', JSON.stringify(searchQuery, null, 2));
+
+      const patients = await Patient.find(searchQuery)
+        .select('firstName lastName dob recordNumber email phone')
+        .sort({ firstName: 1, lastName: 1 })
+        .limit(parseInt(limit))
+        .lean();
+
+      console.log('Found patients:', patients.length);
+      console.log('Patients:', patients);
+
+      return res.json({
+        status: 'success',
+        data: { patients }
+      });
+    }
     const skip = (page - 1) * limit;
 
     // Build query

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import TodaysPatients from './TodaysPatients';
 import SchedulingSystem from './SchedulingSystem';
+import AppointmentScheduler from './AppointmentScheduler';
+import PatientSearch from '../components/PatientSearch';
+import Settings from './Settings';
 import './SecretaryDashboard.css';
 
 const SecretaryDashboard = ({ token, user, onLogout }) => {
@@ -12,6 +15,7 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPatients, setTotalPatients] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch patients
   const fetchPatients = async (page = 1, search = '') => {
@@ -104,20 +108,19 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
       </div>
 
       <div className="search-section">
-        <form onSubmit={handleSearch} className="search-form">
-          <div className="search-input-group">
-            <input
-              type="text"
-              placeholder="Search patients by name, record number, email, or phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <button type="submit" className="search-button">
-              🔍 Search
-            </button>
-          </div>
-        </form>
+        <PatientSearch
+          token={token}
+          onPatientSelect={(patient) => {
+            // When a patient is selected from search, show them in the table
+            setPatients([patient]);
+            setCurrentPage(1);
+            setTotalPages(1);
+            setTotalPatients(1);
+          }}
+          placeholder="Search patients by name, record number, email, or phone..."
+          showCreateNew={true}
+          onCreateNew={() => alert('Create new patient functionality would be implemented here')}
+        />
       </div>
 
       {loading && <div className="loading">Loading patients...</div>}
@@ -218,7 +221,32 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
 
   return (
     <div className="secretary-dashboard">
-      <aside className="sidebar">
+      {/* Top Header with Hamburger */}
+      <div className="top-header">
+        <button
+          className="hamburger-btn"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div className="header-title">
+          <h1>🏥 SpineLine</h1>
+          <span className="clinic-name">{user.clinic?.name}</span>
+        </div>
+        <div className="header-user">
+          <div className="user-avatar">
+            {user.name?.charAt(0) || user.username?.charAt(0) || 'U'}
+          </div>
+          <span className="user-name">{user.name || user.username}</span>
+        </div>
+      </div>
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
+
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <h1>🏥 SpineLine</h1>
           <div className="user-info">
@@ -259,6 +287,12 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
           >
             📊 Reports
           </button>
+          <button
+            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            ⚙️ Settings
+          </button>
         </nav>
 
         <div className="sidebar-footer">
@@ -269,18 +303,6 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
       </aside>
 
       <main className="main-content">
-        <header className="main-header">
-          <div className="header-info">
-            <h1>Welcome back, {user.name}!</h1>
-            <p>Manage your clinic's patients and appointments</p>
-          </div>
-          <div className="header-stats">
-            <div className="stat-card">
-              <div className="stat-number">{totalPatients}</div>
-              <div className="stat-label">Total Patients</div>
-            </div>
-          </div>
-        </header>
 
         <div className="content-area">
           {activeTab === 'todays-patients' && (
@@ -288,7 +310,7 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
           )}
           {activeTab === 'patients' && renderPatientManagement()}
           {activeTab === 'schedule' && (
-            <SchedulingSystem token={token} user={user} />
+            <AppointmentScheduler token={token} user={user} />
           )}
           {activeTab === 'billing' && (
             <div className="coming-soon">
@@ -301,6 +323,9 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
               <h2>📊 Reports</h2>
               <p>Reports and analytics coming soon...</p>
             </div>
+          )}
+          {activeTab === 'settings' && (
+            <Settings token={token} user={user} />
           )}
         </div>
       </main>
