@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>SpineLine API Test</h1>
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testDB()">Test Database</button>
+    <button onclick="testAdminLogin()">Test Admin Login</button>
+    <div id="results"></div>
+
+    <script>
+        const API_BASE_URL = 'https://spinelineweb-production.up.railway.app';
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('results').innerHTML = '<pre>Error: ' + error.message + '</pre>';
+            }
+        }
+        
+        async function testDB() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/test-db`);
+                const data = await response.json();
+                document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('results').innerHTML = '<pre>Error: ' + error.message + '</pre>';
+            }
+        }
+        
+        async function testAdminLogin() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@spineline.com',
+                        password: 'SpineLine2024!'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('results').innerHTML = '<pre>Error: ' + error.message + '</pre>';
+            }
+        }
+    </script>
+</body>
+</html>

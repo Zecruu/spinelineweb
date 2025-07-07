@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import Settings from './Settings';
 import './AdminDashboard.css';
 
@@ -35,7 +36,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch('http://localhost:5001/api/admin/dashboard', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -64,7 +65,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
   // Fetch clinics
   const fetchClinics = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/admin/clinics', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/clinics`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -97,7 +98,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
     setSuccessMessage('');
 
     try {
-      const response = await fetch('http://localhost:5001/api/admin/clinics', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/clinics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
         }
       };
 
-      const response = await fetch('http://localhost:5001/api/admin/users', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -506,7 +507,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch(`http://localhost:5001/api/admin/clinics/${clinicCode}/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/clinics/${clinicCode}/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

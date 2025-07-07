@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './TimeSlotSelection.css';
 import PatientSearch from '../components/PatientSearch';
 
@@ -118,7 +119,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
       
       for (const dateStr of selectedDates) {
         const response = await fetch(
-          `http://localhost:5001/api/appointments/daily/${dateStr}`,
+          `${API_BASE_URL}/api/appointments/daily/${dateStr}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

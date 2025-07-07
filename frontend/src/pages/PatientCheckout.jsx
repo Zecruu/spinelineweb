@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './PatientCheckout.css';
 
 const PatientCheckout = ({ token, user, appointmentId }) => {
@@ -32,7 +33,7 @@ const PatientCheckout = ({ token, user, appointmentId }) => {
     const fetchAppointment = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5001/api/appointments/${appointmentId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -125,7 +126,7 @@ const PatientCheckout = ({ token, user, appointmentId }) => {
         alerts
       };
 
-      const response = await fetch('http://localhost:5001/api/ledger', {
+      const response = await fetch(`${API_BASE_URL}/api/ledger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

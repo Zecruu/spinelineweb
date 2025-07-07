@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './SchedulingSystem.css';
 
 // Visit type color mapping
@@ -64,7 +65,7 @@ const SchedulingSystem = ({ token, user }) => {
       }
 
       const response = await fetch(
-        `http://localhost:5001/api/appointments/calendar/${year}/${month}?${params}`,
+        `${API_BASE_URL}/api/appointments/calendar/${year}/${month}?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -92,7 +93,7 @@ const SchedulingSystem = ({ token, user }) => {
     try {
       const dateStr = date.toISOString().split('T')[0];
       const response = await fetch(
-        `http://localhost:5001/api/appointments/daily/${dateStr}`,
+        `${API_BASE_URL}/api/appointments/daily/${dateStr}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -115,7 +116,7 @@ const SchedulingSystem = ({ token, user }) => {
   // Fetch patients for booking
   const fetchPatients = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/patients?limit=500', {
+      const response = await fetch(`${API_BASE_URL}/api/patients?limit=500`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -349,7 +350,7 @@ const SchedulingSystem = ({ token, user }) => {
 
       // Create all appointments
       for (const appointment of appointments) {
-        const response = await fetch('http://localhost:5001/api/appointments', {
+        const response = await fetch(`${API_BASE_URL}/api/appointments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -409,7 +410,7 @@ const SchedulingSystem = ({ token, user }) => {
   // Cancel appointment
   const cancelAppointment = async (appointmentId, reason) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/cancel`, {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/cancel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

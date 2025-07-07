@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import TodaysPatients from './TodaysPatients';
 import SchedulingSystem from './SchedulingSystem';
 import AppointmentScheduler from './AppointmentScheduler';
 import PatientSearch from '../components/PatientSearch';
+import PatientForm from '../components/PatientForm';
 import Settings from './Settings';
 import './SecretaryDashboard.css';
 
@@ -16,6 +18,8 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalPatients, setTotalPatients] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showPatientForm, setShowPatientForm] = useState(false);
+  const [editingPatientId, setEditingPatientId] = useState(null);
 
   // Fetch patients
   const fetchPatients = async (page = 1, search = '') => {
@@ -33,7 +37,7 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
         queryParams.append('search', search);
       }
 
-      const response = await fetch(`http://localhost:5001/api/patients?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/api/patients?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -87,6 +91,24 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Patient form handlers
+  const handlePatientSave = (savedPatient) => {
+    // Refresh the patient list
+    fetchPatients(currentPage, searchTerm);
+    setShowPatientForm(false);
+    setEditingPatientId(null);
+  };
+
+  const handleEditPatient = (patientId) => {
+    setEditingPatientId(patientId);
+    setShowPatientForm(true);
+  };
+
+  const handleClosePatientForm = () => {
+    setShowPatientForm(false);
+    setEditingPatientId(null);
+  };
+
   // Format phone number
   const formatPhone = (phone) => {
     if (!phone) return 'N/A';
@@ -119,7 +141,10 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
           }}
           placeholder="Search patients by name, record number, email, or phone..."
           showCreateNew={true}
-          onCreateNew={() => alert('Create new patient functionality would be implemented here')}
+          onCreateNew={() => {
+            setEditingPatientId(null);
+            setShowPatientForm(true);
+          }}
         />
       </div>
 
@@ -174,13 +199,29 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
                         </span>
                       </td>
                       <td className="actions">
-                        <button className="btn-action btn-view" title="View Patient">
+                        <button
+                          className="btn-action btn-view"
+                          title="View Patient"
+                          onClick={() => handleEditPatient(patient._id)}
+                        >
                           👁️
                         </button>
-                        <button className="btn-action btn-edit" title="Edit Patient">
+                        <button
+                          className="btn-action btn-edit"
+                          title="Edit Patient"
+                          onClick={() => handleEditPatient(patient._id)}
+                        >
                           ✏️
                         </button>
-                        <button className="btn-action btn-delete" title="Delete Patient">
+                        <button
+                          className="btn-action btn-delete"
+                          title="Delete Patient"
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to delete ${patient.firstName} ${patient.lastName}?`)) {
+                              // TODO: Implement delete functionality
+                            }
+                          }}
+                        >
                           🗑️
                         </button>
                       </td>
@@ -329,6 +370,22 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
           )}
         </div>
       </main>
+
+      {/* Patient Form Modal */}
+      {showPatientForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <PatientForm
+              token={token}
+              user={user}
+              patientId={editingPatientId}
+              onSave={handlePatientSave}
+              onCancel={handleClosePatientForm}
+              onClose={handleClosePatientForm}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

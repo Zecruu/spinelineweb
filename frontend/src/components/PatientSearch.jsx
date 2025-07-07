@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './PatientSearch.css';
 
 const PatientSearch = ({
@@ -48,10 +49,10 @@ const PatientSearch = ({
         params.append('limit', '20'); // Increased limit for better search results
 
         console.log('Searching for:', searchTerm.trim(), 'with filter:', searchFilter);
-        console.log('Request URL:', `http://localhost:5001/api/patients?${params}`);
+        console.log('Request URL:', `${API_BASE_URL}/api/patients?${params}`);
 
         const response = await fetch(
-          `http://localhost:5001/api/patients?${params}`,
+          `${API_BASE_URL}/api/patients?${params}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

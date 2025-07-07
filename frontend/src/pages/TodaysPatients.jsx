@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './TodaysPatients.css';
 
 const TodaysPatients = ({ token, user }) => {
@@ -28,7 +29,7 @@ const TodaysPatients = ({ token, user }) => {
       setLoading(true);
       setError('');
 
-      const response = await fetch('http://localhost:5001/api/appointments/today', {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/today`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,7 +61,7 @@ const TodaysPatients = ({ token, user }) => {
   // Check in patient
   const handleCheckIn = async (appointmentId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/check-in`, {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/check-in`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -81,7 +82,7 @@ const TodaysPatients = ({ token, user }) => {
   // Create walk-in appointment
   const handleAddWalkIn = async (patientId) => {
     try {
-      const response = await fetch('http://localhost:5001/api/appointments/walk-in', {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/walk-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

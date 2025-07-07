@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './AppointmentScheduler.css';
 import TimeSlotSelection from './TimeSlotSelection';
 
@@ -36,7 +37,7 @@ const AppointmentScheduler = ({ token, user }) => {
       }
 
       const response = await fetch(
-        `http://localhost:5001/api/appointments/calendar/${year}/${month}?${params}`,
+        `${API_BASE_URL}/api/appointments/calendar/${year}/${month}?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
