@@ -1,0 +1,12 @@
+{
+  "name": "spineline-monorepo",
+  "version": "1.0.0",
+  "description": "SpineLine Practice Management System",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "install": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
