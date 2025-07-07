@@ -2,13 +2,14 @@
 .patient-form-container {
   background: #0f172a;
   padding: 2rem;
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
+  margin: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   overflow-y: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* Header */
@@ -237,8 +238,10 @@
 /* Responsive */
 @media (max-width: 768px) {
   .patient-form-container {
-    margin: 0.5rem;
-    padding: 1rem;
+    margin: 0 !important;
+    padding: 1rem !important;
+    width: 100vw !important;
+    height: 100vh !important;
   }
   
   .patient-form-header {

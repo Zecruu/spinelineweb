@@ -373,17 +373,24 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
 
       {/* Patient Form Modal */}
       {showPatientForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <PatientForm
-              token={token}
-              user={user}
-              patientId={editingPatientId}
-              onSave={handlePatientSave}
-              onCancel={handleClosePatientForm}
-              onClose={handleClosePatientForm}
-            />
-          </div>
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          margin: 0,
+          padding: 0
+        }}>
+          <PatientForm
+            token={token}
+            user={user}
+            patientId={editingPatientId}
+            onSave={handlePatientSave}
+            onCancel={handleClosePatientForm}
+            onClose={handleClosePatientForm}
+          />
         </div>
       )}
     </div>

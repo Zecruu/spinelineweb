@@ -243,7 +243,14 @@ const PatientForm = ({
   }
 
   return (
-    <div className="patient-form-container">
+    <div className="patient-form-container" style={{
+      width: '100vw',
+      height: '100vh',
+      margin: 0,
+      padding: '2rem',
+      boxSizing: 'border-box',
+      position: 'relative'
+    }}>
       <div className="patient-form-header">
         <h2>
           {patientId ? '✏️ Edit Patient' : '➕ New Patient'}
