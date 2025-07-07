@@ -1,14 +1,14 @@
 /* Patient Form Container */
 .patient-form-container {
-  background: rgba(30, 41, 59, 0.95);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  max-width: 1200px;
-  margin: 0 auto;
+  background: #0f172a;
+  padding: 2rem;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -171,8 +171,9 @@
 
 /* Content Area */
 .patient-form-content {
-  min-height: 500px;
+  flex: 1;
   padding: 1rem 0;
+  overflow-y: auto;
 }
 
 /* Form Groups */
