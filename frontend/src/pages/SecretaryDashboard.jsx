@@ -123,7 +123,13 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
           <span className="patient-count">{totalPatients} patients</span>
         </div>
         <div className="header-right">
-          <button className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setEditingPatientId(null);
+              setShowPatientForm(true);
+            }}
+          >
             <span>+</span> New Patient
           </button>
         </div>
