@@ -111,17 +111,20 @@ app.get('/api/test-db', async (req, res) => {
 
 // Serve static files from the React app build directory
 if (process.env.NODE_ENV === 'production') {
+  // Priority 1: Serve static assets (CSS, JS, images) with correct MIME types
+  app.use('/assets', express.static(path.join(__dirname, '../frontend/dist/assets')));
+  app.use('/vite.svg', express.static(path.join(__dirname, '../frontend/dist/vite.svg')));
+
+  // Priority 2: Serve other static files
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-  // Catch all handler: send back React's index.html file for any non-API routes
-  app.get('*', (req, res) => {
-    // Don't serve index.html for API routes
+  // Priority 3: Catch all handler for React Router (SPA)
+  app.get('*', (req, res, next) => {
+    // Skip if it's an API route
     if (req.path.startsWith('/api/')) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'API route not found'
-      });
+      return next();
     }
+    // Serve React app for all other routes
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
 } else {
