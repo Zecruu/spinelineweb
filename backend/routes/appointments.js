@@ -393,6 +393,52 @@ router.post('/:id/check-in', async (req, res) => {
   }
 });
 
+// Uncheck patient (move from checked-in back to scheduled)
+router.post('/:id/uncheck', async (req, res) => {
+  try {
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      clinicId: req.clinicId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Appointment not found'
+      });
+    }
+
+    if (appointment.status !== 'checked-in') {
+      return res.status(400).json({
+        status: 'error',
+        message: `Cannot uncheck appointment with status: ${appointment.status}`
+      });
+    }
+
+    // Update appointment status back to scheduled
+    appointment.status = 'scheduled';
+    appointment.checkInTime = null;
+    appointment.lastModifiedBy = req.user._id;
+    appointment.lastModified = new Date();
+
+    await appointment.save();
+    await appointment.populate('patientId', 'firstName lastName recordNumber phone email');
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Patient unchecked successfully',
+      data: { appointment }
+    });
+
+  } catch (error) {
+    console.error('Uncheck error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to uncheck patient'
+    });
+  }
+});
+
 // Create walk-in appointment
 router.post('/walk-in', async (req, res) => {
   try {

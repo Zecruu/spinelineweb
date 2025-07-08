@@ -34,6 +34,7 @@ const TodaysPatients = ({ token, user }) => {
   const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [searchType, setSearchType] = useState(''); // 'add-patient' or 'add-walkin'
+  const [selectedPatientForAction, setSelectedPatientForAction] = useState(null);
 
   // Fetch appointments for selected date
   const fetchAppointments = async (date = selectedDate) => {
@@ -145,17 +146,34 @@ const TodaysPatients = ({ token, user }) => {
     setShowPatientSearch(true);
   };
 
-  // Handle patient selection from search modal
+  // Handle patient selection from search modal (just select, don't confirm yet)
   const handlePatientSelectForWalkIn = (patient) => {
+    setSelectedPatientForAction(patient);
+  };
+
+  // Handle confirming the selected patient
+  const handleConfirmPatientSelection = () => {
+    if (!selectedPatientForAction) return;
+
     if (searchType === 'add-walkin') {
-      handleAddWalkIn(patient._id);
+      handleAddWalkIn(selectedPatientForAction._id);
     } else if (searchType === 'add-patient') {
       // Navigate to scheduling system with selected patient
-      const schedulingUrl = `/secretary/scheduling?patientId=${patient._id}&patientName=${encodeURIComponent(patient.firstName + ' ' + patient.lastName)}`;
+      const schedulingUrl = `/secretary/scheduling?patientId=${selectedPatientForAction._id}&patientName=${encodeURIComponent(selectedPatientForAction.firstName + ' ' + selectedPatientForAction.lastName)}`;
       window.location.href = schedulingUrl;
     }
+
+    // Reset state
     setShowPatientSearch(false);
     setSearchType('');
+    setSelectedPatientForAction(null);
+  };
+
+  // Handle canceling patient selection
+  const handleCancelPatientSelection = () => {
+    setShowPatientSearch(false);
+    setSearchType('');
+    setSelectedPatientForAction(null);
   };
 
   // Handle create new patient
@@ -168,6 +186,27 @@ const TodaysPatients = ({ token, user }) => {
   const handlePatientSave = () => {
     setShowPatientForm(false);
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Handle unchecking a patient
+  const handleUncheckPatient = async (appointmentId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/uncheck`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setRefreshTrigger(prev => prev + 1); // Trigger refresh
+      } else {
+        setError('Failed to uncheck patient');
+      }
+    } catch (error) {
+      console.error('Uncheck error:', error);
+      setError('Failed to uncheck patient');
+    }
   };
 
   // Format date/time
@@ -340,7 +379,15 @@ const TodaysPatients = ({ token, user }) => {
                       >
                         Checkout
                       </button>
-                      <button className="btn-action btn-view">View</button>
+                      <button
+                        className="btn-action btn-uncheck"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUncheckPatient(appointment._id);
+                        }}
+                      >
+                        Uncheck
+                      </button>
                     </td>
                   </tr>
                 );
@@ -531,20 +578,56 @@ const TodaysPatients = ({ token, user }) => {
               <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient to Schedule'}</h3>
               <button
                 className="btn-close"
-                onClick={() => {
-                  setShowPatientSearch(false);
-                  setSearchType('');
-                }}
+                onClick={handleCancelPatientSelection}
               >
                 ✕
               </button>
             </div>
-            <PatientSearch
-              token={token}
-              onPatientSelect={handlePatientSelectForWalkIn}
-              onCreateNew={handleCreateNewPatient}
-              showCreateNew={true}
-            />
+            <div className="modal-body">
+              <PatientSearch
+                token={token}
+                onPatientSelect={handlePatientSelectForWalkIn}
+                onCreateNew={handleCreateNewPatient}
+                showCreateNew={true}
+              />
+
+              {/* Selected Patient Display */}
+              {selectedPatientForAction && (
+                <div className="selected-patient-display">
+                  <h4>Selected Patient:</h4>
+                  <div className="patient-details">
+                    <div className="patient-avatar">
+                      {selectedPatientForAction.firstName?.[0]}{selectedPatientForAction.lastName?.[0]}
+                    </div>
+                    <div className="patient-info">
+                      <div className="patient-name">
+                        {selectedPatientForAction.firstName} {selectedPatientForAction.lastName}
+                      </div>
+                      <div className="patient-record">
+                        Record #: {selectedPatientForAction.recordNumber}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer with Confirm/Cancel */}
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={handleCancelPatientSelection}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-primary"
+                onClick={handleConfirmPatientSelection}
+                disabled={!selectedPatientForAction}
+              >
+                {searchType === 'add-walkin' ? 'Add Walk-In' : 'Schedule Patient'}
+              </button>
+            </div>
           </div>
         </div>
       )}
