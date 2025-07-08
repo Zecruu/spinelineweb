@@ -35,6 +35,11 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
+    // In production, allow same-origin requests (frontend served from same domain)
+    if (process.env.NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -56,12 +61,57 @@ const appointmentRoutes = require('./routes/appointments');
 const appointmentHistoryRoutes = require('./routes/appointmentHistory');
 const ledgerRoutes = require('./routes/ledger');
 
+// API Routes - these must come BEFORE static file serving
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/appointment-history', appointmentHistoryRoutes);
 app.use('/api/ledger', ledgerRoutes);
+
+// Production: Serve React app - AFTER API routes
+if (process.env.NODE_ENV === 'production') {
+  const fs = require('fs');
+  const staticPath = path.join(__dirname, '../frontend/dist');
+
+  // Debug: Check if build files exist
+  console.log('Static path:', staticPath);
+  console.log('Build files exist:', fs.existsSync(staticPath));
+  if (fs.existsSync(staticPath)) {
+    console.log('Build directory contents:', fs.readdirSync(staticPath));
+  }
+
+  // Serve static files with explicit options
+  app.use(express.static(staticPath, {
+    maxAge: '1d',
+    setHeaders: (res, filePath) => {
+      console.log('Serving static file:', filePath);
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    }
+  }));
+
+  // Handle React routing - send all non-API requests to React app
+  app.get('*', (req, res) => {
+    console.log('Catch-all route hit:', req.path);
+
+    // If it's an API route, return 404
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'API route not found'
+      });
+    }
+
+    // For all other routes, serve the React app
+    const indexPath = path.join(staticPath, 'index.html');
+    console.log('Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
+  });
+}
 
 // Health check route
 app.get('/api/health', (req, res) => {
