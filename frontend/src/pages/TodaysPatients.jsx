@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
 import { downloadDailyReport } from '../utils/reportGenerator';
+import PatientSearch from '../components/PatientSearch';
+import PatientForm from '../components/PatientForm';
 import './TodaysPatients.css';
 
 const TodaysPatients = ({ token, user }) => {
@@ -29,6 +31,9 @@ const TodaysPatients = ({ token, user }) => {
     checkedIn: 0,
     checkedOut: 0
   });
+  const [showPatientSearch, setShowPatientSearch] = useState(false);
+  const [showPatientForm, setShowPatientForm] = useState(false);
+  const [searchType, setSearchType] = useState(''); // 'add-patient' or 'add-walkin'
 
   // Fetch appointments for selected date
   const fetchAppointments = async (date = selectedDate) => {
@@ -128,6 +133,39 @@ const TodaysPatients = ({ token, user }) => {
     return timeString;
   };
 
+  // Handle add patient button
+  const handleAddPatient = () => {
+    setSearchType('add-patient');
+    setShowPatientSearch(true);
+  };
+
+  // Handle add walk-in button
+  const handleAddWalkInButton = () => {
+    setSearchType('add-walkin');
+    setShowPatientSearch(true);
+  };
+
+  // Handle patient selection for walk-in
+  const handlePatientSelect = (patient) => {
+    if (searchType === 'add-walkin') {
+      handleAddWalkIn(patient._id);
+      setShowPatientSearch(false);
+    }
+    setSearchType('');
+  };
+
+  // Handle create new patient
+  const handleCreateNewPatient = () => {
+    setShowPatientSearch(false);
+    setShowPatientForm(true);
+  };
+
+  // Handle patient form save
+  const handlePatientSave = () => {
+    setShowPatientForm(false);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   // Format date/time
   const formatDateTime = (dateTime) => {
     if (!dateTime) return 'N/A';
@@ -188,7 +226,7 @@ const TodaysPatients = ({ token, user }) => {
         <span className="count">{appointments.scheduled.length}</span>
       </div>
       <div className="table-actions">
-        <button className="btn-add">+ Add Patient</button>
+        <button className="btn-add" onClick={handleAddPatient}>+ Add Patient</button>
       </div>
       <div className="table-content">
         <table className="patients-table">
@@ -255,7 +293,7 @@ const TodaysPatients = ({ token, user }) => {
         <span className="count">{appointments.checkedIn.length}</span>
       </div>
       <div className="table-actions">
-        <button className="btn-add">+ Add Walk-In</button>
+        <button className="btn-add" onClick={handleAddWalkInButton}>+ Add Walk-In</button>
       </div>
       <div className="table-content">
         <table className="patients-table">
@@ -480,6 +518,45 @@ const TodaysPatients = ({ token, user }) => {
         {renderCheckedOutTable()}
         {renderPatientInfo()}
       </div>
+
+      {/* Patient Search Modal */}
+      {showPatientSearch && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient'}</h3>
+              <button
+                className="btn-close"
+                onClick={() => {
+                  setShowPatientSearch(false);
+                  setSearchType('');
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <PatientSearch
+              token={token}
+              onPatientSelect={handlePatientSelect}
+              onCreateNew={handleCreateNewPatient}
+              showCreateNew={true}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Patient Form Modal */}
+      {showPatientForm && (
+        <div className="modal-overlay">
+          <div className="modal-content patient-form-modal">
+            <PatientForm
+              token={token}
+              onSave={handlePatientSave}
+              onCancel={() => setShowPatientForm(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
