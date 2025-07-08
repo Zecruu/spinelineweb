@@ -145,12 +145,16 @@ const TodaysPatients = ({ token, user }) => {
     setShowPatientSearch(true);
   };
 
-  // Handle patient selection for walk-in
+  // Handle patient selection from search modal
   const handlePatientSelectForWalkIn = (patient) => {
     if (searchType === 'add-walkin') {
       handleAddWalkIn(patient._id);
-      setShowPatientSearch(false);
+    } else if (searchType === 'add-patient') {
+      // Navigate to scheduling system with selected patient
+      const schedulingUrl = `/secretary/scheduling?patientId=${patient._id}&patientName=${encodeURIComponent(patient.firstName + ' ' + patient.lastName)}`;
+      window.location.href = schedulingUrl;
     }
+    setShowPatientSearch(false);
     setSearchType('');
   };
 
@@ -524,7 +528,7 @@ const TodaysPatients = ({ token, user }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient'}</h3>
+              <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient to Schedule'}</h3>
               <button
                 className="btn-close"
                 onClick={() => {
