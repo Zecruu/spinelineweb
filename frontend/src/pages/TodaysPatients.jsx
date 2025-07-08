@@ -146,7 +146,7 @@ const TodaysPatients = ({ token, user }) => {
   };
 
   // Handle patient selection for walk-in
-  const handlePatientSelect = (patient) => {
+  const handlePatientSelectForWalkIn = (patient) => {
     if (searchType === 'add-walkin') {
       handleAddWalkIn(patient._id);
       setShowPatientSearch(false);
@@ -178,8 +178,8 @@ const TodaysPatients = ({ token, user }) => {
     return `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
   };
 
-  // Handle patient selection
-  const handlePatientSelect = (appointment) => {
+  // Handle appointment selection
+  const handleAppointmentSelect = (appointment) => {
     setSelectedPatient(appointment);
   };
 
@@ -250,7 +250,7 @@ const TodaysPatients = ({ token, user }) => {
                   <tr
                     key={appointment._id}
                     className="patient-row"
-                    onClick={() => handlePatientSelect(appointment)}
+                    onClick={() => handleAppointmentSelect(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
                       backgroundColor: `${hexColor}08`
@@ -316,7 +316,7 @@ const TodaysPatients = ({ token, user }) => {
                   <tr
                     key={appointment._id}
                     className="patient-row"
-                    onClick={() => handlePatientSelect(appointment)}
+                    onClick={() => handleAppointmentSelect(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
                       backgroundColor: `${hexColor}08`
@@ -377,7 +377,7 @@ const TodaysPatients = ({ token, user }) => {
                   <tr
                     key={appointment._id}
                     className="patient-row"
-                    onClick={() => handlePatientSelect(appointment)}
+                    onClick={() => handleAppointmentSelect(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
                       backgroundColor: `${hexColor}08`
@@ -537,7 +537,7 @@ const TodaysPatients = ({ token, user }) => {
             </div>
             <PatientSearch
               token={token}
-              onPatientSelect={handlePatientSelect}
+              onPatientSelect={handlePatientSelectForWalkIn}
               onCreateNew={handleCreateNewPatient}
               showCreateNew={true}
             />
