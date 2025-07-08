@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const connectDB = require('./config/database');
 
 const app = express();
@@ -108,20 +109,38 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
-// Basic route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to SpineLine API',
-    version: '1.0.0',
-    documentation: '/api/health'
-  });
-});
+// Serve static files from the React app build directory
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-// 404 handler
-app.use('*', (req, res) => {
+  // Catch all handler: send back React's index.html file for any non-API routes
+  app.get('*', (req, res) => {
+    // Don't serve index.html for API routes
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'API route not found'
+      });
+    }
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+} else {
+  // Development mode - basic route
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Welcome to SpineLine API',
+      version: '1.0.0',
+      documentation: '/api/health',
+      frontend: 'Run frontend separately in development mode'
+    });
+  });
+}
+
+// 404 handler for API routes only
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     status: 'error',
-    message: 'Route not found'
+    message: 'API route not found'
   });
 });
 
