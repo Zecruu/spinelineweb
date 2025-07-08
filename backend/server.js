@@ -109,23 +109,47 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
-// Serve static files from the React app build directory
+// Production: Serve React app
 if (process.env.NODE_ENV === 'production') {
-  // Priority 1: Serve static assets (CSS, JS, images) with correct MIME types
-  app.use('/assets', express.static(path.join(__dirname, '../frontend/dist/assets')));
-  app.use('/vite.svg', express.static(path.join(__dirname, '../frontend/dist/vite.svg')));
+  const fs = require('fs');
+  const staticPath = path.join(__dirname, '../frontend/dist');
 
-  // Priority 2: Serve other static files
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  // Debug: Check if build files exist
+  console.log('Static path:', staticPath);
+  console.log('Build files exist:', fs.existsSync(staticPath));
+  if (fs.existsSync(staticPath)) {
+    console.log('Build directory contents:', fs.readdirSync(staticPath));
+  }
 
-  // Priority 3: Catch all handler for React Router (SPA)
-  app.get('*', (req, res, next) => {
-    // Skip if it's an API route
-    if (req.path.startsWith('/api/')) {
-      return next();
+  // Serve static files with explicit options
+  app.use(express.static(staticPath, {
+    maxAge: '1d',
+    setHeaders: (res, filePath) => {
+      console.log('Serving static file:', filePath);
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
     }
-    // Serve React app for all other routes
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  }));
+
+  // Handle React routing - send all non-API requests to React app
+  app.get('*', (req, res) => {
+    console.log('Catch-all route hit:', req.path);
+
+    // If it's an API route, return 404
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'API route not found'
+      });
+    }
+
+    // For all other routes, serve the React app
+    const indexPath = path.join(staticPath, 'index.html');
+    console.log('Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
   });
 } else {
   // Development mode - basic route
@@ -137,15 +161,15 @@ if (process.env.NODE_ENV === 'production') {
       frontend: 'Run frontend separately in development mode'
     });
   });
-}
 
-// 404 handler for API routes only
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'API route not found'
+  // 404 handler for development
+  app.use('*', (req, res) => {
+    res.status(404).json({
+      status: 'error',
+      message: 'Route not found'
+    });
   });
-});
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
