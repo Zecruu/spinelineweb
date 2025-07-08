@@ -61,6 +61,59 @@ router.get('/today', async (req, res) => {
   }
 });
 
+// Get appointments for a specific date organized by status (similar to today endpoint)
+router.get('/date/:date', async (req, res) => {
+  try {
+    const { date } = req.params;
+    const targetDate = new Date(date);
+    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    // Get all appointments for the specified date
+    const appointments = await Appointment.find({
+      clinicId: req.clinicId,
+      date: { $gte: startOfDay, $lt: endOfDay }
+    })
+    .populate('patientId', 'firstName lastName recordNumber phone email dob gender')
+    .sort({ time: 1 });
+
+    // Organize by status
+    const organized = {
+      scheduled: appointments.filter(apt => apt.status === 'scheduled'),
+      checkedIn: appointments.filter(apt => apt.status === 'checked-in'),
+      inProgress: appointments.filter(apt => apt.status === 'in-progress'),
+      checkedOut: appointments.filter(apt => apt.status === 'checked-out'),
+      cancelled: appointments.filter(apt => apt.status === 'cancelled'),
+      noShow: appointments.filter(apt => apt.status === 'no-show')
+    };
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        date: date,
+        appointments: organized,
+        summary: {
+          total: appointments.length,
+          scheduled: organized.scheduled.length,
+          checkedIn: organized.checkedIn.length,
+          inProgress: organized.inProgress.length,
+          checkedOut: organized.checkedOut.length,
+          cancelled: organized.cancelled.length,
+          noShow: organized.noShow.length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get date appointments error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch appointments for date'
+    });
+  }
+});
+
 // Get appointments by date range
 router.get('/', async (req, res) => {
   try {
@@ -649,6 +702,109 @@ router.post('/:id/reschedule', async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Failed to reschedule appointment'
+    });
+  }
+});
+
+// Get daily production report data
+router.get('/reports/daily/:date', async (req, res) => {
+  try {
+    const { date } = req.params;
+    const targetDate = new Date(date);
+    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    // Get all appointments for the specified date
+    const appointments = await Appointment.find({
+      clinicId: req.clinicId,
+      date: { $gte: startOfDay, $lt: endOfDay }
+    })
+    .populate('patientId', 'firstName lastName recordNumber phone email dob gender')
+    .sort({ time: 1 });
+
+    // Get ledger entries for the same date
+    const Ledger = require('../models/Ledger');
+    const ledgerEntries = await Ledger.find({
+      clinicId: req.clinicId,
+      visitDate: { $gte: startOfDay, $lt: endOfDay },
+      isVoided: false
+    })
+    .populate('patientId', 'firstName lastName recordNumber')
+    .populate('appointmentId', 'time visitType');
+
+    // Create a map of appointment ID to ledger entry for easy lookup
+    const ledgerMap = {};
+    ledgerEntries.forEach(entry => {
+      if (entry.appointmentId) {
+        ledgerMap[entry.appointmentId._id.toString()] = entry;
+      }
+    });
+
+    // Organize appointments by status and enrich with billing data
+    const enrichedAppointments = {
+      scheduled: [],
+      checkedIn: [],
+      checkedOut: []
+    };
+
+    appointments.forEach(apt => {
+      const ledgerEntry = ledgerMap[apt._id.toString()];
+      const enrichedApt = {
+        ...apt.toObject(),
+        ledgerData: ledgerEntry || null,
+        // Extract key billing info for easy access
+        deductible: ledgerEntry?.billingCodes?.reduce((total, code) =>
+          total + (code.insuranceCoverage?.deductible || 0), 0) || 0,
+        insuranceProvider: ledgerEntry?.insurance?.primaryInsurance?.companyName || 'N/A',
+        totalBilled: ledgerEntry?.totalAmount || apt.totalAmount || 0,
+        amountPaid: ledgerEntry?.amountPaid || apt.amountPaid || 0,
+        paymentMethod: ledgerEntry?.paymentMethod || apt.paymentMethod || 'N/A'
+      };
+
+      if (apt.status === 'scheduled') {
+        enrichedAppointments.scheduled.push(enrichedApt);
+      } else if (apt.status === 'checked-in' || apt.status === 'in-progress') {
+        enrichedAppointments.checkedIn.push(enrichedApt);
+      } else if (apt.status === 'checked-out') {
+        enrichedAppointments.checkedOut.push(enrichedApt);
+      }
+    });
+
+    // Calculate payment method breakdown
+    const paymentBreakdown = {};
+    ledgerEntries.forEach(entry => {
+      const method = entry.paymentMethod || 'Not Specified';
+      paymentBreakdown[method] = (paymentBreakdown[method] || 0) + (entry.amountPaid || 0);
+    });
+
+    // Calculate summary metrics
+    const summary = {
+      total: appointments.length,
+      scheduled: enrichedAppointments.scheduled.length,
+      checkedIn: enrichedAppointments.checkedIn.length,
+      checkedOut: enrichedAppointments.checkedOut.length,
+      totalRevenue: ledgerEntries.reduce((sum, entry) => sum + (entry.amountPaid || 0), 0),
+      totalBilled: ledgerEntries.reduce((sum, entry) => sum + (entry.totalAmount || 0), 0),
+      paymentBreakdown
+    };
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        date: date,
+        appointments: enrichedAppointments,
+        ledgerEntries,
+        summary,
+        reportGenerated: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('Get daily report error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to generate daily report'
     });
   }
 });

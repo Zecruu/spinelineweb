@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
+import { downloadDailyReport } from '../utils/reportGenerator';
 import './TodaysPatients.css';
 
 const TodaysPatients = ({ token, user }) => {
@@ -22,14 +23,24 @@ const TodaysPatients = ({ token, user }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [trackingMetrics, setTrackingMetrics] = useState({
+    scheduled: 0,
+    checkedIn: 0,
+    checkedOut: 0
+  });
 
-  // Fetch today's appointments
-  const fetchTodaysAppointments = async () => {
+  // Fetch appointments for selected date
+  const fetchAppointments = async (date = selectedDate) => {
     try {
       setLoading(true);
       setError('');
 
-      const response = await fetch(`${API_BASE_URL}/api/appointments/today`, {
+      const endpoint = date === new Date().toISOString().split('T')[0]
+        ? `${API_BASE_URL}/api/appointments/today`
+        : `${API_BASE_URL}/api/appointments/date/${date}`;
+
+      const response = await fetch(endpoint, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -37,13 +48,22 @@ const TodaysPatients = ({ token, user }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setAppointments({
+        const appointmentData = {
           scheduled: data.data.appointments.scheduled || [],
           checkedIn: data.data.appointments.checkedIn || [],
           checkedOut: data.data.appointments.checkedOut || []
+        };
+
+        setAppointments(appointmentData);
+
+        // Update tracking metrics
+        setTrackingMetrics({
+          scheduled: appointmentData.scheduled.length,
+          checkedIn: appointmentData.checkedIn.length,
+          checkedOut: appointmentData.checkedOut.length
         });
       } else {
-        setError('Failed to fetch today\'s appointments');
+        setError('Failed to fetch appointments');
       }
     } catch (error) {
       console.error('Fetch appointments error:', error);
@@ -53,10 +73,10 @@ const TodaysPatients = ({ token, user }) => {
     }
   };
 
-  // Load appointments on component mount and when refresh is triggered
+  // Load appointments on component mount and when refresh is triggered or date changes
   useEffect(() => {
-    fetchTodaysAppointments();
-  }, [token, refreshTrigger]);
+    fetchAppointments(selectedDate);
+  }, [token, refreshTrigger, selectedDate]);
 
   // Check in patient
   const handleCheckIn = async (appointmentId) => {
@@ -123,6 +143,41 @@ const TodaysPatients = ({ token, user }) => {
   // Handle patient selection
   const handlePatientSelect = (appointment) => {
     setSelectedPatient(appointment);
+  };
+
+  // Generate daily report
+  const handleGenerateReport = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch detailed report data from the API
+      const response = await fetch(`${API_BASE_URL}/api/appointments/reports/daily/${selectedDate}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const reportData = {
+          date: selectedDate,
+          appointments: data.data.appointments,
+          summary: data.data.summary,
+          ledgerEntries: data.data.ledgerEntries,
+          customNotes: '' // Can be made configurable later
+        };
+
+        const filename = `daily-production-report-${selectedDate}.pdf`;
+        downloadDailyReport(reportData, filename);
+      } else {
+        setError('Failed to generate report data');
+      }
+    } catch (error) {
+      console.error('Report generation error:', error);
+      setError('Failed to generate daily report');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Render scheduled patients table
@@ -358,20 +413,66 @@ const TodaysPatients = ({ token, user }) => {
   return (
     <div className="todays-patients">
       <div className="page-header">
-        <h1>📋 Today's Patients</h1>
+        <h1>📋 Patient Flow</h1>
         <div className="header-actions">
-          <button 
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="date-selector"
+          />
+          <button
             className="btn-refresh"
             onClick={() => setRefreshTrigger(prev => prev + 1)}
             disabled={loading}
           >
             🔄 Refresh
           </button>
-          <span className="date">{new Date().toLocaleDateString()}</span>
+          <button
+            className="btn-report"
+            onClick={handleGenerateReport}
+            disabled={loading}
+          >
+            📊 Daily Report
+          </button>
         </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}
+
+      {/* Patient Flow Tracking Metrics */}
+      <div className="tracking-metrics">
+        <div className="metric-card scheduled">
+          <div className="metric-icon">📅</div>
+          <div className="metric-content">
+            <div className="metric-number">{trackingMetrics.scheduled}</div>
+            <div className="metric-label">Scheduled</div>
+          </div>
+        </div>
+        <div className="metric-card checked-in">
+          <div className="metric-icon">✅</div>
+          <div className="metric-content">
+            <div className="metric-number">{trackingMetrics.checkedIn}</div>
+            <div className="metric-label">Checked-In</div>
+          </div>
+        </div>
+        <div className="metric-card checked-out">
+          <div className="metric-icon">💳</div>
+          <div className="metric-content">
+            <div className="metric-number">{trackingMetrics.checkedOut}</div>
+            <div className="metric-label">Checked-Out</div>
+          </div>
+        </div>
+        <div className="metric-card total">
+          <div className="metric-icon">👥</div>
+          <div className="metric-content">
+            <div className="metric-number">
+              {trackingMetrics.scheduled + trackingMetrics.checkedIn + trackingMetrics.checkedOut}
+            </div>
+            <div className="metric-label">Total Patients</div>
+          </div>
+        </div>
+      </div>
 
       <div className="tables-grid">
         {renderScheduledTable()}
