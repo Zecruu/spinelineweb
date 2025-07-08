@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const generateDailyProductionReport = (reportData) => {
   const {
@@ -94,7 +94,7 @@ export const generateDailyProductionReport = (reportData) => {
   });
   
   // Create table
-  doc.autoTable({
+  autoTable(doc, {
     head: [['Time', 'Patient Name', 'Record #', 'Deductible', 'Payment', 'Insurance', 'Status', 'Billed', 'Comments']],
     body: tableData,
     startY: yPosition,
@@ -124,7 +124,7 @@ export const generateDailyProductionReport = (reportData) => {
   });
   
   // Payment breakdown summary
-  const finalY = doc.lastAutoTable.finalY + 15;
+  const finalY = doc.previousAutoTable.finalY + 15;
   
   doc.setFontSize(12);
   doc.setTextColor(40, 40, 40);
