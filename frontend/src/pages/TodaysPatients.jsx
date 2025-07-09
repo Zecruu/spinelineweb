@@ -108,6 +108,8 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
   // Create walk-in appointment
   const handleAddWalkIn = async (patientId) => {
     try {
+      console.log('Creating walk-in appointment for patient:', patientId);
+
       const response = await fetch(`${API_BASE_URL}/api/appointments/walk-in`, {
         method: 'POST',
         headers: {
@@ -117,10 +119,17 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
         body: JSON.stringify({ patientId })
       });
 
+      console.log('Walk-in creation response status:', response.status);
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('Walk-in created successfully:', responseData);
         setRefreshTrigger(prev => prev + 1); // Trigger refresh
+        alert('Walk-in appointment created successfully');
       } else {
-        setError('Failed to create walk-in appointment');
+        const errorData = await response.json();
+        console.error('Walk-in creation failed:', errorData);
+        setError(errorData.message || 'Failed to create walk-in appointment');
       }
     } catch (error) {
       console.error('Walk-in error:', error);
@@ -169,15 +178,18 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
 
         const appointmentData = {
           patientId: selectedPatientForAction._id,
-          date: today,
+          date: today.toISOString().split('T')[0], // Format as YYYY-MM-DD
           time: timeString,
           type: 'scheduled',
           visitType: 'Regular Visit',
           status: 'scheduled',
           reason: 'Scheduled appointment',
-          createdBy: 'current-user', // This should be the actual user ID
-          lastModifiedBy: 'current-user'
+          createdBy: user?.id || user?._id,
+          lastModifiedBy: user?.id || user?._id,
+          clinicId: user?.clinicId
         };
+
+        console.log('Creating appointment with data:', appointmentData);
 
         const response = await fetch(`${API_BASE_URL}/api/appointments`, {
           method: 'POST',
@@ -188,11 +200,16 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
           body: JSON.stringify(appointmentData)
         });
 
+        console.log('Appointment creation response status:', response.status);
+
         if (response.ok) {
+          const responseData = await response.json();
+          console.log('Appointment created successfully:', responseData);
           setRefreshTrigger(prev => prev + 1); // Trigger refresh
           alert(`Appointment scheduled for ${selectedPatientForAction.firstName} ${selectedPatientForAction.lastName}`);
         } else {
           const errorData = await response.json();
+          console.error('Appointment creation failed:', errorData);
           setError(errorData.message || 'Failed to schedule appointment');
         }
       } catch (error) {
