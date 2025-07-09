@@ -63,6 +63,10 @@ const patientRoutes = require('./routes/patients');
 const appointmentRoutes = require('./routes/appointments');
 const appointmentHistoryRoutes = require('./routes/appointmentHistory');
 const ledgerRoutes = require('./routes/ledger');
+const billingCodesRoutes = require('./routes/billingCodes');
+const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
+const carePackagesRoutes = require('./routes/carePackages');
+const checkoutRoutes = require('./routes/checkout');
 
 // API Routes - these must come BEFORE static file serving
 app.use('/api/admin', adminRoutes);
@@ -71,6 +75,10 @@ app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/appointment-history', appointmentHistoryRoutes);
 app.use('/api/ledger', ledgerRoutes);
+app.use('/api/billing-codes', billingCodesRoutes);
+app.use('/api/diagnostic-codes', diagnosticCodesRoutes);
+app.use('/api/care-packages', carePackagesRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 // Production: Serve React app - AFTER API routes
 if (process.env.NODE_ENV === 'production') {
