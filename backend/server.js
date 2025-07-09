@@ -80,6 +80,49 @@ app.use('/api/diagnostic-codes', diagnosticCodesRoutes);
 app.use('/api/care-packages', carePackagesRoutes);
 app.use('/api/checkout', checkoutRoutes);
 
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'SpineLine API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Database test route
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+
+    if (mongoose.connection.readyState === 1) {
+      // Test database operation
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      res.status(200).json({
+        status: 'success',
+        message: 'Database connection successful',
+        database: mongoose.connection.name,
+        host: mongoose.connection.host,
+        collections: collections.length,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({
+        status: 'error',
+        message: 'Database not connected',
+        readyState: mongoose.connection.readyState
+      });
+    }
+  } catch (error) {
+    console.error('Database test error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Database test failed',
+      error: error.message
+    });
+  }
+});
+
 // Production: Serve React app - AFTER API routes
 if (process.env.NODE_ENV === 'production') {
   const fs = require('fs');
@@ -142,52 +185,6 @@ if (process.env.NODE_ENV === 'production') {
     });
   });
 }
-
-// Health check route
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'SpineLine API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-
-// Database test route
-app.get('/api/test-db', async (req, res) => {
-  try {
-    const mongoose = require('mongoose');
-    
-    if (mongoose.connection.readyState === 1) {
-      // Test database operation
-      const db = mongoose.connection.db;
-      const admin = db.admin();
-      const result = await admin.ping();
-      
-      res.status(200).json({
-        status: 'success',
-        message: 'MongoDB connection successful',
-        database: mongoose.connection.name,
-        host: mongoose.connection.host,
-        readyState: mongoose.connection.readyState,
-        ping: result
-      });
-    } else {
-      res.status(500).json({
-        status: 'error',
-        message: 'MongoDB not connected',
-        readyState: mongoose.connection.readyState
-      });
-    }
-  } catch (error) {
-    console.error('Database test error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Database test failed',
-      error: error.message
-    });
-  }
-});
 
 // Development mode - basic route for non-production
 if (process.env.NODE_ENV !== 'production') {

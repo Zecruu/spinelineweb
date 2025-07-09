@@ -35,6 +35,8 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [searchType, setSearchType] = useState(''); // 'add-patient' or 'add-walkin'
   const [selectedPatientForAction, setSelectedPatientForAction] = useState(null);
+  const [selectedScheduledPatient, setSelectedScheduledPatient] = useState(null);
+  const [selectedCheckedInPatient, setSelectedCheckedInPatient] = useState(null);
 
   // Fetch appointments for selected date
   const fetchAppointments = async (date = selectedDate) => {
@@ -68,6 +70,10 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
           checkedIn: appointmentData.checkedIn.length,
           checkedOut: appointmentData.checkedOut.length
         });
+
+        // Clear selections when data refreshes
+        setSelectedScheduledPatient(null);
+        setSelectedCheckedInPatient(null);
       } else {
         setError('Failed to fetch appointments');
       }
@@ -181,15 +187,13 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
 
         const appointmentData = {
           patientId: selectedPatientForAction._id,
-          date: today.toISOString().split('T')[0], // Format as YYYY-MM-DD
+          date: today, // Send as Date object
           time: timeString,
-          type: 'scheduled',
-          visitType: 'Regular Visit',
+          type: 'regular', // Must match enum: 'new', 'regular', 're-eval', 'walk-in', etc.
+          visitType: 'Regular', // Must match enum: 'New', 'Regular', 'Re-Eval', etc.
           status: 'scheduled',
-          reason: 'Scheduled appointment',
-          createdBy: user?.id || user?._id,
-          lastModifiedBy: user?.id || user?._id,
-          clinicId: user?.clinicId
+          reason: 'Scheduled appointment'
+          // Note: createdBy, lastModifiedBy, and clinicId are set by the backend middleware
         };
 
         console.log('Creating appointment with data:', appointmentData);
@@ -213,7 +217,8 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
         } else {
           const errorData = await response.json();
           console.error('Appointment creation failed:', errorData);
-          setError(errorData.message || 'Failed to schedule appointment');
+          console.error('Full error details:', JSON.stringify(errorData, null, 2));
+          setError(errorData.message || errorData.errors?.join(', ') || 'Failed to schedule appointment');
         }
       } catch (error) {
         console.error('Schedule appointment error:', error);
@@ -336,25 +341,25 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
               <th>Patient Name</th>
               <th>Time</th>
               <th>Visit Type</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {appointments.scheduled.length === 0 ? (
               <tr>
-                <td colSpan="4" className="no-data">No scheduled patients</td>
+                <td colSpan="3" className="no-data">No scheduled patients</td>
               </tr>
             ) : (
               appointments.scheduled.map(appointment => {
                 const hexColor = colorMap[appointment.color] || colorMap.blue;
+                const isSelected = selectedScheduledPatient?._id === appointment._id;
                 return (
                   <tr
                     key={appointment._id}
-                    className="patient-row"
-                    onClick={() => handleAppointmentSelect(appointment)}
+                    className={`patient-row ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setSelectedScheduledPatient(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
-                      backgroundColor: `${hexColor}08`
+                      backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
                     }}
                   >
                     <td className="patient-name">{getPatientName(appointment.patientId)}</td>
@@ -364,24 +369,27 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
                         {appointment.visitType || 'Regular'}
                       </span>
                     </td>
-                    <td className="actions">
-                      <button
-                        className="btn-action btn-checkin"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCheckIn(appointment._id);
-                        }}
-                      >
-                        Check In
-                      </button>
-                      <button className="btn-action btn-edit">Edit</button>
-                    </td>
                   </tr>
                 );
               })
             )}
           </tbody>
         </table>
+      </div>
+      <div className="table-bottom-actions">
+        <button
+          className="btn-action btn-checkin"
+          onClick={() => selectedScheduledPatient && handleCheckIn(selectedScheduledPatient._id)}
+          disabled={!selectedScheduledPatient}
+        >
+          Check In Selected Patient
+        </button>
+        <button
+          className="btn-action btn-edit"
+          disabled={!selectedScheduledPatient}
+        >
+          Edit Selected Patient
+        </button>
       </div>
     </div>
   );
@@ -402,57 +410,51 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
             <tr>
               <th>Patient Name</th>
               <th>Check-in Time</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {appointments.checkedIn.length === 0 ? (
               <tr>
-                <td colSpan="3" className="no-data">No checked-in patients</td>
+                <td colSpan="2" className="no-data">No checked-in patients</td>
               </tr>
             ) : (
               appointments.checkedIn.map(appointment => {
                 const hexColor = colorMap[appointment.color] || colorMap.blue;
+                const isSelected = selectedCheckedInPatient?._id === appointment._id;
                 return (
                   <tr
                     key={appointment._id}
-                    className="patient-row"
-                    onClick={() => handleAppointmentSelect(appointment)}
+                    className={`patient-row ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setSelectedCheckedInPatient(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
-                      backgroundColor: `${hexColor}08`
+                      backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
                     }}
                   >
                     <td className="patient-name">{getPatientName(appointment.patientId)}</td>
                     <td className="time">{formatDateTime(appointment.checkInTime)}</td>
-                    <td className="actions">
-                      <button
-                        className="btn-action btn-checkout"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onCheckout) {
-                            onCheckout(appointment._id);
-                          }
-                        }}
-                      >
-                        Checkout
-                      </button>
-                      <button
-                        className="btn-action btn-uncheck"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUncheckPatient(appointment._id);
-                        }}
-                      >
-                        Uncheck
-                      </button>
-                    </td>
                   </tr>
                 );
               })
             )}
           </tbody>
         </table>
+      </div>
+      <div className="table-bottom-actions">
+        <button
+          className="btn-action btn-checkout"
+          onClick={() => selectedCheckedInPatient && onCheckout && onCheckout(selectedCheckedInPatient._id)}
+          disabled={!selectedCheckedInPatient}
+        >
+          Checkout Selected Patient
+        </button>
+        <button
+          className="btn-action btn-uncheck"
+          onClick={() => selectedCheckedInPatient && handleUncheckPatient(selectedCheckedInPatient._id)}
+          disabled={!selectedCheckedInPatient}
+        >
+          Uncheck Selected Patient
+        </button>
       </div>
     </div>
   );

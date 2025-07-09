@@ -75,7 +75,7 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
       await fetchDiagnosticCodes();
       
       // Fetch care packages
-      await fetchCarePackages();
+      await fetchCarePackages(appointmentData.data.appointment.patientId._id);
       
     } catch (error) {
       console.error('Checkout data fetch error:', error);
@@ -93,11 +93,14 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
           headers: { 'Authorization': `Bearer ${token}` }
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         setBillingCodes(data.data.billingCodes || []);
         calculateTotal(data.data.billingCodes || []);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Billing codes fetch failed:', response.status, errorData);
       }
     } catch (error) {
       console.error('Billing codes fetch error:', error);
@@ -112,28 +115,42 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
           headers: { 'Authorization': `Bearer ${token}` }
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         setDiagnosticCodes(data.data.diagnosticCodes || []);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Diagnostic codes fetch failed:', response.status, errorData);
       }
     } catch (error) {
       console.error('Diagnostic codes fetch error:', error);
     }
   };
 
-  const fetchCarePackages = async () => {
+  const fetchCarePackages = async (patientId) => {
     try {
+      // Use the passed patientId or fall back to appointment data
+      const targetPatientId = patientId || appointment?.patientId?._id;
+
+      if (!targetPatientId) {
+        console.warn('No patient ID available for care packages fetch');
+        return;
+      }
+
       const response = await fetch(
-        `${API_BASE_URL}/api/care-packages/patient/${appointment?.patientId._id}`,
+        `${API_BASE_URL}/api/care-packages/patient/${targetPatientId}`,
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         setCarePackages(data.data.carePackages || []);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Care packages fetch failed:', response.status, errorData);
       }
     } catch (error) {
       console.error('Care packages fetch error:', error);

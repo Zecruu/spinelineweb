@@ -215,6 +215,15 @@
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
+.table-bottom-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #374151;
+  background: #1f2937;
+  justify-content: center;
+}
+
 .btn-add {
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
@@ -269,6 +278,12 @@
 
 .patient-row:hover {
   background: rgba(59, 130, 246, 0.05);
+}
+
+.patient-row.selected {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .patient-name {
@@ -348,6 +363,12 @@
   transition: all 0.3s ease;
   font-size: 0.7rem;
   font-weight: 500;
+}
+
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(148, 163, 184, 0.1);
 }
 
 .btn-checkin {

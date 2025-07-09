@@ -219,12 +219,18 @@ router.get('/:id', async (req, res) => {
 // Create new appointment
 router.post('/', async (req, res) => {
   try {
+    console.log('Creating appointment - req.body:', req.body);
+    console.log('Creating appointment - req.user:', req.user);
+    console.log('Creating appointment - req.clinicId:', req.clinicId);
+
     const appointmentData = {
       ...req.body,
       clinicId: req.clinicId,
       createdBy: req.user._id,
       lastModifiedBy: req.user._id
     };
+
+    console.log('Final appointment data:', appointmentData);
 
     // Validate patient exists and belongs to clinic
     const patient = await Patient.findOne({
