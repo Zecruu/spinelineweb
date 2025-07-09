@@ -5,7 +5,7 @@ import PatientSearch from '../components/PatientSearch';
 import PatientForm from '../components/PatientForm';
 import './TodaysPatients.css';
 
-const TodaysPatients = ({ token, user }) => {
+const TodaysPatients = ({ token, user, onCheckout }) => {
   // Color mapping for appointment colors
   const colorMap = {
     blue: '#3b82f6',
@@ -410,9 +410,9 @@ const TodaysPatients = ({ token, user }) => {
                         className="btn-action btn-checkout"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Navigate to checkout page
-                          window.history.pushState({}, '', `/secretary/checkout/${appointment._id}`);
-                          window.location.reload();
+                          if (onCheckout) {
+                            onCheckout(appointment._id);
+                          }
                         }}
                       >
                         Checkout

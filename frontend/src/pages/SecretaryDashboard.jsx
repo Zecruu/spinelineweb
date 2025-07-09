@@ -8,7 +8,7 @@ import PatientForm from '../components/PatientForm';
 import Settings from './Settings';
 import './SecretaryDashboard.css';
 
-const SecretaryDashboard = ({ token, user, onLogout }) => {
+const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
   const [activeTab, setActiveTab] = useState('todays-patients');
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -353,7 +353,7 @@ const SecretaryDashboard = ({ token, user, onLogout }) => {
 
         <div className="content-area">
           {activeTab === 'todays-patients' && (
-            <TodaysPatients token={token} user={user} />
+            <TodaysPatients token={token} user={user} onCheckout={onCheckout} />
           )}
           {activeTab === 'patients' && renderPatientManagement()}
           {activeTab === 'schedule' && (

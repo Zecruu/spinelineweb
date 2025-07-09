@@ -1,0 +1,264 @@
+.care-packages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.care-packages-header p {
+  color: #94a3b8;
+  margin: 0;
+}
+
+.care-packages-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-packages {
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.care-package-item {
+  background: #334155;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.package-info {
+  margin-bottom: 1rem;
+}
+
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.package-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.package-type {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.package-progress {
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #475569;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-text {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.package-details {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.package-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-use {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn-use:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.btn-remove {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.package-modal {
+  background: #1e293b;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-add-section {
+  margin-bottom: 2rem;
+}
+
+.quick-add-section h4 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.common-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.common-package-btn {
+  background: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.common-package-btn:hover {
+  background: #475569;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.common-package-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.common-package-sessions {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.common-package-price {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.manual-entry-section {
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding-top: 2rem;
+}
+
+.manual-entry-section h4 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .package-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .care-packages-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .care-package-item {
+    padding: 1rem;
+  }
+  
+  .package-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .package-details {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .package-actions {
+    flex-direction: column;
+  }
+  
+  .common-packages-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar styling for care packages list */
+.care-packages-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.care-packages-list::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 3px;
+}
+
+.care-packages-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+
+.care-packages-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Progress bar animations */
+.progress-fill {
+  animation: progressLoad 0.5s ease-out;
+}
+
+@keyframes progressLoad {
+  from {
+    width: 0%;
+  }
+}
+
+/* Package status indicators */
+.care-package-item[data-status="critical"] {
+  border-left: 4px solid #ef4444;
+}
+
+.care-package-item[data-status="warning"] {
+  border-left: 4px solid #f59e0b;
+}
+
+.care-package-item[data-status="active"] {
+  border-left: 4px solid #10b981;
+}

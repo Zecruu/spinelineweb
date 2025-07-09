@@ -4,10 +4,11 @@ import AdminDashboard from './pages/AdminDashboard'
 import UserLogin from './pages/UserLogin'
 import SecretaryDashboard from './pages/SecretaryDashboard'
 import PatientCheckout from './pages/PatientCheckout'
+import Checkout from './pages/Checkout'
 import './App.css'
 
 function App() {
-  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'admin-dashboard', 'patient-checkout'
+  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'admin-dashboard', 'patient-checkout', 'checkout'
   const [userToken, setUserToken] = useState(null)
   const [userData, setUserData] = useState(null)
   const [adminToken, setAdminToken] = useState(null)
@@ -107,6 +108,16 @@ function App() {
     setCurrentView('admin-login')
   }
 
+  const handleCheckout = (appointmentId) => {
+    setCheckoutAppointmentId(appointmentId)
+    setCurrentView('checkout')
+  }
+
+  const handleBackToPatients = () => {
+    setCheckoutAppointmentId(null)
+    setCurrentView('secretary-dashboard')
+  }
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -131,6 +142,7 @@ function App() {
           token={userToken}
           user={userData}
           onLogout={handleUserLogout}
+          onCheckout={handleCheckout}
         />
       )}
 
@@ -147,6 +159,15 @@ function App() {
           token={userToken}
           user={userData}
           appointmentId={checkoutAppointmentId}
+        />
+      )}
+
+      {currentView === 'checkout' && (
+        <Checkout
+          token={userToken}
+          user={userData}
+          appointmentId={checkoutAppointmentId}
+          onBack={handleBackToPatients}
         />
       )}
     </div>

@@ -1,0 +1,318 @@
+.insurance-info-card {
+  background: #334155;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.insurance-info-card h4 {
+  color: #3b82f6;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.insurance-details {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.insurance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.insurance-row:last-child {
+  border-bottom: none;
+}
+
+.insurance-row .label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.insurance-row .value {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.status.insured {
+  color: #10b981;
+}
+
+.status.uninsured {
+  color: #ef4444;
+}
+
+.copay-breakdown {
+  margin-bottom: 1.5rem;
+}
+
+.copay-breakdown h4 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.codes-coverage-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.code-coverage-item {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.code-coverage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.code-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.code-number {
+  background: #3b82f6;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.code-desc {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.coverage-status {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.code-coverage-details {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.coverage-amounts {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.copay-override {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.override-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.override-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #10b981;
+}
+
+.override-alert {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: #f59e0b;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.insurance-calculation-summary {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.insurance-calculation-summary h4 {
+  color: #10b981;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.calculation-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.calc-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #334155;
+  border-radius: 6px;
+}
+
+.calc-item.total {
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.calc-label {
+  color: #94a3b8;
+}
+
+.calc-item.total .calc-label {
+  color: white;
+}
+
+.calc-value {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.calc-value.insurance {
+  color: #3b82f6;
+}
+
+.calc-value.copay {
+  color: #f59e0b;
+}
+
+.override-summary {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.override-summary h5 {
+  color: #f59e0b;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.override-summary p {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.self-pay-notice {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.notice-content h4 {
+  color: #f59e0b;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.notice-content p {
+  color: #e2e8f0;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.self-pay-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #334155;
+  padding: 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.self-pay-total .amount {
+  color: #f59e0b;
+  font-size: 1.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .code-coverage-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .code-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .coverage-amounts {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .insurance-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .calc-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .self-pay-total {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+/* Animation for override alerts */
+.override-alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
