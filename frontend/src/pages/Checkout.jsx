@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
-import Sidebar from '../components/Sidebar';
 import ScheduleNextVisit from '../components/checkout/ScheduleNextVisit';
 import ESignatureCapture from '../components/checkout/ESignatureCapture';
 import BillingCodesDisplay from '../components/checkout/BillingCodesDisplay';
@@ -193,7 +192,6 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
   if (loading) {
     return (
       <div className="checkout-page">
-        <Sidebar />
         <div className="checkout-content">
           <div className="loading">Loading checkout data...</div>
         </div>
@@ -204,7 +202,6 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
   if (error) {
     return (
       <div className="checkout-page">
-        <Sidebar />
         <div className="checkout-content">
           <div className="error">Error: {error}</div>
           <button onClick={() => onBack && onBack()}>
@@ -217,7 +214,24 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
 
   return (
     <div className="checkout-page">
-      <Sidebar />
+      {/* Top Navigation Header */}
+      <div className="checkout-nav">
+        <div className="nav-left">
+          <button
+            className="btn-back"
+            onClick={() => onBack && onBack()}
+          >
+            ← Back to Today's Patients
+          </button>
+        </div>
+        <div className="nav-center">
+          <h1>🏥 SpineLine - Patient Checkout</h1>
+        </div>
+        <div className="nav-right">
+          <span className="user-info">{user?.name || user?.username}</span>
+        </div>
+      </div>
+
       <div className="checkout-content">
         <div className="checkout-header">
           <h1>Patient Checkout</h1>
