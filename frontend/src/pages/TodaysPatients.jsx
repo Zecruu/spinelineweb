@@ -164,6 +164,9 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
   const handleConfirmPatientSelection = async () => {
     if (!selectedPatientForAction) return;
 
+    console.log('User data:', user);
+    console.log('Selected patient:', selectedPatientForAction);
+
     if (searchType === 'add-walkin') {
       handleAddWalkIn(selectedPatientForAction._id);
     } else if (searchType === 'add-patient') {
