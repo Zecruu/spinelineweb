@@ -152,15 +152,53 @@ const TodaysPatients = ({ token, user }) => {
   };
 
   // Handle confirming the selected patient
-  const handleConfirmPatientSelection = () => {
+  const handleConfirmPatientSelection = async () => {
     if (!selectedPatientForAction) return;
 
     if (searchType === 'add-walkin') {
       handleAddWalkIn(selectedPatientForAction._id);
     } else if (searchType === 'add-patient') {
-      // Navigate to scheduling system with selected patient
-      const schedulingUrl = `/secretary/scheduling?patientId=${selectedPatientForAction._id}&patientName=${encodeURIComponent(selectedPatientForAction.firstName + ' ' + selectedPatientForAction.lastName)}`;
-      window.location.href = schedulingUrl;
+      // Create a scheduled appointment for today
+      try {
+        const today = new Date();
+        const timeString = today.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const appointmentData = {
+          patientId: selectedPatientForAction._id,
+          date: today,
+          time: timeString,
+          type: 'scheduled',
+          visitType: 'Regular Visit',
+          status: 'scheduled',
+          reason: 'Scheduled appointment',
+          createdBy: 'current-user', // This should be the actual user ID
+          lastModifiedBy: 'current-user'
+        };
+
+        const response = await fetch(`${API_BASE_URL}/api/appointments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(appointmentData)
+        });
+
+        if (response.ok) {
+          setRefreshTrigger(prev => prev + 1); // Trigger refresh
+          alert(`Appointment scheduled for ${selectedPatientForAction.firstName} ${selectedPatientForAction.lastName}`);
+        } else {
+          const errorData = await response.json();
+          setError(errorData.message || 'Failed to schedule appointment');
+        }
+      } catch (error) {
+        console.error('Schedule appointment error:', error);
+        setError('Failed to schedule appointment');
+      }
     }
 
     // Reset state

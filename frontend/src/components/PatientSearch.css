@@ -15,11 +15,11 @@
 }
 
 .filter-select {
-  background: rgba(51, 65, 85, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: #6b7280;
+  border: 1px solid #000000;
   border-radius: 6px;
   padding: 0.75rem;
-  color: #f1f5f9;
+  color: #ffffff;
   font-size: 0.9rem;
   min-width: 120px;
 }
@@ -37,11 +37,11 @@
 
 .search-input {
   width: 100%;
-  background: rgba(51, 65, 85, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: #6b7280;
+  border: 1px solid #000000;
   border-radius: 6px;
   padding: 0.75rem;
-  color: #f1f5f9;
+  color: #ffffff;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
@@ -83,8 +83,8 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: rgba(30, 41, 59, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #6b7280;
+  border: 2px solid #000000;
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
@@ -101,7 +101,8 @@
   padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid #000000;
+  color: #ffffff;
 }
 
 .search-result-item:last-child {
