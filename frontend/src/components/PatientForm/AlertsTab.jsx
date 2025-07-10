@@ -25,17 +25,17 @@ const AlertsTab = ({ formData, updateFormData, user }) => {
     };
     
     updateFormData({
-      alerts: [...formData.alerts, newAlert]
+      alerts: [...(formData.alerts || []), newAlert]
     });
   };
 
   const removeAlert = (index) => {
-    const updatedAlerts = formData.alerts.filter((_, i) => i !== index);
+    const updatedAlerts = (formData.alerts || []).filter((_, i) => i !== index);
     updateFormData({ alerts: updatedAlerts });
   };
 
   const updateAlert = (index, field, value) => {
-    const updatedAlerts = [...formData.alerts];
+    const updatedAlerts = [...(formData.alerts || [])];
     updatedAlerts[index] = {
       ...updatedAlerts[index],
       [field]: value
@@ -91,7 +91,7 @@ const AlertsTab = ({ formData, updateFormData, user }) => {
       </div>
 
       <div className="alerts-list">
-        {formData.alerts.length === 0 ? (
+        {!formData.alerts || formData.alerts.length === 0 ? (
           <div className="no-alerts">
             <div className="no-alerts-icon">🔔</div>
             <p>No alerts created yet.</p>
@@ -99,7 +99,7 @@ const AlertsTab = ({ formData, updateFormData, user }) => {
           </div>
         ) : (
           <div className="alerts-grid">
-            {formData.alerts.map((alert, index) => {
+            {(formData.alerts || []).map((alert, index) => {
               const severityInfo = getSeverityInfo(alert.priority);
               
               return (

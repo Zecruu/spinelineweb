@@ -58,7 +58,7 @@ const DiagnosticCodesDisplay = ({ diagnosticCodes, appointmentId, token }) => {
       </div>
 
       <div className="diagnostic-codes-content">
-        {diagnosticCodes.length === 0 ? (
+        {!diagnosticCodes || diagnosticCodes.length === 0 ? (
           <div className="no-diagnostic-codes">
             <div className="no-codes-icon">🏥</div>
             <p>No diagnostic codes recorded for this visit</p>

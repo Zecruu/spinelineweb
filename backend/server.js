@@ -146,6 +146,12 @@ if (process.env.NODE_ENV === 'production') {
         res.setHeader('Content-Type', 'text/css');
       } else if (filePath.endsWith('.js')) {
         res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.html')) {
+        res.setHeader('Content-Type', 'text/html');
+      } else if (filePath.endsWith('.json')) {
+        res.setHeader('Content-Type', 'application/json');
+      } else if (filePath.endsWith('.ico')) {
+        res.setHeader('Content-Type', 'image/x-icon');
       }
     }
   }));
@@ -160,6 +166,12 @@ if (process.env.NODE_ENV === 'production') {
         status: 'error',
         message: 'API route not found'
       });
+    }
+
+    // If it's a static asset request that wasn't found, return 404
+    if (req.path.match(/\.(css|js|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/)) {
+      console.log('Static asset not found:', req.path);
+      return res.status(404).send('Asset not found');
     }
 
     // For all other routes, serve the React app

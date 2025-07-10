@@ -15,7 +15,7 @@ const CopayLogic = ({ billingCodes, patient, totalAmount, setTotalAmount }) => {
   }, [billingCodes, patient, copayOverrides]);
 
   const calculateInsuranceCoverage = () => {
-    if (!patient?.insurance || billingCodes.length === 0) {
+    if (!patient?.insurance || !billingCodes || billingCodes.length === 0) {
       setInsuranceCalculation({
         coveredAmount: 0,
         copayAmount: 0,
