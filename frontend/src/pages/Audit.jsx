@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
+import PatientSearch from '../components/PatientSearch';
 import './Audit.css';
 
 const Audit = ({ token, user }) => {
@@ -10,6 +11,8 @@ const Audit = ({ token, user }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedLogs, setSelectedLogs] = useState([]);
   const [complianceSummary, setComplianceSummary] = useState(null);
+  const [showPatientSearch, setShowPatientSearch] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   // Filters and pagination
   const [filters, setFilters] = useState({
@@ -129,6 +132,25 @@ const Audit = ({ token, user }) => {
     }));
   };
 
+  // Handle patient selection
+  const handlePatientSelect = (patient) => {
+    setSelectedPatient(patient);
+    setFilters(prev => ({
+      ...prev,
+      patientId: patient._id
+    }));
+    setShowPatientSearch(false);
+  };
+
+  // Clear patient selection
+  const clearPatientSelection = () => {
+    setSelectedPatient(null);
+    setFilters(prev => ({
+      ...prev,
+      patientId: ''
+    }));
+  };
+
   // Handle search
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, currentPage: 1 }));
@@ -154,6 +176,8 @@ const Audit = ({ token, user }) => {
 
   // Handle select all
   const handleSelectAll = () => {
+    if (!auditLogs || auditLogs.length === 0) return;
+
     if (selectedLogs.length === auditLogs.length) {
       setSelectedLogs([]);
     } else {
@@ -254,6 +278,33 @@ const Audit = ({ token, user }) => {
             />
           </div>
           <div className="filter-group">
+            <label>Patient:</label>
+            <div className="patient-search-container">
+              {selectedPatient ? (
+                <div className="selected-patient-filter">
+                  <span className="patient-name">
+                    {selectedPatient.firstName} {selectedPatient.lastName}
+                  </span>
+                  <span className="patient-record">#{selectedPatient.recordNumber}</span>
+                  <button
+                    onClick={clearPatientSelection}
+                    className="btn-clear-patient"
+                    title="Clear patient selection"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowPatientSearch(true)}
+                  className="btn-select-patient"
+                >
+                  🔍 Select Patient
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="filter-group">
             <label>Start Date:</label>
             <input
               type="date"
@@ -321,7 +372,7 @@ const Audit = ({ token, user }) => {
             <button onClick={handleSearch} className="btn-search" disabled={loading}>
               🔍 Search
             </button>
-            <button 
+            <button
               onClick={() => {
                 setFilters({
                   search: '',
@@ -334,9 +385,10 @@ const Audit = ({ token, user }) => {
                   copayOverride: false,
                   patientId: ''
                 });
+                setSelectedPatient(null);
                 fetchAuditLogs(1);
                 fetchComplianceSummary();
-              }} 
+              }}
               className="btn-clear"
             >
               🗑️ Clear
@@ -351,14 +403,14 @@ const Audit = ({ token, user }) => {
           <label className="checkbox-label">
             <input
               type="checkbox"
-              checked={selectedLogs.length === auditLogs.length && auditLogs.length > 0}
+              checked={auditLogs && auditLogs.length > 0 && selectedLogs.length === auditLogs.length}
               onChange={handleSelectAll}
             />
-            Select All ({selectedLogs.length} selected)
+            Select All ({selectedLogs?.length || 0} selected)
           </label>
           <button
             onClick={handleExportPDF}
-            disabled={selectedLogs.length === 0}
+            disabled={!selectedLogs || selectedLogs.length === 0}
             className="btn-export"
           >
             📄 Export PDF
@@ -406,7 +458,7 @@ const Audit = ({ token, user }) => {
                 </tr>
               </thead>
               <tbody>
-                {auditLogs.length > 0 ? (
+                {auditLogs && auditLogs.length > 0 ? (
                   auditLogs.map((log) => (
                     <tr key={log._id} className="audit-row">
                       <td className="select-cell">
@@ -679,6 +731,39 @@ const Audit = ({ token, user }) => {
                 className="btn-close-modal"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Patient Search Modal */}
+      {showPatientSearch && (
+        <div className="modal-overlay">
+          <div className="modal-content patient-search-modal">
+            <div className="modal-header">
+              <h3>Select Patient for Audit Filter</h3>
+              <button
+                className="btn-close"
+                onClick={() => setShowPatientSearch(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <PatientSearch
+                token={token}
+                onPatientSelect={handlePatientSelect}
+                showCreateNew={false}
+                placeholder="Search patients for audit filtering..."
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                onClick={() => setShowPatientSearch(false)}
+                className="btn-close-modal"
+              >
+                Cancel
               </button>
             </div>
           </div>

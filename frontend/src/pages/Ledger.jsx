@@ -300,7 +300,7 @@ const Ledger = ({ token, user }) => {
                 </tr>
               </thead>
               <tbody>
-                {ledgerEntries.length > 0 ? (
+                {ledgerEntries && ledgerEntries.length > 0 ? (
                   ledgerEntries.map((entry) => (
                     <tr key={entry._id} className="ledger-row">
                       <td className="date-cell">
