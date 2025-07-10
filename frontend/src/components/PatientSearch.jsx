@@ -217,7 +217,7 @@ const PatientSearch = ({
                 </div>
               )}
             </>
-          ) : (
+          ) : searchTerm.trim().length >= 2 ? (
             <div className="no-results">
               <div className="no-results-text">No patients found</div>
               {showCreateNew && onCreateNew && (
@@ -226,7 +226,7 @@ const PatientSearch = ({
                 </button>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>

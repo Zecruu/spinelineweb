@@ -583,16 +583,17 @@
 
 .modal-content {
   background: #6b7280;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 0;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
+  max-width: 700px;
+  width: 95%;
+  max-height: 85vh;
   overflow: hidden;
   border: 2px solid #000000;
   display: flex;
   flex-direction: column;
   color: #ffffff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .patient-form-modal {
@@ -604,10 +605,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 2px solid #000000;
-  background: #4b5563;
+  padding: 2rem 2rem 1.5rem 2rem;
+  border-bottom: 1px solid #374151;
+  background: linear-gradient(135deg, #4b5563, #374151);
   color: #ffffff;
+  border-radius: 16px 16px 0 0;
 }
 
 .modal-header h3 {
@@ -645,53 +647,125 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  padding: 1.5rem 2rem;
-  border-top: 2px solid #000000;
-  background: #4b5563;
+  padding: 1.5rem 2rem 2rem 2rem;
+  border-top: 1px solid #374151;
+  background: linear-gradient(135deg, #374151, #4b5563);
   color: #ffffff;
+  border-radius: 0 0 16px 16px;
 }
 
 .modal-footer .btn-secondary {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .modal-footer .btn-secondary:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
 }
 
 .modal-footer .btn-primary {
-  background: #16a34a;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.modal-footer .btn-primary:hover {
-  background: #15803d;
+.modal-footer .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .modal-footer .btn-primary:disabled {
   background: #6b7280;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.appointment-form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .selected-patient-display {
-  margin-top: 2rem;
   padding: 1.5rem;
   background: #4b5563;
   border: 2px solid #000000;
   border-radius: 8px;
+}
+
+.appointment-details {
+  padding: 1.5rem;
+  background: #374151;
+  border: 2px solid #000000;
+  border-radius: 8px;
+}
+
+.appointment-details h4 {
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.form-input,
+.form-select {
+  padding: 0.75rem;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  background: #6b7280;
+  color: #ffffff;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.color-select option {
+  background: #6b7280;
+  color: #ffffff;
 }
 
 .selected-patient-display h4 {

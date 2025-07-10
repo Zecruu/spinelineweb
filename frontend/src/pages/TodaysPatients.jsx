@@ -37,6 +37,11 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
   const [selectedPatientForAction, setSelectedPatientForAction] = useState(null);
   const [selectedScheduledPatient, setSelectedScheduledPatient] = useState(null);
   const [selectedCheckedInPatient, setSelectedCheckedInPatient] = useState(null);
+  const [appointmentDetails, setAppointmentDetails] = useState({
+    time: '',
+    visitType: 'Regular',
+    color: 'blue'
+  });
 
   // Fetch appointments for selected date
   const fetchAppointments = async (date = selectedDate) => {
@@ -143,10 +148,28 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
     }
   };
 
-  // Format time
+  // Format time to 12-hour format with AM/PM
   const formatTime = (timeString) => {
     if (!timeString) return 'N/A';
-    return timeString;
+
+    // Handle both HH:MM and HH:MM:SS formats
+    const timeParts = timeString.split(':');
+    if (timeParts.length < 2) return timeString;
+
+    let hours = parseInt(timeParts[0]);
+    const minutes = timeParts[1];
+
+    // Determine AM/PM
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format
+    if (hours === 0) {
+      hours = 12; // 12 AM
+    } else if (hours > 12) {
+      hours = hours - 12; // Convert to PM
+    }
+
+    return `${hours}:${minutes} ${ampm}`;
   };
 
   // Handle add patient button
@@ -188,11 +211,12 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
         const appointmentData = {
           patientId: selectedPatientForAction._id,
           date: today, // Send as Date object
-          time: timeString,
-          type: 'regular', // Must match enum: 'new', 'regular', 're-eval', 'walk-in', etc.
-          visitType: 'Regular', // Must match enum: 'New', 'Regular', 'Re-Eval', etc.
+          time: appointmentDetails.time || timeString,
+          type: appointmentDetails.visitType.toLowerCase().replace(' ', '-'), // Convert to enum format
+          visitType: appointmentDetails.visitType,
           status: 'scheduled',
-          reason: 'Scheduled appointment'
+          reason: 'Scheduled appointment',
+          color: appointmentDetails.color
           // Note: createdBy, lastModifiedBy, and clinicId are set by the backend middleware
         };
 
@@ -230,6 +254,11 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
     setShowPatientSearch(false);
     setSearchType('');
     setSelectedPatientForAction(null);
+    setAppointmentDetails({
+      time: '',
+      visitType: 'Regular',
+      color: 'blue'
+    });
   };
 
   // Handle canceling patient selection
@@ -237,6 +266,11 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
     setShowPatientSearch(false);
     setSearchType('');
     setSelectedPatientForAction(null);
+    setAppointmentDetails({
+      time: '',
+      visitType: 'Regular',
+      color: 'blue'
+    });
   };
 
   // Handle create new patient
@@ -401,9 +435,7 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
         <h3>✅ Checked-In Patients</h3>
         <span className="count">{appointments.checkedIn.length}</span>
       </div>
-      <div className="table-actions">
-        <button className="btn-add" onClick={handleAddWalkInButton}>+ Add Walk-In</button>
-      </div>
+
       <div className="table-content">
         <table className="patients-table">
           <thead>
@@ -651,20 +683,79 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
                 showCreateNew={true}
               />
 
-              {/* Selected Patient Display */}
+              {/* Selected Patient Display and Appointment Details */}
               {selectedPatientForAction && (
-                <div className="selected-patient-display">
-                  <h4>Selected Patient:</h4>
-                  <div className="patient-details">
-                    <div className="patient-avatar">
-                      {selectedPatientForAction.firstName?.[0]}{selectedPatientForAction.lastName?.[0]}
-                    </div>
-                    <div className="patient-info">
-                      <div className="patient-name">
-                        {selectedPatientForAction.firstName} {selectedPatientForAction.lastName}
+                <div className="appointment-form">
+                  <div className="selected-patient-display">
+                    <h4>Selected Patient:</h4>
+                    <div className="patient-details">
+                      <div className="patient-avatar">
+                        {selectedPatientForAction.firstName?.[0]}{selectedPatientForAction.lastName?.[0]}
                       </div>
-                      <div className="patient-record">
-                        Record #: {selectedPatientForAction.recordNumber}
+                      <div className="patient-info">
+                        <div className="patient-name">
+                          {selectedPatientForAction.firstName} {selectedPatientForAction.lastName}
+                        </div>
+                        <div className="patient-record">
+                          Record #: {selectedPatientForAction.recordNumber}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="appointment-details">
+                    <h4>Appointment Details:</h4>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>Time:</label>
+                        <input
+                          type="time"
+                          value={appointmentDetails.time}
+                          onChange={(e) => setAppointmentDetails(prev => ({
+                            ...prev,
+                            time: e.target.value
+                          }))}
+                          className="form-input"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Visit Type:</label>
+                        <select
+                          value={appointmentDetails.visitType}
+                          onChange={(e) => setAppointmentDetails(prev => ({
+                            ...prev,
+                            visitType: e.target.value
+                          }))}
+                          className="form-select"
+                        >
+                          <option value="New">New Patient</option>
+                          <option value="Regular">Regular Visit</option>
+                          <option value="Re-Eval">Re-Evaluation</option>
+                          <option value="Follow-Up">Follow-Up</option>
+                          <option value="Consultation">Consultation</option>
+                          <option value="Decompression">Decompression</option>
+                          <option value="Chiropractic">Chiropractic</option>
+                          <option value="Evaluation">Evaluation</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label>Color:</label>
+                        <select
+                          value={appointmentDetails.color}
+                          onChange={(e) => setAppointmentDetails(prev => ({
+                            ...prev,
+                            color: e.target.value
+                          }))}
+                          className="form-select color-select"
+                        >
+                          <option value="blue">Blue</option>
+                          <option value="green">Green</option>
+                          <option value="red">Red</option>
+                          <option value="yellow">Yellow</option>
+                          <option value="purple">Purple</option>
+                          <option value="orange">Orange</option>
+                          <option value="white">White</option>
+                        </select>
                       </div>
                     </div>
                   </div>
