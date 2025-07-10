@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Appointment = require('../models/Appointment');
 const Ledger = require('../models/Ledger');
+const AuditLog = require('../models/AuditLog');
 const { authenticateToken } = require('../middleware/auth');
 
 // Complete checkout process
@@ -87,32 +88,93 @@ router.post('/complete', authenticateToken, async (req, res) => {
 
     await ledgerEntry.save();
 
-    // Create audit record (for compliance)
-    const auditRecord = {
-      type: 'checkout_completed',
-      appointmentId,
-      patientId,
+    // Create comprehensive audit log for compliance
+    const auditLog = new AuditLog({
       clinicId: req.user.clinicId,
-      timestamp: new Date(),
-      data: {
-        billingCodes: billingCodes.length,
-        diagnosticCodes: diagnosticCodes.length,
-        carePackagesAffected: carePackages.length,
-        totalAmount,
-        paymentMethod: paymentData.method,
-        signatureCaptured: Boolean(signature),
-        processedBy: processedBy || req.user.id
-      },
-      metadata: {
-        userAgent: req.get('User-Agent'),
-        ipAddress: req.ip,
-        sessionId: req.sessionID
-      }
-    };
+      patientId,
+      appointmentId,
+      ledgerEntryId: ledgerEntry._id,
+      visitDate: checkoutTime || new Date(),
+      visitType: appointment.visitType || 'Regular',
+      providerId: appointment.providerId || req.user.id,
+      providerName: req.user.name || req.user.username,
 
-    // Store audit record in ledger for now (could be separate audit collection)
-    ledgerEntry.auditTrail = [auditRecord];
-    await ledgerEntry.save();
+      // SOAP Notes (if provided in request)
+      soapNote: req.body.soapNote || {
+        subjective: req.body.visitNotes || '',
+        objective: '',
+        assessment: '',
+        plan: '',
+        isComplete: Boolean(req.body.soapNote?.isComplete)
+      },
+
+      // Billing and Diagnostic Codes
+      billingCodes: billingCodes.map(code => ({
+        code: code.code,
+        description: code.description,
+        units: code.units || 1,
+        unitPrice: code.price,
+        totalPrice: code.price * (code.units || 1),
+        modifiers: code.modifiers || [],
+        isPreAuthorized: code.preAuthorized || false
+      })),
+
+      diagnosticCodes: diagnosticCodes.map(code => ({
+        code: code.code,
+        description: code.description,
+        isPrimary: code.isPrimary || false
+      })),
+
+      // Digital Signature
+      signature: {
+        data: signature,
+        timestamp: new Date(),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        signedBy: `${appointment.patientId.firstName} ${appointment.patientId.lastName}`,
+        isValid: Boolean(signature)
+      },
+
+      // Payment Information
+      payment: {
+        method: paymentData.method,
+        amount: paymentData.amount,
+        copayAmount: paymentData.copay || 0,
+        copayOverride: paymentData.copayOverride ? {
+          originalAmount: paymentData.copayOverride.original,
+          newAmount: paymentData.copayOverride.new,
+          reason: paymentData.copayOverride.reason,
+          authorizedBy: req.user.id
+        } : undefined,
+        insuranceClaim: paymentData.insurance ? {
+          claimNumber: paymentData.insurance.claimNumber,
+          preAuthNumber: paymentData.insurance.preAuthNumber,
+          status: 'pending'
+        } : undefined
+      },
+
+      // Care Package Information
+      carePackage: carePackages.length > 0 ? {
+        packageId: carePackages[0].packageId,
+        packageName: carePackages[0].packageName,
+        visitsUsed: carePackages[0].visitsUsed || 1,
+        visitsRemaining: carePackages[0].visitsRemaining
+      } : undefined,
+
+      // Audit Trail
+      auditEvents: [{
+        eventType: 'created',
+        timestamp: new Date(),
+        userId: req.user.id,
+        description: 'Audit log created during checkout process',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      }],
+
+      createdBy: req.user.id
+    });
+
+    await auditLog.save();
 
     res.status(200).json({
       status: 'success',
@@ -120,6 +182,7 @@ router.post('/complete', authenticateToken, async (req, res) => {
       data: {
         appointmentId,
         ledgerEntryId: ledgerEntry._id,
+        auditLogId: auditLog._id,
         checkoutTime: appointment.checkOutTime,
         totalAmount,
         paymentMethod: paymentData.method

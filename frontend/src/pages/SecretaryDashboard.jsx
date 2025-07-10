@@ -5,6 +5,8 @@ import SchedulingSystem from './SchedulingSystem';
 import AppointmentScheduler from './AppointmentScheduler';
 import PatientSearch from '../components/PatientSearch';
 import PatientForm from '../components/PatientForm';
+import Ledger from './Ledger';
+import Audit from './Audit';
 import Settings from './Settings';
 import './SecretaryDashboard.css';
 
@@ -323,16 +325,16 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
             📅 Schedule
           </button>
           <button
-            className={`nav-item ${activeTab === 'billing' ? 'active' : ''}`}
-            onClick={() => setActiveTab('billing')}
+            className={`nav-item ${activeTab === 'ledger' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ledger')}
           >
-            💰 Billing
+            📊 Ledger
           </button>
           <button
-            className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reports')}
+            className={`nav-item ${activeTab === 'audit' ? 'active' : ''}`}
+            onClick={() => setActiveTab('audit')}
           >
-            📊 Reports
+            🔍 Audit
           </button>
           <button
             className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
@@ -359,17 +361,11 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
           {activeTab === 'schedule' && (
             <AppointmentScheduler token={token} user={user} />
           )}
-          {activeTab === 'billing' && (
-            <div className="coming-soon">
-              <h2>💰 Billing</h2>
-              <p>Billing management coming soon...</p>
-            </div>
+          {activeTab === 'ledger' && (
+            <Ledger token={token} user={user} />
           )}
-          {activeTab === 'reports' && (
-            <div className="coming-soon">
-              <h2>📊 Reports</h2>
-              <p>Reports and analytics coming soon...</p>
-            </div>
+          {activeTab === 'audit' && (
+            <Audit token={token} user={user} />
           )}
           {activeTab === 'settings' && (
             <Settings token={token} user={user} />
