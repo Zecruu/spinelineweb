@@ -111,6 +111,13 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
     setEditingPatientId(null);
   };
 
+  // Handle edit patient from Today's Patients
+  const handleEditPatientFromToday = (patientId) => {
+    setActiveTab('patients');
+    setEditingPatientId(patientId);
+    setShowPatientForm(true);
+  };
+
   // Format phone number
   const formatPhone = (phone) => {
     if (!phone) return 'N/A';
@@ -355,7 +362,12 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
 
         <div className="content-area">
           {activeTab === 'todays-patients' && (
-            <TodaysPatients token={token} user={user} onCheckout={onCheckout} />
+            <TodaysPatients
+              token={token}
+              user={user}
+              onCheckout={onCheckout}
+              onEditPatient={handleEditPatientFromToday}
+            />
           )}
           {activeTab === 'patients' && renderPatientManagement()}
           {activeTab === 'schedule' && (

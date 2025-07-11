@@ -5,7 +5,7 @@ import PatientSearch from '../components/PatientSearch';
 import PatientForm from '../components/PatientForm';
 import './TodaysPatients.css';
 
-const TodaysPatients = ({ token, user, onCheckout }) => {
+const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
   // Color mapping for appointment colors
   const colorMap = {
     blue: '#3b82f6',
@@ -320,6 +320,13 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
     setSelectedPatient(appointment);
   };
 
+  // Handle edit patient - navigate to patient management
+  const handleEditPatient = (patient) => {
+    if (patient && patient._id && onEditPatient) {
+      onEditPatient(patient._id);
+    }
+  };
+
   // Generate daily report
   const handleGenerateReport = async () => {
     try {
@@ -551,37 +558,142 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
       </div>
       <div className="table-content patient-info-content">
         {selectedPatient ? (
-          <div className="patient-details">
-            <div className="patient-avatar">
-              <div className="avatar-placeholder">
-                {getPatientName(selectedPatient.patientId).charAt(0)}
+          <div className="patient-info-display">
+            {/* Patient Header with Photo and Basic Info */}
+            <div className="patient-header">
+              <div className="patient-photo-square">
+                <div className="photo-placeholder">
+                  {getPatientName(selectedPatient.patientId).split(' ').map(name => name.charAt(0)).join('')}
+                </div>
+              </div>
+              <div className="patient-basic-details">
+                <h3 className="patient-name">{getPatientName(selectedPatient.patientId)}</h3>
+                <p className="record-number">Record #{selectedPatient.patientId?.recordNumber}</p>
+                <p className="contact-info">
+                  📞 {selectedPatient.patientId?.phone || 'No phone'}
+                </p>
+                <p className="contact-info">
+                  ✉️ {selectedPatient.patientId?.email || 'No email'}
+                </p>
+              </div>
+              <button
+                className="btn-edit-patient"
+                onClick={() => handleEditPatient(selectedPatient.patientId)}
+                title="Edit Patient Information"
+              >
+                ✏️ Edit Patient
+              </button>
+            </div>
+
+            {/* Insurance Information */}
+            <div className="info-section">
+              <h4 className="section-title">🏥 Insurance Information</h4>
+              <div className="insurance-details">
+                {selectedPatient.patientId?.insuranceInfo && selectedPatient.patientId.insuranceInfo.length > 0 ? (
+                  selectedPatient.patientId.insuranceInfo
+                    .filter(insurance => insurance.isActive)
+                    .map((insurance, index) => (
+                      <div key={index} className="insurance-item">
+                        <div className="insurance-row">
+                          <span className="label">Provider:</span>
+                          <span className="value">{insurance.companyName || 'Unknown'}</span>
+                        </div>
+                        <div className="insurance-row">
+                          <span className="label">Policy #:</span>
+                          <span className="value">{insurance.policyNumber || 'N/A'}</span>
+                        </div>
+                        <div className="insurance-row">
+                          <span className="label">Copay:</span>
+                          <span className="value copay">${insurance.copay || 0}</span>
+                        </div>
+                        {insurance.isPrimary && (
+                          <span className="primary-badge">Primary</span>
+                        )}
+                      </div>
+                    ))
+                ) : (
+                  <div className="no-insurance">
+                    <span className="self-pay-badge">Self-Pay Patient</span>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="patient-basic-info">
-              <h4>{getPatientName(selectedPatient.patientId)}</h4>
-              <p className="record-number">#{selectedPatient.patientId?.recordNumber}</p>
-              <p className="phone">{selectedPatient.patientId?.phone || 'No phone'}</p>
-              <p className="email">{selectedPatient.patientId?.email || 'No email'}</p>
-            </div>
-            <div className="appointment-info">
-              <h5>Appointment Details</h5>
-              <p><strong>Type:</strong> {selectedPatient.visitType}</p>
-              <p><strong>Status:</strong> {selectedPatient.status}</p>
-              <p><strong>Time:</strong> {formatTime(selectedPatient.time)}</p>
-              {selectedPatient.checkInTime && (
-                <p><strong>Checked In:</strong> {formatDateTime(selectedPatient.checkInTime)}</p>
-              )}
-            </div>
-            {selectedPatient.reason && (
-              <div className="visit-reason">
-                <h5>Reason for Visit</h5>
-                <p>{selectedPatient.reason}</p>
+
+            {/* Referral Information */}
+            <div className="info-section">
+              <h4 className="section-title">👨‍⚕️ Referral Information</h4>
+              <div className="referral-details">
+                {selectedPatient.patientId?.referral ? (
+                  <div className="referral-item">
+                    <div className="referral-row">
+                      <span className="label">Referred By:</span>
+                      <span className="value">
+                        {selectedPatient.patientId.referral.referredBy?.firstName} {selectedPatient.patientId.referral.referredBy?.lastName || 'Unknown'}
+                      </span>
+                    </div>
+                    <div className="referral-row">
+                      <span className="label">Source:</span>
+                      <span className="value">{selectedPatient.patientId.referral.source || 'N/A'}</span>
+                    </div>
+                    {selectedPatient.patientId.referral.validDays && (
+                      <div className="referral-row">
+                        <span className="label">Valid Days:</span>
+                        <span className="value">{selectedPatient.patientId.referral.validDays} days</span>
+                      </div>
+                    )}
+                    {selectedPatient.patientId.referral.bonusAmount && (
+                      <div className="referral-row">
+                        <span className="label">Bonus:</span>
+                        <span className="value bonus">${selectedPatient.patientId.referral.bonusAmount}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="no-referral">
+                    <span className="direct-patient-badge">Direct Patient</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* Appointment Details */}
+            <div className="info-section">
+              <h4 className="section-title">📅 Appointment Details</h4>
+              <div className="appointment-details">
+                <div className="appointment-row">
+                  <span className="label">Type:</span>
+                  <span className="value visit-type">{selectedPatient.visitType}</span>
+                </div>
+                <div className="appointment-row">
+                  <span className="label">Status:</span>
+                  <span className={`value status-${selectedPatient.status}`}>
+                    {selectedPatient.status.charAt(0).toUpperCase() + selectedPatient.status.slice(1)}
+                  </span>
+                </div>
+                <div className="appointment-row">
+                  <span className="label">Time:</span>
+                  <span className="value">{formatTime(selectedPatient.time)}</span>
+                </div>
+                {selectedPatient.checkInTime && (
+                  <div className="appointment-row">
+                    <span className="label">Checked In:</span>
+                    <span className="value">{formatDateTime(selectedPatient.checkInTime)}</span>
+                  </div>
+                )}
+                {selectedPatient.reason && (
+                  <div className="appointment-row full-width">
+                    <span className="label">Reason:</span>
+                    <span className="value reason">{selectedPatient.reason}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="no-selection">
-            <p>Select a patient to view details</p>
+            <div className="no-selection-icon">👤</div>
+            <h4>No Patient Selected</h4>
+            <p>Click on a patient from any table to view their details</p>
           </div>
         )}
       </div>
