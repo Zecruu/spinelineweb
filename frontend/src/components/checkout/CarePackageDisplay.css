@@ -10,6 +10,142 @@
   margin: 0;
 }
 
+/* Active Package Highlight */
+.active-package-highlight {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.active-package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.active-package-header h4 {
+  color: #10b981;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.package-status-badge {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.active-package-info .package-name {
+  color: #f1f5f9;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.package-sessions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sessions-remaining {
+  color: #10b981;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.sessions-total {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.package-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #334155;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.package-progress-bar .progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Auto-Deduction Alerts */
+.auto-deduction-alerts {
+  background: #1e293b;
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.auto-deduction-alerts h4 {
+  color: #f59e0b;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.deduction-alert {
+  background: #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.deduction-alert:last-child {
+  margin-bottom: 0;
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.alert-header .package-name {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.deduction-count {
+  color: #f59e0b;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.matched-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.matched-code {
+  background: #475569;
+  color: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.alert-note {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 .care-packages-list {
   max-height: 400px;
   overflow-y: auto;

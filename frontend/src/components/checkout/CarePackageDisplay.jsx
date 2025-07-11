@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { API_BASE_URL } from '../../config/api';
 import './CarePackageDisplay.css';
 
-const CarePackageDisplay = ({ 
-  carePackages, 
-  setCarePackages, 
-  patientId, 
-  billingCodes, 
-  token 
+const CarePackageDisplay = ({
+  carePackages,
+  setCarePackages,
+  patientId,
+  billingCodes,
+  token
 }) => {
+  const [autoDeductions, setAutoDeductions] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
   const [newPackage, setNewPackage] = useState({
     name: '',
@@ -19,6 +20,56 @@ const CarePackageDisplay = ({
     linkedBillingCodes: []
   });
   const [loading, setLoading] = useState(false);
+
+  // Check for auto-deductions when billing codes change
+  useEffect(() => {
+    checkAutoDeductions();
+  }, [billingCodes, carePackages]);
+
+  const checkAutoDeductions = () => {
+    if (!billingCodes || !carePackages) return;
+
+    const newAutoDeductions = {};
+
+    billingCodes.forEach(billingCode => {
+      carePackages.forEach(pkg => {
+        if (pkg.status === 'active' &&
+            pkg.remainingSessions > 0 &&
+            pkg.linkedBillingCodes.includes(billingCode.code)) {
+
+          if (!newAutoDeductions[pkg._id]) {
+            newAutoDeductions[pkg._id] = [];
+          }
+
+          newAutoDeductions[pkg._id].push({
+            billingCode: billingCode.code,
+            description: billingCode.description,
+            units: billingCode.units || 1
+          });
+        }
+      });
+    });
+
+    setAutoDeductions(newAutoDeductions);
+  };
+
+  const getActivePackage = () => {
+    return carePackages.find(pkg => pkg.status === 'active' && pkg.remainingSessions > 0);
+  };
+
+  const getPackageStatusColor = (pkg) => {
+    if (pkg.status !== 'active') return '#6b7280';
+    if (pkg.remainingSessions === 0) return '#ef4444';
+    if (pkg.remainingSessions <= 2) return '#f59e0b';
+    return '#10b981';
+  };
+
+  const getPackageStatusText = (pkg) => {
+    if (pkg.status !== 'active') return 'Inactive';
+    if (pkg.remainingSessions === 0) return 'Completed';
+    if (pkg.remainingSessions <= 2) return 'Low Sessions';
+    return 'Active';
+  };
 
   const packageTypes = {
     decompression: { name: 'Decompression Package', color: '#3b82f6' },
@@ -165,19 +216,80 @@ const CarePackageDisplay = ({
     }
   };
 
+  const activePackage = getActivePackage();
+
   return (
     <div className="checkout-section">
       <h3>🧾 Care Packages</h3>
-      
+
       <div className="care-packages-header">
-        <p>Active care packages for this patient</p>
-        <button 
+        <p>Patient care packages and session tracking</p>
+        <button
           className="btn-primary"
           onClick={() => setShowAddModal(true)}
         >
           Add Package
         </button>
       </div>
+
+      {/* Active Package Highlight */}
+      {activePackage && (
+        <div className="active-package-highlight">
+          <div className="active-package-header">
+            <h4>🎯 Currently Active Package</h4>
+            <span
+              className="package-status-badge"
+              style={{ backgroundColor: getPackageStatusColor(activePackage) }}
+            >
+              {getPackageStatusText(activePackage)}
+            </span>
+          </div>
+          <div className="active-package-info">
+            <div className="package-name">{activePackage.name}</div>
+            <div className="package-sessions">
+              <span className="sessions-remaining">{activePackage.remainingSessions}</span>
+              <span className="sessions-total">of {activePackage.totalSessions} sessions remaining</span>
+            </div>
+            <div className="package-progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${((activePackage.totalSessions - activePackage.remainingSessions) / activePackage.totalSessions) * 100}%`,
+                  backgroundColor: getPackageStatusColor(activePackage)
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auto-Deduction Alerts */}
+      {Object.keys(autoDeductions).length > 0 && (
+        <div className="auto-deduction-alerts">
+          <h4>⚡ Auto-Deduction Available</h4>
+          {Object.entries(autoDeductions).map(([packageId, deductions]) => {
+            const pkg = carePackages.find(p => p._id === packageId);
+            return (
+              <div key={packageId} className="deduction-alert">
+                <div className="alert-header">
+                  <span className="package-name">{pkg?.name}</span>
+                  <span className="deduction-count">{deductions.length} code(s) match</span>
+                </div>
+                <div className="matched-codes">
+                  {deductions.map((deduction, index) => (
+                    <span key={index} className="matched-code">
+                      {deduction.billingCode} ({deduction.units} unit{deduction.units !== 1 ? 's' : ''})
+                    </span>
+                  ))}
+                </div>
+                <div className="alert-note">
+                  Sessions will be automatically deducted when checkout is completed
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="care-packages-list">
         {carePackages.length === 0 ? (

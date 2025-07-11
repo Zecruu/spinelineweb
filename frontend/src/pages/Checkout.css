@@ -54,6 +54,27 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+.checkout-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.checkout-content::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.checkout-content::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.checkout-content::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .checkout-header {
@@ -85,9 +106,35 @@
 
 .checkout-sections {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 2rem;
   margin-bottom: 2rem;
+  min-height: auto;
+}
+
+.checkout-left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.checkout-right-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.checkout-center-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.checkout-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .checkout-section {
@@ -109,6 +156,17 @@
 
 .checkout-section.full-width {
   grid-column: 1 / -1;
+}
+
+.checkout-signature-section {
+  margin-top: 2rem;
+}
+
+.checkout-signature-section .checkout-section {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .checkout-footer {
@@ -203,9 +261,38 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .checkout-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-right-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-left-panel {
+    order: 2;
+  }
+
+  .checkout-right-panel {
+    order: 1;
+  }
+}
+
 @media (max-width: 1200px) {
   .checkout-sections {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .checkout-right-panel {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .checkout-center-column,
+  .checkout-right-column {
+    gap: 1.5rem;
   }
 }
 
@@ -222,10 +309,32 @@
 
   .checkout-content {
     padding: 1rem;
+    max-height: calc(100vh - 140px);
   }
 
   .checkout-header {
     padding: 1.5rem;
+  }
+
+  .checkout-sections {
+    gap: 1rem;
+  }
+
+  .checkout-right-panel {
+    gap: 1rem;
+  }
+
+  .checkout-center-column,
+  .checkout-right-column {
+    gap: 1rem;
+  }
+
+  .checkout-section {
+    padding: 1rem;
+  }
+
+  .checkout-signature-section {
+    margin-top: 1rem;
   }
 
   .checkout-footer {

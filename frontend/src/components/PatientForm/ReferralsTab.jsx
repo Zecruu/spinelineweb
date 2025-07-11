@@ -7,10 +7,14 @@ const ReferralsTab = ({ formData, updateFormData }) => {
     'Dr. Williams - Physical Therapy',
     'Dr. Brown - Neurology'
   ]);
+  const [calculatedExpiration, setCalculatedExpiration] = useState('');
 
   const referralSources = [
-    'MD',
     'Patient',
+    'Google',
+    'Doctor',
+    'Social Media',
+    'MD',
     'Facebook',
     'Google Ads',
     'Website',
@@ -18,6 +22,26 @@ const ReferralsTab = ({ formData, updateFormData }) => {
     'Insurance',
     'Other'
   ];
+
+  // Calculate expiration date when issued date or valid days change
+  useEffect(() => {
+    if (formData.referral?.issuedDate && formData.referral?.validDays) {
+      const issuedDate = new Date(formData.referral.issuedDate);
+      const expirationDate = new Date(issuedDate);
+      expirationDate.setDate(expirationDate.getDate() + parseInt(formData.referral.validDays));
+      setCalculatedExpiration(expirationDate.toLocaleDateString());
+
+      // Update the form data with calculated expiration
+      updateFormData({
+        referral: {
+          ...formData.referral,
+          expirationDate: expirationDate.toISOString()
+        }
+      });
+    } else {
+      setCalculatedExpiration('');
+    }
+  }, [formData.referral?.issuedDate, formData.referral?.validDays]);
 
   const handleReferralChange = (field, value) => {
     if (field.includes('.')) {
@@ -59,18 +83,18 @@ const ReferralsTab = ({ formData, updateFormData }) => {
             <input
               type="text"
               className="form-input"
-              value={formData.referral.referredBy}
-              onChange={(e) => handleReferralChange('referredBy', e.target.value)}
+              value={formData.referral.referredByName || ''}
+              onChange={(e) => handleReferralChange('referredByName', e.target.value)}
               placeholder="Enter referrer name or select from dropdown"
               list="saved-referrers"
             />
-            
+
             <datalist id="saved-referrers">
               {savedReferrers.map((referrer, index) => (
                 <option key={index} value={referrer} />
               ))}
             </datalist>
-            
+
             <button
               type="button"
               className="add-referrer-btn"
@@ -81,12 +105,12 @@ const ReferralsTab = ({ formData, updateFormData }) => {
             </button>
           </div>
         </div>
-        
+
         <div className="form-group">
           <label className="required">Referral Source</label>
           <select
             className="form-select"
-            value={formData.referral.source}
+            value={formData.referral.source || 'Patient'}
             onChange={(e) => handleReferralChange('source', e.target.value)}
             required
           >
@@ -97,18 +121,101 @@ const ReferralsTab = ({ formData, updateFormData }) => {
         </div>
       </div>
 
-      <div className="form-group">
-        <div className="form-checkbox">
+      {/* Referral Timing Section */}
+      <div className="section-header">📅 Referral Timing & Validity</div>
+
+      <div className="form-grid form-grid-3">
+        <div className="form-group">
+          <label>Referral Issued Date</label>
           <input
-            type="checkbox"
-            id="referral-bonus"
-            checked={formData.referral.bonusPaid}
-            onChange={(e) => handleReferralChange('bonusPaid', e.target.checked)}
+            type="date"
+            className="form-input"
+            value={formData.referral.issuedDate ? new Date(formData.referral.issuedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+            onChange={(e) => handleReferralChange('issuedDate', e.target.value)}
           />
-          <label htmlFor="referral-bonus">Referral Bonus Paid</label>
+          <small className="field-hint">Date when the referral was issued</small>
         </div>
+
+        <div className="form-group">
+          <label>Valid Days</label>
+          <input
+            type="number"
+            className="form-input"
+            value={formData.referral.validDays || 60}
+            onChange={(e) => handleReferralChange('validDays', parseInt(e.target.value) || 60)}
+            min="1"
+            max="365"
+            placeholder="60"
+          />
+          <small className="field-hint">Number of days the referral is valid</small>
+        </div>
+
+        <div className="form-group">
+          <label>Calculated Expiration</label>
+          <input
+            type="text"
+            className={`form-input calculated-expiration ${calculatedExpiration && new Date(calculatedExpiration) < new Date() ? 'expired' : ''}`}
+            value={calculatedExpiration}
+            readOnly
+            placeholder="Auto-calculated"
+          />
+          <small className="field-hint">
+            {calculatedExpiration && new Date(calculatedExpiration) < new Date() ?
+              '⚠️ Referral has expired' :
+              'Automatically calculated expiration date'
+            }
+          </small>
+        </div>
+      </div>
+
+      {/* Bonus Tracking Section */}
+      <div className="section-header">💰 Bonus Tracking</div>
+
+      <div className="form-grid form-grid-2">
+        <div className="form-group">
+          <div className="form-checkbox">
+            <input
+              type="checkbox"
+              id="referral-bonus"
+              checked={formData.referral.bonusPaid || false}
+              onChange={(e) => handleReferralChange('bonusPaid', e.target.checked)}
+            />
+            <label htmlFor="referral-bonus">Referral Bonus Paid</label>
+          </div>
+          <small className="field-hint">
+            Check this box if an incentive payout has been logged for this referral
+          </small>
+        </div>
+
+        {formData.referral.bonusPaid && (
+          <div className="form-group">
+            <label>Payout Amount ($)</label>
+            <input
+              type="number"
+              className="form-input"
+              value={formData.referral.payoutAmount || ''}
+              onChange={(e) => handleReferralChange('payoutAmount', parseFloat(e.target.value) || 0)}
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+            <small className="field-hint">Amount paid for this referral</small>
+          </div>
+        )}
+      </div>
+
+      {/* Referral Notes Section */}
+      <div className="form-group">
+        <label>Referral Notes</label>
+        <textarea
+          className="form-textarea"
+          value={formData.referral.notes || ''}
+          onChange={(e) => handleReferralChange('notes', e.target.value)}
+          placeholder="Optional notes for internal use..."
+          rows="3"
+        />
         <small className="field-hint">
-          Check this box if an incentive payout has been logged for this referral
+          Internal notes about this referral (not visible to patient)
         </small>
       </div>
 
@@ -167,29 +274,56 @@ const ReferralsTab = ({ formData, updateFormData }) => {
       )}
 
       <div className="referral-summary">
-        <h4>Referral Summary</h4>
+        <h4>📊 Referral Summary</h4>
         <div className="summary-grid">
           <div className="summary-item">
             <label>Source:</label>
-            <span>{formData.referral.source || 'Not specified'}</span>
+            <span className="summary-value">{formData.referral.source || 'Patient'}</span>
           </div>
-          
+
           <div className="summary-item">
             <label>Referred By:</label>
-            <span>{formData.referral.referredBy || 'Not specified'}</span>
+            <span className="summary-value">{formData.referral.referredByName || 'Not specified'}</span>
           </div>
-          
+
           <div className="summary-item">
-            <label>Bonus Status:</label>
-            <span className={`bonus-status ${formData.referral.bonusPaid ? 'paid' : 'unpaid'}`}>
-              {formData.referral.bonusPaid ? '✅ Paid' : '⏳ Pending'}
+            <label>Issued:</label>
+            <span className="summary-value">
+              {formData.referral.issuedDate ?
+                new Date(formData.referral.issuedDate).toLocaleDateString() :
+                new Date().toLocaleDateString()
+              }
             </span>
           </div>
-          
-          {formData.referral.source === 'MD' && formData.referral.referringDoctor.name && (
+
+          <div className="summary-item">
+            <label>Valid Until:</label>
+            <span className={`summary-value ${calculatedExpiration && new Date(calculatedExpiration) < new Date() ? 'expired' : ''}`}>
+              {calculatedExpiration || 'Not calculated'}
+              {calculatedExpiration && new Date(calculatedExpiration) < new Date() && ' (EXPIRED)'}
+            </span>
+          </div>
+
+          <div className="summary-item">
+            <label>Bonus Status:</label>
+            <span className={`bonus-status ${formData.referral.bonusPaid ? 'paid' : 'pending'}`}>
+              {formData.referral.bonusPaid ? '✅ Paid' : '🕒 Pending'}
+            </span>
+          </div>
+
+          {formData.referral.bonusPaid && formData.referral.payoutAmount && (
+            <div className="summary-item">
+              <label>Payout Amount:</label>
+              <span className="summary-value payout-amount">
+                ${formData.referral.payoutAmount.toFixed(2)}
+              </span>
+            </div>
+          )}
+
+          {formData.referral.source === 'MD' && formData.referral.referringDoctor?.name && (
             <div className="summary-item">
               <label>Doctor:</label>
-              <span>{formData.referral.referringDoctor.name}</span>
+              <span className="summary-value">{formData.referral.referringDoctor.name}</span>
             </div>
           )}
         </div>

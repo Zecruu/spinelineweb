@@ -1,0 +1,290 @@
+/* Doctor Sidebar Specific Styles - No conflicts with Secretary Dashboard */
+.doctor-sidebar-container .doctor-top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-sidebar-container .doctor-hamburger-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.doctor-sidebar-container .doctor-hamburger-btn span {
+  width: 24px;
+  height: 3px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.doctor-sidebar-container .doctor-hamburger-btn:hover span {
+  background: #3b82f6;
+}
+
+.doctor-sidebar-container .doctor-header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.doctor-sidebar-container .doctor-header-title h1 {
+  color: #3b82f6;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.doctor-sidebar-container .doctor-header-title .clinic-name {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: -2px;
+}
+
+.doctor-sidebar-container .doctor-header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.doctor-sidebar-container .doctor-header-user .user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.doctor-sidebar-container .doctor-header-user .user-name {
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+.doctor-sidebar-container .doctor-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+}
+
+.doctor-sidebar-container .doctor-sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+  border-right: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  transition: left 0.3s ease;
+  z-index: 95;
+  overflow-y: auto;
+}
+
+.doctor-sidebar-container .doctor-sidebar.sidebar-open {
+  left: 0;
+}
+
+.doctor-sidebar-container .doctor-sidebar-header {
+  padding: 2rem 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, #1e293b 0%, #2d3748 100%);
+}
+
+.doctor-sidebar-container .doctor-sidebar-header h1 {
+  color: #3b82f6;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.doctor-sidebar-container .doctor-user-info {
+  text-align: center;
+}
+
+.doctor-sidebar-container .doctor-user-info .user-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.doctor-sidebar-container .doctor-user-info .user-role {
+  color: #3b82f6;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.doctor-sidebar-container .doctor-user-info .clinic-name {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.doctor-sidebar-container .doctor-sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.doctor-sidebar-container .doctor-nav-item {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.doctor-sidebar-container .doctor-nav-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #f1f5f9;
+  border-left-color: #3b82f6;
+}
+
+.doctor-sidebar-container .doctor-nav-item.active {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%);
+  color: #3b82f6;
+  border-left-color: #3b82f6;
+  font-weight: 600;
+}
+
+.doctor-sidebar-container .doctor-sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%);
+}
+
+.doctor-sidebar-container .doctor-logout-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.doctor-sidebar-container .doctor-logout-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .doctor-sidebar-container .doctor-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-sidebar-container .doctor-sidebar {
+    width: 100%;
+  }
+
+  .doctor-sidebar-container .doctor-header-title h1 {
+    font-size: 1.2rem;
+  }
+
+  .doctor-sidebar-container .doctor-header-user .user-name {
+    display: none;
+  }
+
+  .doctor-sidebar-container .doctor-top-header {
+    padding: 0 1rem;
+  }
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.doctor-sidebar-container .doctor-sidebar.sidebar-open {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Focus states */
+.doctor-sidebar-container .doctor-hamburger-btn:focus,
+.doctor-sidebar-container .doctor-nav-item:focus,
+.doctor-sidebar-container .doctor-logout-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+.doctor-sidebar-container .doctor-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.doctor-sidebar-container .doctor-sidebar::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.doctor-sidebar-container .doctor-sidebar::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.doctor-sidebar-container .doctor-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

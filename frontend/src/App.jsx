@@ -3,12 +3,14 @@ import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import UserLogin from './pages/UserLogin'
 import SecretaryDashboard from './pages/SecretaryDashboard'
+import DoctorDashboard from './pages/DoctorDashboard'
+import PatientEncounter from './pages/PatientEncounter'
 import PatientCheckout from './pages/PatientCheckout'
 import Checkout from './pages/Checkout'
 import './App.css'
 
 function App() {
-  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'admin-dashboard', 'patient-checkout', 'checkout'
+  const [currentView, setCurrentView] = useState('user-login') // 'user-login', 'admin-login', 'secretary-dashboard', 'doctor-dashboard', 'admin-dashboard', 'patient-checkout', 'checkout'
   const [userToken, setUserToken] = useState(null)
   const [userData, setUserData] = useState(null)
   const [adminToken, setAdminToken] = useState(null)
@@ -34,8 +36,10 @@ function App() {
 
           // Route based on user role
           const user = JSON.parse(userDataStored)
-          if (user.role === 'secretary' || user.role === 'doctor') {
+          if (user.role === 'secretary') {
             setCurrentView('secretary-dashboard')
+          } else if (user.role === 'doctor') {
+            setCurrentView('doctor-dashboard')
           }
         } catch (error) {
           console.error('Error parsing stored user data:', error)
@@ -79,8 +83,10 @@ function App() {
     localStorage.setItem('userData', JSON.stringify(user))
 
     // Route based on user role
-    if (user.role === 'secretary' || user.role === 'doctor') {
+    if (user.role === 'secretary') {
       setCurrentView('secretary-dashboard')
+    } else if (user.role === 'doctor') {
+      setCurrentView('doctor-dashboard')
     }
   }
 
@@ -143,6 +149,14 @@ function App() {
           user={userData}
           onLogout={handleUserLogout}
           onCheckout={handleCheckout}
+        />
+      )}
+
+      {currentView === 'doctor-dashboard' && (
+        <DoctorDashboard
+          token={userToken}
+          user={userData}
+          onLogout={handleUserLogout}
         />
       )}
 

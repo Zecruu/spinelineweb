@@ -1,0 +1,257 @@
+.doctor-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+.doctor-main-content {
+  flex: 1;
+  margin-left: 0;
+  margin-top: 70px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Section */
+.doctor-header {
+  background: #1e293b;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.date-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.date-selector-container h1 {
+  color: #3b82f6;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #334155;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.date-selector label {
+  font-size: 1.2rem;
+}
+
+.date-input {
+  background: transparent;
+  border: none;
+  color: #f1f5f9;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.date-display {
+  color: #94a3b8;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-card {
+  background: #334155;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  min-width: 100px;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card.checked-in .stat-number {
+  color: #10b981;
+}
+
+.stat-card.checked-out .stat-number {
+  color: #3b82f6;
+}
+
+.stat-card.needs-review .stat-number {
+  color: #f59e0b;
+}
+
+/* Filters Toggle */
+.filters-toggle {
+  background: #475569;
+  color: #f1f5f9;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filters-toggle:hover {
+  background: #64748b;
+}
+
+/* Main Content */
+.doctor-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.patient-tables-container {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #334155;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .doctor-main-content {
+    margin-left: 0;
+  }
+  
+  .doctor-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .date-selector-container {
+    justify-content: space-between;
+  }
+  
+  .dashboard-stats {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-header {
+    padding: 1rem;
+  }
+  
+  .date-selector-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .date-selector-container h1 {
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-stats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .patient-tables-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+
+/* Scrollbar Styling */
+.patient-tables-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.patient-tables-container::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.patient-tables-container::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.patient-tables-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

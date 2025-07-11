@@ -260,54 +260,67 @@ const Checkout = ({ token, user, appointmentId, onBack }) => {
         </div>
 
         <div className="checkout-sections">
-          {/* Schedule Next Visit */}
-          <ScheduleNextVisit 
-            patientId={patient?._id}
-            token={token}
-          />
+          {/* Left Panel - Schedule Next Visit */}
+          <div className="checkout-left-panel">
+            <ScheduleNextVisit
+              patientId={patient?._id}
+              token={token}
+            />
+          </div>
 
-          {/* Billing Codes */}
-          <BillingCodesDisplay
-            billingCodes={billingCodes}
-            setBillingCodes={setBillingCodes}
-            appointmentId={appointmentId}
-            patient={patient}
-            token={token}
-            onCodesChange={calculateTotal}
-          />
+          {/* Right Panel - Main Content */}
+          <div className="checkout-right-panel">
+            {/* Center Column */}
+            <div className="checkout-center-column">
+              {/* Billing Codes */}
+              <BillingCodesDisplay
+                billingCodes={billingCodes}
+                setBillingCodes={setBillingCodes}
+                appointmentId={appointmentId}
+                patient={patient}
+                token={token}
+                onCodesChange={calculateTotal}
+              />
 
-          {/* Care Packages */}
-          <CarePackageDisplay
-            carePackages={carePackages}
-            setCarePackages={setCarePackages}
-            patientId={patient?._id}
-            billingCodes={billingCodes}
-            token={token}
-          />
+              {/* Diagnostic Codes */}
+              <DiagnosticCodesDisplay
+                diagnosticCodes={diagnosticCodes}
+                appointmentId={appointmentId}
+                token={token}
+              />
+            </div>
 
-          {/* Diagnostic Codes */}
-          <DiagnosticCodesDisplay
-            diagnosticCodes={diagnosticCodes}
-            appointmentId={appointmentId}
-            token={token}
-          />
+            {/* Right Column */}
+            <div className="checkout-right-column">
+              {/* Care Packages */}
+              <CarePackageDisplay
+                carePackages={carePackages}
+                setCarePackages={setCarePackages}
+                patientId={patient?._id}
+                billingCodes={billingCodes}
+                token={token}
+              />
 
-          {/* Copay Logic */}
-          <CopayLogic
-            billingCodes={billingCodes}
-            patient={patient}
-            totalAmount={totalAmount}
-            setTotalAmount={setTotalAmount}
-          />
+              {/* Insurance & Copay Logic */}
+              <CopayLogic
+                billingCodes={billingCodes}
+                patient={patient}
+                totalAmount={totalAmount}
+                setTotalAmount={setTotalAmount}
+              />
 
-          {/* Change Calculator */}
-          <ChangeCalculator
-            totalAmount={totalAmount}
-            paymentData={paymentData}
-            setPaymentData={setPaymentData}
-          />
+              {/* Change Calculator */}
+              <ChangeCalculator
+                totalAmount={totalAmount}
+                paymentData={paymentData}
+                setPaymentData={setPaymentData}
+              />
+            </div>
+          </div>
+        </div>
 
-          {/* E-Signature */}
+        {/* E-Signature - Full Width */}
+        <div className="checkout-signature-section">
           <ESignatureCapture
             signature={signature}
             setSignature={setSignature}

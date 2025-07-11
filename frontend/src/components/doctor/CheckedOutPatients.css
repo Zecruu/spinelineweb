@@ -1,0 +1,264 @@
+.patient-table-section.checked-out {
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.checked-out .section-header h2 {
+  color: #3b82f6;
+}
+
+.review-count {
+  color: #f59e0b;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* Patient Row Highlighting */
+.patient-row.needs-review {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 4px solid #f59e0b;
+}
+
+.patient-row.needs-review:hover {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+/* Time Column for Checked Out */
+.checked-out .col-time {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.checkout-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Review Status */
+.review-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-icon {
+  font-size: 1.1rem;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.status-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.soap-info {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.review-status.needs-review .status-label {
+  color: #f59e0b;
+}
+
+.review-status.complete .status-label {
+  color: #10b981;
+}
+
+/* Action Buttons for Checked Out */
+.checked-out .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.checked-out .btn-action {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.checked-out .btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.checked-out .btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.checked-out .btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.checked-out .btn-secondary:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.checked-out .btn-warning {
+  background: #f59e0b;
+  color: white;
+  animation: pulse-warning 2s infinite;
+}
+
+.checked-out .btn-warning:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  animation: none;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+  }
+}
+
+/* Documentation Status Indicators */
+.review-status.needs-review {
+  position: relative;
+}
+
+.review-status.needs-review::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 2px;
+}
+
+/* Enhanced Empty State */
+.checked-out .empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.checked-out .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.checked-out .empty-state p {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  color: #e2e8f0;
+}
+
+.checked-out .empty-state small {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Responsive Design for Checked Out */
+@media (max-width: 1200px) {
+  .checked-out .table-header,
+  .checked-out .patient-row {
+    grid-template-columns: 120px 1fr 130px 140px 180px;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+  }
+  
+  .checked-out .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .checked-out .btn-action {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .checked-out .table-header,
+  .checked-out .patient-row {
+    grid-template-columns: 100px 1fr 100px 120px 140px;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .review-status {
+    gap: 0.5rem;
+  }
+  
+  .status-info {
+    gap: 0.125rem;
+  }
+  
+  .status-label {
+    font-size: 0.8rem;
+  }
+  
+  .soap-info {
+    font-size: 0.7rem;
+  }
+}
+
+/* Priority Indicators */
+.patient-row.needs-review .patient-name {
+  position: relative;
+}
+
+.patient-row.needs-review .patient-name::after {
+  content: '!';
+  position: absolute;
+  right: -12px;
+  top: -2px;
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Hover Effects */
+.checked-out .patient-row:hover .review-status.needs-review .status-label {
+  color: #d97706;
+}
+
+.checked-out .patient-row:hover .review-status.complete .status-label {
+  color: #059669;
+}
+
+/* Table Sorting Indicators */
+.checked-out .table-header .col-status {
+  position: relative;
+  cursor: pointer;
+}
+
+.checked-out .table-header .col-status:hover {
+  color: #3b82f6;
+}
+
+.checked-out .table-header .col-status::after {
+  content: '⇅';
+  position: absolute;
+  right: 8px;
+  opacity: 0.5;
+  font-size: 0.8rem;
+}

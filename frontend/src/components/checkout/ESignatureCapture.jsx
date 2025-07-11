@@ -5,6 +5,7 @@ const ESignatureCapture = ({ signature, setSignature, billingCodes, totalAmount 
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
+  const [showEPadModal, setShowEPadModal] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -151,14 +152,21 @@ const ESignatureCapture = ({ signature, setSignature, billingCodes, totalAmount 
         </div>
         
         <div className="signature-controls">
-          <button 
+          <button
+            className="btn-primary btn-epad"
+            onClick={() => setShowEPadModal(true)}
+          >
+            📱 Use E-Pad
+          </button>
+
+          <button
             className="btn-danger"
             onClick={clearSignature}
             disabled={!hasSignature}
           >
             Clear Signature
           </button>
-          
+
           <div className="signature-status">
             {hasSignature ? (
               <span className="signature-valid">✓ Signature Captured</span>
@@ -174,12 +182,85 @@ const ESignatureCapture = ({ signature, setSignature, billingCodes, totalAmount 
           <strong>Note:</strong> This digital signature has the same legal effect as a handwritten signature.
           By signing, you acknowledge that you have read and agree to the terms above.
         </p>
-        
+
         <div className="signature-metadata">
           <p>Date: {new Date().toLocaleDateString()}</p>
           <p>Time: {new Date().toLocaleTimeString()}</p>
         </div>
       </div>
+
+      {/* E-Pad Modal */}
+      {showEPadModal && (
+        <div className="modal-overlay">
+          <div className="epad-modal">
+            <div className="modal-header">
+              <h3>📱 E-Pad Signature</h3>
+              <button
+                className="btn-close"
+                onClick={() => setShowEPadModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="epad-content">
+              <div className="epad-instructions">
+                <h4>Instructions for Patient:</h4>
+                <ol>
+                  <li>Use your finger or stylus to sign in the area below</li>
+                  <li>Sign clearly and legibly</li>
+                  <li>Click "Accept Signature" when complete</li>
+                  <li>Click "Clear" to start over if needed</li>
+                </ol>
+              </div>
+
+              <div className="epad-signature-area">
+                <canvas
+                  ref={canvasRef}
+                  width={700}
+                  height={300}
+                  className="epad-canvas"
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                />
+
+                {!hasSignature && (
+                  <div className="epad-placeholder">
+                    Please sign here
+                  </div>
+                )}
+              </div>
+
+              <div className="epad-controls">
+                <button
+                  className="btn-danger"
+                  onClick={clearSignature}
+                >
+                  Clear
+                </button>
+
+                <button
+                  className="btn-success"
+                  onClick={() => {
+                    if (hasSignature) {
+                      captureSignature();
+                      setShowEPadModal(false);
+                    }
+                  }}
+                  disabled={!hasSignature}
+                >
+                  Accept Signature
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

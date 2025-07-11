@@ -101,14 +101,60 @@ const patientSchema = new mongoose.Schema({
 
   // Referral Information
   referral: {
+    // Referral Source and Attribution
+    source: {
+      type: String,
+      enum: ['Patient', 'Google', 'Doctor', 'Social Media', 'MD', 'Facebook', 'Google Ads', 'Website', 'Word of Mouth', 'Insurance', 'Other'],
+      default: 'Patient'
+    },
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Patient', // Reference to another patient who referred this one
+      default: null
+    },
+    referredByName: {
+      type: String,
+      trim: true
+    },
+
+    // Referral Timing and Validity
+    issuedDate: {
+      type: Date,
+      default: Date.now
+    },
+    validDays: {
+      type: Number,
+      min: 1,
+      default: 60 // Default 60 days validity
+    },
+    expirationDate: {
+      type: Date
+    },
+
+    // Bonus and Payout Tracking
+    bonusPaid: {
+      type: Boolean,
+      default: false
+    },
+    payoutDate: {
+      type: Date
+    },
+    payoutHandledBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    payoutAmount: {
+      type: Number,
+      min: 0
+    },
+
+    // Medical Referral Information (for MD referrals)
     referringDoctor: {
       name: String,
       phone: String,
       email: String,
       npi: String
     },
-    referralDate: Date,
-    expirationDate: Date,
     visitsAuthorized: {
       type: Number,
       min: 0
@@ -119,6 +165,8 @@ const patientSchema = new mongoose.Schema({
       default: 0
     },
     diagnosis: String,
+
+    // General Information
     notes: String,
     isActive: {
       type: Boolean,
@@ -128,7 +176,17 @@ const patientSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    reminderDate: Date
+    reminderDate: Date,
+
+    // Audit Trail
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    lastModifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   },
 
   // Active Packages
@@ -305,6 +363,33 @@ patientSchema.index({ 'alerts.isActive': 1, 'alerts.priority': 1 });
 // Virtual for full name
 patientSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
+});
+
+// Virtual for referral expiration status
+patientSchema.virtual('referral.isExpired').get(function() {
+  if (!this.referral?.expirationDate) return false;
+  return new Date(this.referral.expirationDate) < new Date();
+});
+
+// Virtual for referral days remaining
+patientSchema.virtual('referral.daysRemaining').get(function() {
+  if (!this.referral?.expirationDate) return null;
+  const today = new Date();
+  const expiration = new Date(this.referral.expirationDate);
+  const diffTime = expiration - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+});
+
+// Pre-save middleware to calculate expiration date
+patientSchema.pre('save', function(next) {
+  if (this.referral && this.referral.issuedDate && this.referral.validDays) {
+    const issuedDate = new Date(this.referral.issuedDate);
+    const expirationDate = new Date(issuedDate);
+    expirationDate.setDate(expirationDate.getDate() + this.referral.validDays);
+    this.referral.expirationDate = expirationDate;
+  }
+  next();
 });
 
 // Virtual for age

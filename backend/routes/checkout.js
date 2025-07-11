@@ -3,6 +3,7 @@ const router = express.Router();
 const Appointment = require('../models/Appointment');
 const Ledger = require('../models/Ledger');
 const AuditLog = require('../models/AuditLog');
+const Patient = require('../models/Patient');
 const { authenticateToken } = require('../middleware/auth');
 
 // Complete checkout process
@@ -29,11 +30,11 @@ router.post('/complete', authenticateToken, async (req, res) => {
       });
     }
 
-    // Find the appointment
+    // Find the appointment and populate patient with referral info
     const appointment = await Appointment.findOne({
       _id: appointmentId,
       clinicId: req.user.clinicId
-    }).populate('patientId', 'firstName lastName recordNumber');
+    }).populate('patientId', 'firstName lastName recordNumber referral');
 
     if (!appointment) {
       return res.status(404).json({
@@ -41,6 +42,8 @@ router.post('/complete', authenticateToken, async (req, res) => {
         message: 'Appointment not found'
       });
     }
+
+    const patient = appointment.patientId;
 
     // Update appointment status to checked out
     appointment.status = 'checked-out';
@@ -176,6 +179,42 @@ router.post('/complete', authenticateToken, async (req, res) => {
 
     await auditLog.save();
 
+    // Handle referral bonus automation
+    let bonusProcessed = false;
+    if (patient.referral && patient.referral.referredBy && !patient.referral.bonusPaid) {
+      try {
+        // Update the patient's referral bonus status
+        await Patient.findByIdAndUpdate(patient._id, {
+          'referral.bonusPaid': true,
+          'referral.payoutDate': new Date(),
+          'referral.payoutHandledBy': req.user.id
+        });
+
+        // Add referral bonus event to audit log
+        auditLog.auditEvents.push({
+          eventType: 'referral_bonus_triggered',
+          timestamp: new Date(),
+          userId: req.user.id,
+          description: `Referral bonus triggered for patient ${patient.firstName} ${patient.lastName}`,
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: {
+            referredPatientId: patient._id,
+            referrerPatientId: patient.referral.referredBy,
+            bonusAmount: patient.referral.payoutAmount || 0
+          }
+        });
+
+        await auditLog.save();
+        bonusProcessed = true;
+
+        console.log(`Referral bonus processed for patient ${patient.firstName} ${patient.lastName} (${patient._id})`);
+      } catch (bonusError) {
+        console.error('Error processing referral bonus:', bonusError);
+        // Don't fail the checkout if bonus processing fails
+      }
+    }
+
     res.status(200).json({
       status: 'success',
       message: 'Checkout completed successfully',
@@ -185,7 +224,8 @@ router.post('/complete', authenticateToken, async (req, res) => {
         auditLogId: auditLog._id,
         checkoutTime: appointment.checkOutTime,
         totalAmount,
-        paymentMethod: paymentData.method
+        paymentMethod: paymentData.method,
+        bonusProcessed
       }
     });
 

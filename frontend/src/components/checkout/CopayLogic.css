@@ -1,4 +1,22 @@
-.insurance-info-card {
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  margin: 0;
+}
+
+.btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.insurance-info-card, .referral-info-card {
   background: #334155;
   border-radius: 8px;
   padding: 1.5rem;
@@ -6,21 +24,63 @@
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.insurance-info-card h4 {
-  color: #3b82f6;
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
+.card-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.insurance-details {
+.card-header h4 {
+  color: #3b82f6;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.insured {
+  background: #10b981;
+  color: white;
+}
+
+.status-badge.uninsured {
+  background: #ef4444;
+  color: white;
+}
+
+.status-badge.active {
+  background: #10b981;
+  color: white;
+}
+
+.status-badge.expired {
+  background: #f59e0b;
+  color: white;
+}
+
+.status-badge.inactive {
+  background: #6b7280;
+  color: white;
+}
+
+.status-badge.none {
+  background: #374151;
+  color: #9ca3af;
+}
+
+.insurance-details, .referral-details {
   display: grid;
   gap: 0.75rem;
 }
 
-.insurance-row {
+.insurance-row, .referral-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,18 +88,26 @@
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.insurance-row:last-child {
+.insurance-row:last-child, .referral-row:last-child {
   border-bottom: none;
 }
 
-.insurance-row .label {
+.insurance-row .label, .referral-row .label {
   color: #94a3b8;
   font-weight: 500;
 }
 
-.insurance-row .value {
+.insurance-row .value, .referral-row .value {
   color: #f1f5f9;
   font-weight: 600;
+}
+
+.insurance-row .value.expired, .referral-row .value.expired {
+  color: #ef4444;
+}
+
+.insurance-row .value.warning, .referral-row .value.warning {
+  color: #f59e0b;
 }
 
 .status.insured {

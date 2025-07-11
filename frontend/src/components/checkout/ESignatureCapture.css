@@ -82,6 +82,18 @@
   gap: 1rem;
 }
 
+.btn-epad {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #10b981;
+  font-weight: 600;
+}
+
+.btn-epad:hover {
+  background: #059669;
+}
+
 .signature-status {
   font-weight: 600;
 }
@@ -182,4 +194,144 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* E-Pad Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.epad-modal {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.modal-header h3 {
+  color: #3b82f6;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.btn-close {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.epad-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.epad-instructions {
+  background: #334155;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.epad-instructions h4 {
+  color: #10b981;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.epad-instructions ol {
+  color: #e2e8f0;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.epad-instructions li {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.epad-signature-area {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+  overflow: hidden;
+}
+
+.epad-canvas {
+  display: block;
+  width: 100%;
+  height: 300px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.epad-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #6b7280;
+  font-size: 1.2rem;
+  font-weight: 500;
+  pointer-events: none;
+  text-align: center;
+}
+
+.epad-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.epad-controls button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.epad-controls .btn-success:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
 }

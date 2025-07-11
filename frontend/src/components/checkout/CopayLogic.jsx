@@ -3,6 +3,7 @@ import './CopayLogic.css';
 
 const CopayLogic = ({ billingCodes, patient, totalAmount, setTotalAmount }) => {
   const [copayOverrides, setCopayOverrides] = useState({});
+  const [showEditModal, setShowEditModal] = useState(false);
   const [insuranceCalculation, setInsuranceCalculation] = useState({
     coveredAmount: 0,
     copayAmount: 0,
@@ -87,24 +88,65 @@ const CopayLogic = ({ billingCodes, patient, totalAmount, setTotalAmount }) => {
   };
 
   const getInsuranceInfo = () => {
-    if (!patient?.insurance) {
+    if (!patient?.insuranceInfo || patient.insuranceInfo.length === 0) {
       return {
         provider: 'Self-Pay',
         policyNumber: 'N/A',
         groupNumber: 'N/A',
-        status: 'uninsured'
+        status: 'uninsured',
+        copay: 0,
+        effectiveDate: null,
+        expirationDate: null
       };
     }
 
+    // Get primary insurance or first active insurance
+    const primaryInsurance = patient.insuranceInfo.find(ins => ins.isPrimary && ins.isActive) ||
+                            patient.insuranceInfo.find(ins => ins.isActive) ||
+                            patient.insuranceInfo[0];
+
     return {
-      provider: patient.insurance.provider || 'Unknown',
-      policyNumber: patient.insurance.policyNumber || 'N/A',
-      groupNumber: patient.insurance.groupNumber || 'N/A',
-      status: 'insured'
+      provider: primaryInsurance.companyName || 'Unknown',
+      policyNumber: primaryInsurance.policyNumber || 'N/A',
+      groupNumber: primaryInsurance.groupId || 'N/A',
+      status: 'insured',
+      copay: primaryInsurance.copay || 0,
+      effectiveDate: primaryInsurance.effectiveDate,
+      expirationDate: primaryInsurance.expirationDate,
+      deductible: primaryInsurance.deductible || 0,
+      deductibleMet: primaryInsurance.deductibleMet || 0
+    };
+  };
+
+  const getReferralInfo = () => {
+    if (!patient?.referral) {
+      return {
+        status: 'none',
+        referringDoctor: 'N/A',
+        expirationDate: null,
+        visitsRemaining: 0,
+        isExpired: false
+      };
+    }
+
+    const referral = patient.referral;
+    const isExpired = referral.expirationDate && new Date(referral.expirationDate) < new Date();
+    const visitsRemaining = Math.max(0, (referral.visitsAuthorized || 0) - (referral.visitsUsed || 0));
+
+    return {
+      status: referral.isActive ? (isExpired ? 'expired' : 'active') : 'inactive',
+      referringDoctor: referral.referringDoctor?.name || 'N/A',
+      expirationDate: referral.expirationDate,
+      visitsRemaining,
+      isExpired,
+      visitsAuthorized: referral.visitsAuthorized || 0,
+      visitsUsed: referral.visitsUsed || 0,
+      diagnosis: referral.diagnosis
     };
   };
 
   const insuranceInfo = getInsuranceInfo();
+  const referralInfo = getReferralInfo();
 
   const getCoverageStatus = (code) => {
     const override = copayOverrides[code.code];
@@ -142,10 +184,23 @@ const CopayLogic = ({ billingCodes, patient, totalAmount, setTotalAmount }) => {
 
   return (
     <div className="checkout-section">
-      <h3>💰 Insurance & Copay Logic</h3>
-      
+      <div className="section-header">
+        <h3>💰 Insurance & Copay</h3>
+        <button
+          className="btn-secondary btn-edit"
+          onClick={() => setShowEditModal(true)}
+        >
+          ✏️ Edit
+        </button>
+      </div>
+
       <div className="insurance-info-card">
-        <h4>🏥 Insurance Information</h4>
+        <div className="card-header">
+          <h4>🏥 Insurance Information</h4>
+          <span className={`status-badge ${insuranceInfo.status}`}>
+            {insuranceInfo.status === 'insured' ? '✅ Insured' : '❌ Self-Pay'}
+          </span>
+        </div>
         <div className="insurance-details">
           <div className="insurance-row">
             <span className="label">Provider:</span>
@@ -159,12 +214,68 @@ const CopayLogic = ({ billingCodes, patient, totalAmount, setTotalAmount }) => {
             <span className="label">Group #:</span>
             <span className="value">{insuranceInfo.groupNumber}</span>
           </div>
-          <div className="insurance-row">
-            <span className="label">Status:</span>
-            <span className={`status ${insuranceInfo.status}`}>
-              {insuranceInfo.status === 'insured' ? '✅ Insured' : '❌ Self-Pay'}
-            </span>
+          {insuranceInfo.status === 'insured' && (
+            <>
+              <div className="insurance-row">
+                <span className="label">Copay:</span>
+                <span className="value">${insuranceInfo.copay.toFixed(2)}</span>
+              </div>
+              {insuranceInfo.expirationDate && (
+                <div className="insurance-row">
+                  <span className="label">Expires:</span>
+                  <span className={`value ${new Date(insuranceInfo.expirationDate) < new Date() ? 'expired' : ''}`}>
+                    {new Date(insuranceInfo.expirationDate).toLocaleDateString()}
+                    {new Date(insuranceInfo.expirationDate) < new Date() && ' (EXPIRED)'}
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Referral Information */}
+      <div className="referral-info-card">
+        <div className="card-header">
+          <h4>📋 Referral Status</h4>
+          <span className={`status-badge ${referralInfo.status}`}>
+            {referralInfo.status === 'active' ? '✅ Active' :
+             referralInfo.status === 'expired' ? '⚠️ Expired' :
+             referralInfo.status === 'inactive' ? '❌ Inactive' : '➖ None'}
+          </span>
+        </div>
+        <div className="referral-details">
+          <div className="referral-row">
+            <span className="label">Referring Doctor:</span>
+            <span className="value">{referralInfo.referringDoctor}</span>
           </div>
+          {referralInfo.status !== 'none' && (
+            <>
+              {referralInfo.expirationDate && (
+                <div className="referral-row">
+                  <span className="label">Expires:</span>
+                  <span className={`value ${referralInfo.isExpired ? 'expired' : ''}`}>
+                    {new Date(referralInfo.expirationDate).toLocaleDateString()}
+                    {referralInfo.isExpired && ' (EXPIRED)'}
+                  </span>
+                </div>
+              )}
+              <div className="referral-row">
+                <span className="label">Visits Remaining:</span>
+                <span className={`value ${referralInfo.visitsRemaining <= 2 ? 'warning' : ''}`}>
+                  {referralInfo.visitsRemaining} of {referralInfo.visitsAuthorized}
+                  {referralInfo.visitsRemaining <= 2 && referralInfo.visitsRemaining > 0 && ' (Low)'}
+                  {referralInfo.visitsRemaining === 0 && ' (Exhausted)'}
+                </span>
+              </div>
+              {referralInfo.diagnosis && (
+                <div className="referral-row">
+                  <span className="label">Diagnosis:</span>
+                  <span className="value">{referralInfo.diagnosis}</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 

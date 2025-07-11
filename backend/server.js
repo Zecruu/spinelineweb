@@ -68,6 +68,8 @@ const billingCodesRoutes = require('./routes/billingCodes');
 const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
 const carePackagesRoutes = require('./routes/carePackages');
 const checkoutRoutes = require('./routes/checkout');
+const referralsRoutes = require('./routes/referrals');
+const doctorRoutes = require('./routes/doctor');
 
 // API Routes - these must come BEFORE static file serving
 app.use('/api/admin', adminRoutes);
@@ -81,6 +83,8 @@ app.use('/api/billing-codes', billingCodesRoutes);
 app.use('/api/diagnostic-codes', diagnosticCodesRoutes);
 app.use('/api/care-packages', carePackagesRoutes);
 app.use('/api/checkout', checkoutRoutes);
+app.use('/api/referrals', referralsRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

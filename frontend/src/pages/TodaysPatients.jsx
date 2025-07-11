@@ -35,8 +35,6 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [searchType, setSearchType] = useState(''); // 'add-patient' or 'add-walkin'
   const [selectedPatientForAction, setSelectedPatientForAction] = useState(null);
-  const [selectedScheduledPatient, setSelectedScheduledPatient] = useState(null);
-  const [selectedCheckedInPatient, setSelectedCheckedInPatient] = useState(null);
   const [appointmentDetails, setAppointmentDetails] = useState({
     time: '',
     visitType: 'Regular',
@@ -77,8 +75,7 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
         });
 
         // Clear selections when data refreshes
-        setSelectedScheduledPatient(null);
-        setSelectedCheckedInPatient(null);
+        setSelectedPatient(null);
       } else {
         setError('Failed to fetch appointments');
       }
@@ -385,12 +382,12 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
             ) : (
               appointments.scheduled.map(appointment => {
                 const hexColor = colorMap[appointment.color] || colorMap.blue;
-                const isSelected = selectedScheduledPatient?._id === appointment._id;
+                const isSelected = selectedPatient?._id === appointment._id;
                 return (
                   <tr
                     key={appointment._id}
                     className={`patient-row ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setSelectedScheduledPatient(appointment)}
+                    onClick={() => handleAppointmentSelect(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
                       backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
@@ -413,14 +410,14 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
       <div className="table-bottom-actions">
         <button
           className="btn-action btn-checkin"
-          onClick={() => selectedScheduledPatient && handleCheckIn(selectedScheduledPatient._id)}
-          disabled={!selectedScheduledPatient}
+          onClick={() => selectedPatient && selectedPatient.status === 'scheduled' && handleCheckIn(selectedPatient._id)}
+          disabled={!selectedPatient || selectedPatient.status !== 'scheduled'}
         >
           Check In Selected Patient
         </button>
         <button
           className="btn-action btn-edit"
-          disabled={!selectedScheduledPatient}
+          disabled={!selectedPatient || selectedPatient.status !== 'scheduled'}
         >
           Edit Selected Patient
         </button>
@@ -452,12 +449,12 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
             ) : (
               appointments.checkedIn.map(appointment => {
                 const hexColor = colorMap[appointment.color] || colorMap.blue;
-                const isSelected = selectedCheckedInPatient?._id === appointment._id;
+                const isSelected = selectedPatient?._id === appointment._id;
                 return (
                   <tr
                     key={appointment._id}
                     className={`patient-row ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setSelectedCheckedInPatient(appointment)}
+                    onClick={() => handleAppointmentSelect(appointment)}
                     style={{
                       borderLeft: `4px solid ${hexColor}`,
                       backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
@@ -475,15 +472,15 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
       <div className="table-bottom-actions">
         <button
           className="btn-action btn-checkout"
-          onClick={() => selectedCheckedInPatient && onCheckout && onCheckout(selectedCheckedInPatient._id)}
-          disabled={!selectedCheckedInPatient}
+          onClick={() => selectedPatient && selectedPatient.status === 'checked-in' && onCheckout && onCheckout(selectedPatient._id)}
+          disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
         >
           Checkout Selected Patient
         </button>
         <button
           className="btn-action btn-uncheck"
-          onClick={() => selectedCheckedInPatient && handleUncheckPatient(selectedCheckedInPatient._id)}
-          disabled={!selectedCheckedInPatient}
+          onClick={() => selectedPatient && selectedPatient.status === 'checked-in' && handleUncheckPatient(selectedPatient._id)}
+          disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
         >
           Uncheck Selected Patient
         </button>
@@ -548,11 +545,11 @@ const TodaysPatients = ({ token, user, onCheckout }) => {
 
   // Render patient info preview
   const renderPatientInfo = () => (
-    <div className="patient-info-container">
+    <div className="patient-table-container">
       <div className="table-header">
         <h3>👤 Patient Info</h3>
       </div>
-      <div className="patient-info-content">
+      <div className="table-content patient-info-content">
         {selectedPatient ? (
           <div className="patient-details">
             <div className="patient-avatar">
