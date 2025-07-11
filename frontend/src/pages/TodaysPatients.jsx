@@ -445,18 +445,20 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
           <thead>
             <tr>
               <th>Patient Name</th>
-              <th>Check-in Time</th>
+              <th>Time</th>
+              <th>Signed</th>
             </tr>
           </thead>
           <tbody>
             {appointments.checkedIn.length === 0 ? (
               <tr>
-                <td colSpan="2" className="no-data">No checked-in patients</td>
+                <td colSpan="3" className="no-data">No checked-in patients</td>
               </tr>
             ) : (
               appointments.checkedIn.map(appointment => {
                 const hexColor = colorMap[appointment.color] || colorMap.blue;
                 const isSelected = selectedPatient?._id === appointment._id;
+                const isDoctorSigned = appointment.doctorSigned || appointment.soapNote?.isCompleted || false;
                 return (
                   <tr
                     key={appointment._id}
@@ -468,7 +470,14 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
                     }}
                   >
                     <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                    <td className="time">{formatDateTime(appointment.checkInTime)}</td>
+                    <td className="time">{formatTime(appointment.time)}</td>
+                    <td className="signature-status">
+                      {isDoctorSigned ? (
+                        <span className="signed-checkmark" title="Doctor has signed this visit">✅</span>
+                      ) : (
+                        <span className="unsigned-indicator" title="Awaiting doctor signature">⏳</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })

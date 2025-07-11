@@ -271,6 +271,23 @@
   font-size: 0.9rem;
 }
 
+/* Column width control for checked-in patients table */
+.patients-table th:nth-child(1),
+.patients-table td:nth-child(1) {
+  width: 50%; /* Patient Name */
+}
+
+.patients-table th:nth-child(2),
+.patients-table td:nth-child(2) {
+  width: 35%; /* Time */
+}
+
+.patients-table th:nth-child(3),
+.patients-table td:nth-child(3) {
+  width: 15%; /* Signed status */
+  text-align: center;
+}
+
 .patient-row {
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -638,6 +655,24 @@
 .visit-type {
   color: #a78bfa;
   font-weight: 600;
+}
+
+/* Signature Status Indicators */
+.signature-status {
+  text-align: center;
+  padding: 0.25rem;
+}
+
+.signed-checkmark {
+  color: #10b981;
+  font-size: 1.1rem;
+  cursor: help;
+}
+
+.unsigned-indicator {
+  color: #f59e0b;
+  font-size: 1.1rem;
+  cursor: help;
 }
 
 /* No Selection State */
