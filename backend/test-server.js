@@ -1,46 +1,90 @@
-// Minimal test server to debug Railway deployment issues
-console.log('🔄 Starting minimal test server...');
+// Ultra minimal test server for Railway debugging
+console.log('🔄 Starting ultra minimal test server...');
+console.log('Environment variables:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT:', process.env.PORT);
+console.log('- PWD:', process.env.PWD);
 
-try {
-  const express = require('express');
-  console.log('✅ Express loaded');
-  
-  const app = express();
-  console.log('✅ Express app created');
-  
-  // Minimal health check
-  app.get('/api/health', (req, res) => {
-    console.log('🔍 Health check requested');
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+const express = require('express');
+const app = express();
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  console.log('🔍 Health check requested at', new Date().toISOString());
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    port: process.env.PORT,
+    env: process.env.NODE_ENV
   });
-  
-  app.get('/', (req, res) => {
-    console.log('🔍 Root requested');
-    res.json({ message: 'Test server is running' });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  console.log('🔍 Root requested at', new Date().toISOString());
+  res.status(200).json({
+    message: 'Ultra minimal test server is running',
+    timestamp: new Date().toISOString()
   });
-  
-  const PORT = process.env.PORT || 5001;
-  console.log(`🔌 Attempting to start server on port ${PORT}`);
-  
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Test server running on port ${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+});
+
+// Catch all other routes
+app.get('*', (req, res) => {
+  console.log('🔍 Unknown route requested:', req.path);
+  res.status(404).json({
+    error: 'Route not found',
+    path: req.path,
+    timestamp: new Date().toISOString()
   });
-  
-  server.on('error', (error) => {
-    console.error('❌ Server error:', error);
+});
+
+const PORT = process.env.PORT || 5001;
+console.log(`🔌 Starting server on port ${PORT}`);
+console.log(`🔌 Railway PORT env var: ${process.env.PORT}`);
+
+const server = app.listen(PORT, () => {
+  const address = server.address();
+  console.log(`🚀 Server is running on port ${address.port}`);
+  console.log(`📊 Health check URL: http://localhost:${address.port}/api/health`);
+  console.log(`🌐 Server ready to accept connections`);
+  console.log(`🔍 Server address:`, address);
+});
+
+server.on('listening', () => {
+  console.log('✅ Server is listening');
+});
+
+server.on('error', (error) => {
+  console.error('❌ Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+  }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
   });
-  
-  // Handle graceful shutdown
-  process.on('SIGTERM', () => {
-    console.log('🛑 SIGTERM received');
-    server.close(() => {
-      console.log('✅ Server closed');
-      process.exit(0);
-    });
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
   });
-  
-} catch (error) {
-  console.error('❌ Fatal error:', error);
-  process.exit(1);
-}
+});
+
+// Keep process alive
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled rejection at:', promise, 'reason:', reason);
+});
+
+console.log('🔄 Server setup complete, waiting for connections...');
