@@ -11,11 +11,17 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
   try {
     const { date, providerId, patientType, searchTerm } = req.query;
     const clinicId = req.user.clinicId;
-    
+
+    // Parse the date to ensure proper comparison
+    const queryDate = new Date(date);
+    const startOfDay = new Date(queryDate.getFullYear(), queryDate.getMonth(), queryDate.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
     // Build query for appointments
     const appointmentQuery = {
       clinicId,
-      appointmentDate: date,
+      date: { $gte: startOfDay, $lt: endOfDay }, // Fixed: Use date range for proper matching
       status: { $in: ['checked-in', 'checked-out'] }
     };
 
@@ -25,6 +31,15 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
     }
     // Note: Removed automatic filtering by current user to show all clinic patients
     // This allows doctors to see all checked-in patients in their clinic
+
+    // Debug logging
+    console.log('Doctor daily patients query:', {
+      date,
+      startOfDay,
+      endOfDay,
+      clinicId,
+      appointmentQuery
+    });
 
     // Fetch appointments with patient data
     let appointments = await Appointment.find(appointmentQuery)
@@ -40,7 +55,16 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
         } : {}
       })
       .populate('providerId', 'name username')
-      .sort({ appointmentTime: 1 });
+      .sort({ time: 1 }); // Fixed: Use 'time' field instead of 'appointmentTime'
+
+    console.log('Found appointments:', appointments.length);
+    console.log('Appointments:', appointments.map(apt => ({
+      id: apt._id,
+      date: apt.date,
+      time: apt.time,
+      status: apt.status,
+      patientName: apt.patientId ? `${apt.patientId.firstName} ${apt.patientId.lastName}` : 'No patient'
+    })));
 
     // Filter out appointments where patient didn't match search
     appointments = appointments.filter(apt => apt.patientId);
@@ -69,7 +93,7 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
       
       return {
         _id: appointment._id,
-        appointmentTime: appointment.appointmentTime,
+        appointmentTime: appointment.time, // Fixed: Use 'time' field
         checkOutTime: appointment.checkOutTime,
         visitType: appointment.visitType,
         status: appointment.status,
@@ -152,7 +176,7 @@ router.get('/encounter/:patientId', authenticateToken, async (req, res) => {
       status: { $in: ['checked-out', 'completed'] }
     })
     .populate('providerId', 'name username')
-    .sort({ appointmentDate: -1 })
+    .sort({ date: -1 }) // Fixed: Use 'date' field
     .limit(10);
 
     // Get SOAP notes for recent appointments
@@ -214,7 +238,7 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
       clinicId: req.user.clinicId
     })
     .populate('providerId', 'name username')
-    .sort({ appointmentDate: -1, appointmentTime: -1 })
+    .sort({ date: -1, time: -1 }) // Fixed: Use 'date' and 'time' fields
     .limit(parseInt(limit))
     .skip(parseInt(offset));
 
@@ -238,8 +262,8 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
       
       return {
         _id: appointment._id,
-        appointmentDate: appointment.appointmentDate,
-        appointmentTime: appointment.appointmentTime,
+        appointmentDate: appointment.date, // Fixed: Use 'date' field
+        appointmentTime: appointment.time, // Fixed: Use 'time' field
         visitType: appointment.visitType,
         status: appointment.status,
         provider: appointment.providerId ? {
