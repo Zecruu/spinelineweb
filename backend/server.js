@@ -256,4 +256,5 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔍 Database test: http://localhost:${PORT}/api/test-db`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔄 Update 12 - Deployment forced at: ${new Date().toISOString()}`);
 });
