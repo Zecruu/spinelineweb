@@ -1,101 +1,146 @@
-require('dotenv').config();
+console.log('🔄 Starting SpineLine server...');
+
+try {
+  require('dotenv').config();
+  console.log('✅ Environment variables loaded');
+} catch (error) {
+  console.error('❌ Error loading environment variables:', error);
+}
+
+try {
+  const express = require('express');
+  const cors = require('cors');
+  const helmet = require('helmet');
+  const rateLimit = require('express-rate-limit');
+  const path = require('path');
+  console.log('✅ Dependencies loaded');
+
+  const app = express();
+  console.log('✅ Express app created');
+} catch (error) {
+  console.error('❌ Error loading dependencies:', error);
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const connectDB = require('./config/database');
 
 const app = express();
 
 // Trust proxy for Railway deployment
-app.set('trust proxy', 1);
+try {
+  app.set('trust proxy', 1);
+  console.log('✅ Proxy trust configured');
+} catch (error) {
+  console.error('❌ Error configuring proxy trust:', error);
+}
 
-// Connect to MongoDB
-connectDB().then((connection) => {
-  if (connection) {
-    console.log('✅ Database connection established');
-  } else {
-    console.log('⚠️ Server starting without database connection');
-  }
-}).catch((error) => {
-  console.error('❌ Database connection failed:', error.message);
-  console.log('⚠️ Server starting without database connection');
-});
+// Connect to MongoDB (non-blocking)
+try {
+  const connectDB = require('./config/database');
+  console.log('✅ Database module loaded');
 
-// Security middleware with CSP configuration
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      connectSrc: [
-        "'self'",
-        "https://*.railway.app",
-        "http://localhost:*",
-        "ws://localhost:*"
-      ],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'", "https:", "data:"]
+  // Don't wait for database connection
+  connectDB().then((connection) => {
+    if (connection) {
+      console.log('✅ Database connection established');
+    } else {
+      console.log('⚠️ Server running without database connection');
     }
-  }
-}));
+  }).catch((error) => {
+    console.error('❌ Database connection failed:', error.message);
+    console.log('⚠️ Server running without database connection');
+  });
+} catch (error) {
+  console.error('❌ Error loading database module:', error);
+  console.log('⚠️ Server starting without database module');
+}
+
+// Security middleware (simplified for deployment)
+try {
+  app.use(helmet({
+    contentSecurityPolicy: false // Disable CSP for now to avoid conflicts
+  }));
+  console.log('✅ Security middleware configured');
+} catch (error) {
+  console.error('❌ Error configuring security middleware:', error);
+}
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+try {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+  });
+  app.use('/api/', limiter);
+  console.log('✅ Rate limiting configured');
+} catch (error) {
+  console.error('❌ Error configuring rate limiting:', error);
+}
+
+// CORS configuration (simplified for deployment)
+try {
+  app.use(cors({
+    origin: true, // Allow all origins for now
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  }));
+  console.log('✅ CORS configured');
+} catch (error) {
+  console.error('❌ Error configuring CORS:', error);
+}
+
+// Simple health check (before any other middleware)
+app.get('/api/health', (req, res) => {
+  console.log('🔍 Health check requested');
+  res.status(200).json({
+    status: 'success',
+    message: 'SpineLine API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
-app.use('/api/', limiter);
-
-// CORS configuration
-const allowedOrigins = [
-  'http://localhost:7890',
-  'http://localhost:7891',
-  'http://localhost:7892',
-  process.env.CLIENT_URL
-].filter(Boolean);
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    // In production, allow same-origin requests (frontend served from same domain)
-    if (process.env.NODE_ENV === 'production') {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+try {
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true }));
+  console.log('✅ Body parsing middleware configured');
+} catch (error) {
+  console.error('❌ Error configuring body parsing:', error);
+}
 
 // Routes
-const adminRoutes = require('./routes/admin');
-const authRoutes = require('./routes/auth');
-const patientRoutes = require('./routes/patients');
-const appointmentRoutes = require('./routes/appointments');
-const appointmentHistoryRoutes = require('./routes/appointmentHistory');
-const ledgerRoutes = require('./routes/ledger');
-const auditRoutes = require('./routes/audit');
-const billingCodesRoutes = require('./routes/billingCodes');
-const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
-const carePackagesRoutes = require('./routes/carePackages');
-const checkoutRoutes = require('./routes/checkout');
-const referralsRoutes = require('./routes/referrals');
-const doctorRoutes = require('./routes/doctor');
-const soapNotesRoutes = require('./routes/soapNotes');
+let adminRoutes, authRoutes, patientRoutes, appointmentRoutes, appointmentHistoryRoutes;
+let ledgerRoutes, auditRoutes, billingCodesRoutes, diagnosticCodesRoutes, carePackagesRoutes;
+let checkoutRoutes, referralsRoutes, doctorRoutes, soapNotesRoutes;
+
+try {
+  adminRoutes = require('./routes/admin');
+  authRoutes = require('./routes/auth');
+  patientRoutes = require('./routes/patients');
+  appointmentRoutes = require('./routes/appointments');
+  appointmentHistoryRoutes = require('./routes/appointmentHistory');
+  ledgerRoutes = require('./routes/ledger');
+  auditRoutes = require('./routes/audit');
+  billingCodesRoutes = require('./routes/billingCodes');
+  diagnosticCodesRoutes = require('./routes/diagnosticCodes');
+  carePackagesRoutes = require('./routes/carePackages');
+  checkoutRoutes = require('./routes/checkout');
+  referralsRoutes = require('./routes/referrals');
+  doctorRoutes = require('./routes/doctor');
+  soapNotesRoutes = require('./routes/soapNotes');
+  console.log('✅ Route modules loaded');
+} catch (error) {
+  console.error('❌ Error loading route modules:', error);
+  console.error('Error details:', error.message);
+  process.exit(1);
+}
 
 // API Routes - these must come BEFORE static file serving
 app.use('/api/admin', adminRoutes);
@@ -113,27 +158,34 @@ app.use('/api/referrals', referralsRoutes);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/soap-notes', soapNotesRoutes);
 
-// Health check route
-app.get('/api/health', (req, res) => {
-  const mongoose = require('mongoose');
-  const dbStatus = mongoose.connection.readyState;
-  const dbStatusText = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting'
-  };
+// Database status endpoint (separate from health check)
+app.get('/api/db-status', (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const dbStatus = mongoose.connection.readyState;
+    const dbStatusText = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    };
 
-  res.status(200).json({
-    status: 'success',
-    message: 'SpineLine API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    database: {
-      status: dbStatusText[dbStatus] || 'unknown',
-      connected: dbStatus === 1
-    }
-  });
+    res.status(200).json({
+      status: 'success',
+      database: {
+        status: dbStatusText[dbStatus] || 'unknown',
+        connected: dbStatus === 1
+      }
+    });
+  } catch (error) {
+    res.status(200).json({
+      status: 'success',
+      database: {
+        status: 'unavailable',
+        connected: false
+      }
+    });
+  }
 });
 
 // Database test route
