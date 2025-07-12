@@ -67,22 +67,40 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
     setSelectedDate(event.target.value);
   };
 
-  const handlePatientAction = (patientId, action) => {
-    switch (action) {
-      case 'openNote':
-        console.log(`Opening encounter note for patient ${patientId}`);
-        // TODO: Implement encounter navigation when routing is added
-        break;
-      case 'viewProfile':
-        console.log(`Viewing profile for patient ${patientId}`);
-        // TODO: Implement patient profile navigation when routing is added
-        break;
-      case 'startSOAP':
-        console.log(`Starting SOAP note for patient ${patientId}`);
-        // TODO: Implement SOAP note navigation when routing is added
-        break;
-      default:
-        console.log(`Action ${action} for patient ${patientId}`);
+  const handlePatientAction = async (patientId, action) => {
+    try {
+      const patient = [...checkedInPatients, ...checkedOutPatients].find(p => p._id === patientId);
+      if (!patient) {
+        alert('Patient not found');
+        return;
+      }
+
+      switch (action) {
+        case 'openNote':
+        case 'startSOAP':
+          // For now, show patient info and indicate SOAP note functionality
+          alert(`SOAP Note functionality for ${patient.firstName} ${patient.lastName}\n\nThis will open the encounter documentation interface.\n\nFeatures:\n- SOAP note editor\n- Billing codes\n- Diagnostic codes\n- Digital signature\n\n(Full implementation coming soon)`);
+          break;
+
+        case 'viewProfile':
+          // Show patient profile information
+          const profileInfo = `Patient Profile: ${patient.firstName} ${patient.lastName}\n\n` +
+            `Record Number: ${patient.recordNumber}\n` +
+            `Visit Type: ${patient.visitType || 'N/A'}\n` +
+            `Appointment Time: ${patient.appointmentTime || 'N/A'}\n` +
+            `Status: ${patient.status}\n` +
+            `Phone: ${patient.phone || 'N/A'}\n` +
+            `Email: ${patient.email || 'N/A'}\n\n` +
+            `(Full patient management interface coming soon)`;
+          alert(profileInfo);
+          break;
+
+        default:
+          console.log(`Action ${action} for patient ${patientId}`);
+      }
+    } catch (error) {
+      console.error('Error handling patient action:', error);
+      alert('An error occurred. Please try again.');
     }
   };
 

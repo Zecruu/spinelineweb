@@ -26,6 +26,12 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
     return colors[visitType] || '#6b7280';
   };
 
+  const getPatientInitials = (firstName, lastName) => {
+    const firstInitial = firstName?.charAt(0)?.toUpperCase() || '';
+    const lastInitial = lastName?.charAt(lastName.length - 1)?.toUpperCase() || '';
+    return firstInitial + lastInitial;
+  };
+
   const getReviewStatus = (patient) => {
     if (!patient.soapNote || !patient.soapNote.isSigned) {
       return {
@@ -124,16 +130,23 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
 
                     <div className="col-patient">
                       <div className="patient-info">
-                        <div className="patient-name">
-                          {patient.firstName} {patient.lastName}
+                        <div className="patient-avatar">
+                          <div className="avatar-circle">
+                            {getPatientInitials(patient.firstName, patient.lastName)}
+                          </div>
                         </div>
-                        <div className="patient-details">
-                          Record: {patient.recordNumber}
-                          {patient.hasAlerts && (
-                            <span className="alert-indicator" title="Patient has medical alerts">
-                              ⚠️
-                            </span>
-                          )}
+                        <div className="patient-details-wrapper">
+                          <div className="patient-name">
+                            {patient.firstName} {patient.lastName}
+                          </div>
+                          <div className="patient-details">
+                            Record: {patient.recordNumber}
+                            {patient.hasAlerts && (
+                              <span className="alert-indicator" title="Patient has medical alerts">
+                                ⚠️
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
