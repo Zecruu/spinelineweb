@@ -22,12 +22,9 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
     // Filter by provider if specified
     if (providerId) {
       appointmentQuery.providerId = providerId;
-    } else {
-      // Default to current user if they're a provider
-      if (req.user.role === 'doctor' || req.user.role === 'provider') {
-        appointmentQuery.providerId = req.user.id;
-      }
     }
+    // Note: Removed automatic filtering by current user to show all clinic patients
+    // This allows doctors to see all checked-in patients in their clinic
 
     // Fetch appointments with patient data
     let appointments = await Appointment.find(appointmentQuery)

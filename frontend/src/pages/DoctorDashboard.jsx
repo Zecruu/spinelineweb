@@ -32,7 +32,8 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
       setLoading(true);
       const queryParams = new URLSearchParams({
         date: selectedDate,
-        providerId: user.id,
+        // Temporarily remove providerId filter to show all clinic patients
+        // providerId: user.id,
         ...filters
       });
 
