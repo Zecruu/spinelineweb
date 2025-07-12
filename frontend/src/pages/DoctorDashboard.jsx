@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import CheckedInPatients from '../components/doctor/CheckedInPatients';
 import CheckedOutPatients from '../components/doctor/CheckedOutPatients';
 import PatientFilters from '../components/doctor/PatientFilters';
+import SOAPNoteInterface from '../components/doctor/SOAPNoteInterface';
 import './DoctorDashboard.css';
 
 const DoctorDashboard = ({ token, user, onLogout }) => {
@@ -22,6 +23,9 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
     totalCheckedOut: 0,
     needsReview: 0
   });
+  const [showSOAPInterface, setShowSOAPInterface] = useState(false);
+  const [selectedPatientForSOAP, setSelectedPatientForSOAP] = useState(null);
+  const [selectedAppointmentForSOAP, setSelectedAppointmentForSOAP] = useState(null);
 
   useEffect(() => {
     fetchDailyPatients();
@@ -78,8 +82,15 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
       switch (action) {
         case 'openNote':
         case 'startSOAP':
-          // For now, show patient info and indicate SOAP note functionality
-          alert(`SOAP Note functionality for ${patient.firstName} ${patient.lastName}\n\nThis will open the encounter documentation interface.\n\nFeatures:\n- SOAP note editor\n- Billing codes\n- Diagnostic codes\n- Digital signature\n\n(Full implementation coming soon)`);
+          // Open SOAP Note Interface
+          setSelectedPatientForSOAP(patient);
+          setSelectedAppointmentForSOAP({
+            _id: patient.appointmentId || patient._id,
+            time: patient.appointmentTime,
+            visitType: patient.visitType,
+            status: patient.status
+          });
+          setShowSOAPInterface(true);
           break;
 
         case 'viewProfile':
@@ -101,6 +112,26 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
     } catch (error) {
       console.error('Error handling patient action:', error);
       alert('An error occurred. Please try again.');
+    }
+  };
+
+  const handleCloseSOAP = () => {
+    setShowSOAPInterface(false);
+    setSelectedPatientForSOAP(null);
+    setSelectedAppointmentForSOAP(null);
+    // Refresh patient data to get updated status
+    fetchDailyPatients();
+  };
+
+  const handleSaveSOAP = async (soapData) => {
+    try {
+      // Save SOAP note data
+      console.log('Saving SOAP data:', soapData);
+      // TODO: Implement actual save functionality
+      alert('SOAP note saved successfully!');
+    } catch (error) {
+      console.error('Error saving SOAP note:', error);
+      alert('Error saving SOAP note. Please try again.');
     }
   };
 
@@ -130,6 +161,17 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
 
   return (
     <div className="doctor-dashboard">
+      {/* SOAP Note Interface Overlay */}
+      {showSOAPInterface && selectedPatientForSOAP && selectedAppointmentForSOAP && (
+        <SOAPNoteInterface
+          patient={selectedPatientForSOAP}
+          appointment={selectedAppointmentForSOAP}
+          onClose={handleCloseSOAP}
+          onSave={handleSaveSOAP}
+          token={token}
+        />
+      )}
+
       <Sidebar
         user={user}
         onLogout={onLogout}

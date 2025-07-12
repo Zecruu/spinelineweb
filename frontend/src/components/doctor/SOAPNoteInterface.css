@@ -1,0 +1,402 @@
+/* SOAP Note Interface Styles */
+.soap-note-interface {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0f172a;
+  color: #f1f5f9;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Sticky Header */
+.soap-header {
+  background: #1e293b;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Insurance Section */
+.insurance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.insurance-info h4 {
+  color: #3b82f6;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.coverage-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.insurance-name {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-size: 1.1rem;
+}
+
+.copay-info {
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.covered-codes {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* Patient Section */
+.patient-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.patient-avatar-large {
+  flex-shrink: 0;
+}
+
+.avatar-circle-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.8rem;
+  border: 3px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.patient-details-main {
+  text-align: center;
+}
+
+.patient-name-large {
+  color: #f1f5f9;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.patient-meta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.patient-meta span {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.visit-info {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.visit-type {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.visit-time {
+  color: #f59e0b;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* History Section */
+.history-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.history-toggle {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-toggle:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.history-toggle.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.save-status {
+  text-align: right;
+}
+
+.save-indicator {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.save-status small {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* History Panel */
+.history-panel {
+  background: #334155;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1.5rem 2rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.history-content h3 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-item {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+
+.visit-date {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.visit-summary {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.no-history {
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Main Content */
+.soap-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* SOAP Tabs */
+.soap-tabs {
+  background: #334155;
+  display: flex;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.tab-button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.tab-button.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.tab-icon {
+  font-size: 1.2rem;
+}
+
+.tab-label {
+  font-size: 1rem;
+}
+
+/* Tab Content */
+.tab-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.soap-section h3 {
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.soap-textarea {
+  width: 100%;
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  color: #f1f5f9;
+  padding: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 400px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.soap-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.soap-textarea::placeholder {
+  color: #64748b;
+}
+
+/* Action Buttons */
+.soap-actions {
+  background: #1e293b;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.soap-actions button {
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .soap-header {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .patient-section {
+    justify-content: center;
+  }
+  
+  .history-section {
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .soap-header {
+    padding: 1rem;
+  }
+  
+  .tab-content {
+    padding: 1rem;
+  }
+  
+  .soap-actions {
+    padding: 1rem;
+    flex-direction: column;
+  }
+  
+  .soap-actions button {
+    width: 100%;
+  }
+}

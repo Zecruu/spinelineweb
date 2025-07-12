@@ -86,6 +86,7 @@ const carePackagesRoutes = require('./routes/carePackages');
 const checkoutRoutes = require('./routes/checkout');
 const referralsRoutes = require('./routes/referrals');
 const doctorRoutes = require('./routes/doctor');
+const soapNotesRoutes = require('./routes/soapNotes');
 
 // API Routes - these must come BEFORE static file serving
 app.use('/api/admin', adminRoutes);
@@ -101,6 +102,7 @@ app.use('/api/care-packages', carePackagesRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/referrals', referralsRoutes);
 app.use('/api/doctor', doctorRoutes);
+app.use('/api/soap-notes', soapNotesRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
