@@ -477,6 +477,394 @@
   font-style: italic;
 }
 
+/* Codes Section */
+.codes-section {
+  padding: 0;
+}
+
+.codes-section h3 {
+  color: #f1f5f9;
+  margin: 0 0 2rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.codes-group {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.codes-group h4 {
+  color: #3b82f6;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.codes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.code-item {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.3s ease;
+}
+
+.code-item:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.code-item.diagnostic {
+  border-left: 4px solid #dc2626;
+}
+
+.code-item.billing {
+  border-left: 4px solid #059669;
+}
+
+.code-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.code-number {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f1f5f9;
+  font-family: 'Courier New', monospace;
+}
+
+.code-description {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.code-units {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.code-units label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.units-input {
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+  color: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  width: 60px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.units-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.remove-code-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.remove-code-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+
+.add-code-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.code-search {
+  flex: 1;
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  color: #f1f5f9;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.code-search:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.add-code-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-code-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Quick Codes Section */
+.quick-codes {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.quick-codes h5 {
+  color: #94a3b8;
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quick-code-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quick-code-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.quick-code-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.quick-code-btn:active {
+  transform: translateY(0);
+}
+
+/* Signature Section */
+.signature-section {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.signature-section h3 {
+  color: #f1f5f9;
+  margin: 0 0 2rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.completion-checklist {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.completion-checklist h4 {
+  color: #3b82f6;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.checklist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.checklist-item.complete {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.checklist-item.incomplete {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.check-icon {
+  font-size: 1.2rem;
+  min-width: 24px;
+}
+
+.checklist-item span:last-child {
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+.signature-area {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.signature-area h4 {
+  color: #3b82f6;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.signed-note {
+  text-align: center;
+  padding: 2rem;
+}
+
+.signature-display {
+  background: rgba(16, 185, 129, 0.1);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.signature-text {
+  color: #f1f5f9;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.signature-status {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.signature-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.signature-info {
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+.signature-info ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.signature-info li {
+  margin-bottom: 0.5rem;
+}
+
+.sign-button {
+  align-self: center;
+  padding: 1rem 3rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 250px;
+}
+
+.sign-button.ready {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.sign-button.ready:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.sign-button.disabled {
+  background: #6b7280;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Action Button Updates */
+.soap-actions .btn-success.disabled {
+  background: #6b7280;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.soap-actions .btn-success:disabled {
+  background: #6b7280;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .soap-header {

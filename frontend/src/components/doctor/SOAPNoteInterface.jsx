@@ -10,6 +10,13 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     plan: ''
   });
   const [spineSegments, setSpineSegments] = useState({});
+  const [diagnosticCodes, setDiagnosticCodes] = useState([]);
+  const [billingCodes, setBillingCodes] = useState([]);
+  const [availableDiagnosticCodes, setAvailableDiagnosticCodes] = useState([]);
+  const [availableBillingCodes, setAvailableBillingCodes] = useState([]);
+  const [isReadyToSign, setIsReadyToSign] = useState(false);
+  const [signatureData, setSignatureData] = useState(null);
+  const [isSigned, setIsSigned] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [patientHistory, setPatientHistory] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,6 +27,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   useEffect(() => {
     loadExistingSOAPNote();
     loadPatientHistory();
+    loadAvailableCodes();
   }, [appointment._id, patient._id]);
 
   // Auto-save functionality
@@ -31,7 +39,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
       return () => clearTimeout(timer);
     }
-  }, [soapData, spineSegments, isDirty]);
+  }, [soapData, spineSegments, diagnosticCodes, billingCodes, isDirty]);
 
   const loadExistingSOAPNote = async () => {
     try {
@@ -50,6 +58,8 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           plan: existingNote.plan?.treatmentPlan || ''
         });
         setSpineSegments(existingNote.spineSegments || {});
+        setDiagnosticCodes(existingNote.diagnosticCodes || []);
+        setBillingCodes(existingNote.billingCodes || []);
       }
     } catch (error) {
       console.error('Error loading existing SOAP note:', error);
@@ -73,6 +83,34 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     }
   };
 
+  const loadAvailableCodes = async () => {
+    try {
+      // Load diagnostic codes
+      const diagnosticResponse = await fetch('/api/diagnostic-codes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (diagnosticResponse.ok) {
+        const diagnosticData = await diagnosticResponse.json();
+        setAvailableDiagnosticCodes(diagnosticData);
+      }
+
+      // Load billing codes
+      const billingResponse = await fetch('/api/billing-codes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (billingResponse.ok) {
+        const billingData = await billingResponse.json();
+        setAvailableBillingCodes(billingData);
+      }
+    } catch (error) {
+      console.error('Error loading available codes:', error);
+    }
+  };
+
   const handleAutoSave = async () => {
     try {
       setLoading(true);
@@ -87,6 +125,8 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           patientId: patient._id,
           soapData,
           spineSegments,
+          diagnosticCodes,
+          billingCodes,
           status: 'in-progress'
         })
       });
@@ -143,7 +183,9 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     { id: 'objective', label: 'Objective', icon: '🔍' },
     { id: 'assessment', label: 'Assessment', icon: '📊' },
     { id: 'plan', label: 'Plan', icon: '📋' },
-    { id: 'spine', label: 'Spine Listings', icon: '🦴' }
+    { id: 'spine', label: 'Spine Listings', icon: '🦴' },
+    { id: 'codes', label: 'Diagnosis & Billing', icon: '🏥' },
+    { id: 'signature', label: 'Sign & Complete', icon: '✍️' }
   ];
 
   const spineSegmentsList = [
@@ -161,6 +203,84 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       }
     }));
     setIsDirty(true);
+  };
+
+  const addDiagnosticCode = (code) => {
+    if (!diagnosticCodes.find(dc => dc.code === code.code)) {
+      setDiagnosticCodes(prev => [...prev, { ...code, id: Date.now() }]);
+      setIsDirty(true);
+    }
+  };
+
+  const removeDiagnosticCode = (id) => {
+    setDiagnosticCodes(prev => prev.filter(dc => dc.id !== id));
+    setIsDirty(true);
+  };
+
+  const addBillingCode = (code) => {
+    if (!billingCodes.find(bc => bc.code === code.code)) {
+      setBillingCodes(prev => [...prev, { ...code, id: Date.now(), units: 1 }]);
+      setIsDirty(true);
+    }
+  };
+
+  const removeBillingCode = (id) => {
+    setBillingCodes(prev => prev.filter(bc => bc.id !== id));
+    setIsDirty(true);
+  };
+
+  const updateBillingCodeUnits = (id, units) => {
+    setBillingCodes(prev => prev.map(bc =>
+      bc.id === id ? { ...bc, units: parseInt(units) || 1 } : bc
+    ));
+    setIsDirty(true);
+  };
+
+  // Check if note is ready to sign
+  useEffect(() => {
+    const hasContent = soapData.subjective || soapData.objective || soapData.assessment || soapData.plan;
+    const hasCodes = diagnosticCodes.length > 0 || billingCodes.length > 0;
+    setIsReadyToSign(hasContent && hasCodes);
+  }, [soapData, diagnosticCodes, billingCodes]);
+
+  const handleSignNote = async () => {
+    if (!isReadyToSign) {
+      alert('Please complete the SOAP note and add at least one diagnostic or billing code before signing.');
+      return;
+    }
+
+    try {
+      // Create a simple text signature for now (in production, this would be a digital signature pad)
+      const signature = `${patient.firstName} ${patient.lastName} - ${new Date().toLocaleString()} - Dr. ${user.firstName} ${user.lastName}`;
+
+      const response = await fetch(`/api/soap-notes/sign/${appointment._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          signatureData: signature,
+          soapData,
+          spineSegments,
+          diagnosticCodes,
+          billingCodes
+        })
+      });
+
+      if (response.ok) {
+        setIsSigned(true);
+        setSignatureData(signature);
+        alert('SOAP note signed successfully! Patient has been moved to checked-out status.');
+        onClose(); // Close the interface and refresh the dashboard
+      } else {
+        const error = await response.json();
+        alert(`Error signing note: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Error signing SOAP note:', error);
+      alert('Error signing SOAP note. Please try again.');
+    }
   };
 
   return (
@@ -268,7 +388,193 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
         {/* Tab Content */}
         <div className="tab-content">
-          {activeTab === 'spine' ? (
+          {activeTab === 'codes' ? (
+            <div className="codes-section">
+              <h3>Diagnosis & Billing Codes</h3>
+
+              {/* Diagnostic Codes */}
+              <div className="codes-group">
+                <h4>Diagnostic Codes (ICD-10)</h4>
+                <div className="codes-list">
+                  {diagnosticCodes.map(code => (
+                    <div key={code.id} className="code-item diagnostic">
+                      <div className="code-info">
+                        <span className="code-number">{code.code}</span>
+                        <span className="code-description">{code.description}</span>
+                      </div>
+                      <button
+                        className="remove-code-btn"
+                        onClick={() => removeDiagnosticCode(code.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="add-code-section">
+                  <input
+                    type="text"
+                    className="code-search"
+                    placeholder="Search diagnostic codes..."
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const foundCode = availableDiagnosticCodes.find(code =>
+                          code.code.toLowerCase().includes(searchTerm) ||
+                          code.description.toLowerCase().includes(searchTerm)
+                        );
+                        if (foundCode) {
+                          addDiagnosticCode(foundCode);
+                          e.target.value = '';
+                        }
+                      }
+                    }}
+                  />
+                  <button
+                    className="add-code-btn"
+                    onClick={() => {
+                      const input = document.querySelector('.code-search');
+                      const searchTerm = input.value.toLowerCase();
+                      const foundCode = availableDiagnosticCodes.find(code =>
+                        code.code.toLowerCase().includes(searchTerm) ||
+                        code.description.toLowerCase().includes(searchTerm)
+                      );
+                      if (foundCode) {
+                        addDiagnosticCode(foundCode);
+                        input.value = '';
+                      }
+                    }}
+                  >
+                    Add Code
+                  </button>
+                </div>
+
+                {/* Quick Add Common Diagnostic Codes */}
+                <div className="quick-codes">
+                  <h5>Common Codes:</h5>
+                  <div className="quick-code-buttons">
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addDiagnosticCode({code: 'M54.5', description: 'Low back pain'})}
+                    >
+                      M54.5 - Low back pain
+                    </button>
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addDiagnosticCode({code: 'M54.2', description: 'Cervicalgia'})}
+                    >
+                      M54.2 - Cervicalgia
+                    </button>
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addDiagnosticCode({code: 'M25.50', description: 'Pain in unspecified joint'})}
+                    >
+                      M25.50 - Joint pain
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Billing Codes */}
+              <div className="codes-group">
+                <h4>Billing Codes (CPT)</h4>
+                <div className="codes-list">
+                  {billingCodes.map(code => (
+                    <div key={code.id} className="code-item billing">
+                      <div className="code-info">
+                        <span className="code-number">{code.code}</span>
+                        <span className="code-description">{code.description}</span>
+                      </div>
+                      <div className="code-units">
+                        <label>Units:</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={code.units}
+                          onChange={(e) => updateBillingCodeUnits(code.id, e.target.value)}
+                          className="units-input"
+                        />
+                      </div>
+                      <button
+                        className="remove-code-btn"
+                        onClick={() => removeBillingCode(code.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="add-code-section">
+                  <input
+                    type="text"
+                    className="code-search billing-search"
+                    placeholder="Search billing codes..."
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const foundCode = availableBillingCodes.find(code =>
+                          code.code.toLowerCase().includes(searchTerm) ||
+                          code.description.toLowerCase().includes(searchTerm)
+                        );
+                        if (foundCode) {
+                          addBillingCode(foundCode);
+                          e.target.value = '';
+                        }
+                      }
+                    }}
+                  />
+                  <button
+                    className="add-code-btn"
+                    onClick={() => {
+                      const input = document.querySelector('.billing-search');
+                      const searchTerm = input.value.toLowerCase();
+                      const foundCode = availableBillingCodes.find(code =>
+                        code.code.toLowerCase().includes(searchTerm) ||
+                        code.description.toLowerCase().includes(searchTerm)
+                      );
+                      if (foundCode) {
+                        addBillingCode(foundCode);
+                        input.value = '';
+                      }
+                    }}
+                  >
+                    Add Code
+                  </button>
+                </div>
+
+                {/* Quick Add Common Billing Codes */}
+                <div className="quick-codes">
+                  <h5>Common Codes:</h5>
+                  <div className="quick-code-buttons">
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addBillingCode({code: '98940', description: 'Chiropractic manipulative treatment; spinal, 1-2 regions'})}
+                    >
+                      98940 - CMT 1-2 regions
+                    </button>
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addBillingCode({code: '98941', description: 'Chiropractic manipulative treatment; spinal, 3-4 regions'})}
+                    >
+                      98941 - CMT 3-4 regions
+                    </button>
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addBillingCode({code: '98942', description: 'Chiropractic manipulative treatment; spinal, 5 regions'})}
+                    >
+                      98942 - CMT 5 regions
+                    </button>
+                    <button
+                      className="quick-code-btn"
+                      onClick={() => addBillingCode({code: '97140', description: 'Manual therapy techniques'})}
+                    >
+                      97140 - Manual therapy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'spine' ? (
             <div className="spine-section">
               <h3>Spine Segment Documentation</h3>
               <div className="spine-groups">
@@ -320,6 +626,73 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
                 ))}
               </div>
             </div>
+          ) : activeTab === 'signature' ? (
+            <div className="signature-section">
+              <h3>Complete & Sign SOAP Note</h3>
+
+              {/* Completion Checklist */}
+              <div className="completion-checklist">
+                <h4>Documentation Checklist</h4>
+                <div className="checklist-items">
+                  <div className={`checklist-item ${soapData.subjective ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{soapData.subjective ? '✅' : '❌'}</span>
+                    <span>Subjective Notes</span>
+                  </div>
+                  <div className={`checklist-item ${soapData.objective ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{soapData.objective ? '✅' : '❌'}</span>
+                    <span>Objective Findings</span>
+                  </div>
+                  <div className={`checklist-item ${soapData.assessment ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{soapData.assessment ? '✅' : '❌'}</span>
+                    <span>Assessment</span>
+                  </div>
+                  <div className={`checklist-item ${soapData.plan ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{soapData.plan ? '✅' : '❌'}</span>
+                    <span>Treatment Plan</span>
+                  </div>
+                  <div className={`checklist-item ${diagnosticCodes.length > 0 ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{diagnosticCodes.length > 0 ? '✅' : '❌'}</span>
+                    <span>Diagnostic Codes ({diagnosticCodes.length})</span>
+                  </div>
+                  <div className={`checklist-item ${billingCodes.length > 0 ? 'complete' : 'incomplete'}`}>
+                    <span className="check-icon">{billingCodes.length > 0 ? '✅' : '❌'}</span>
+                    <span>Billing Codes ({billingCodes.length})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Signature Area */}
+              <div className="signature-area">
+                <h4>Digital Signature</h4>
+                {isSigned ? (
+                  <div className="signed-note">
+                    <div className="signature-display">
+                      <span className="signature-text">{signatureData}</span>
+                      <span className="signature-status">✅ Signed & Locked</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="signature-form">
+                    <div className="signature-info">
+                      <p>By clicking "Sign Note", you confirm that:</p>
+                      <ul>
+                        <li>All documentation is accurate and complete</li>
+                        <li>Treatment provided matches the documented services</li>
+                        <li>This note will be locked and cannot be modified</li>
+                        <li>Patient will be moved to checked-out status</li>
+                      </ul>
+                    </div>
+                    <button
+                      className={`sign-button ${isReadyToSign ? 'ready' : 'disabled'}`}
+                      onClick={handleSignNote}
+                      disabled={!isReadyToSign}
+                    >
+                      {isReadyToSign ? '✍️ Sign Note' : '⚠️ Complete Required Fields'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ) : (
             <div className="soap-section">
               <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
@@ -343,9 +716,19 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
         <button className="btn-primary" onClick={() => handleAutoSave()}>
           Save Progress
         </button>
-        <button className="btn-success">
-          Complete & Sign
-        </button>
+        {isSigned ? (
+          <button className="btn-success" disabled>
+            ✅ Signed & Complete
+          </button>
+        ) : (
+          <button
+            className={`btn-success ${isReadyToSign ? '' : 'disabled'}`}
+            onClick={handleSignNote}
+            disabled={!isReadyToSign}
+          >
+            ✍️ Complete & Sign
+          </button>
+        )}
       </div>
     </div>
   );

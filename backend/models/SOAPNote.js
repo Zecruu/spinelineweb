@@ -182,6 +182,27 @@ const soapNoteSchema = new mongoose.Schema({
     default: {}
   },
 
+  // Diagnostic Codes (ICD-10)
+  diagnosticCodes: [{
+    code: String,
+    description: String,
+    severity: String,
+    laterality: String,
+    id: Number
+  }],
+
+  // Billing Codes (CPT)
+  billingCodes: [{
+    code: String,
+    description: String,
+    units: {
+      type: Number,
+      default: 1
+    },
+    modifier: String,
+    id: Number
+  }],
+
   // Digital Signature and Completion
   isSigned: {
     type: Boolean,

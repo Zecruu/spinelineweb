@@ -31,7 +31,15 @@ router.get('/appointment/:appointmentId', auth, async (req, res) => {
 // Create or update SOAP note (autosave)
 router.post('/autosave', auth, async (req, res) => {
   try {
-    const { appointmentId, patientId, soapData, spineSegments = {}, status = 'in-progress' } = req.body;
+    const {
+      appointmentId,
+      patientId,
+      soapData,
+      spineSegments = {},
+      diagnosticCodes = [],
+      billingCodes = [],
+      status = 'in-progress'
+    } = req.body;
     const clinicId = req.user.clinicId;
     const providerId = req.user.id;
 
@@ -73,6 +81,8 @@ router.post('/autosave', auth, async (req, res) => {
 
       soapNote.status = status;
       soapNote.spineSegments = spineSegments;
+      soapNote.diagnosticCodes = diagnosticCodes;
+      soapNote.billingCodes = billingCodes;
       soapNote.lastModifiedBy = providerId;
       
     } else {
@@ -95,6 +105,8 @@ router.post('/autosave', auth, async (req, res) => {
           treatmentPlan: soapData.plan || ''
         },
         spineSegments,
+        diagnosticCodes,
+        billingCodes,
         status,
         createdBy: providerId
       });
@@ -159,7 +171,13 @@ router.get('/patient-history/:patientId', auth, async (req, res) => {
 router.post('/sign/:appointmentId', auth, async (req, res) => {
   try {
     const { appointmentId } = req.params;
-    const { signatureData, soapData } = req.body;
+    const {
+      signatureData,
+      soapData,
+      spineSegments = {},
+      diagnosticCodes = [],
+      billingCodes = []
+    } = req.body;
     const clinicId = req.user.clinicId;
     const providerId = req.user.id;
 
@@ -190,6 +208,11 @@ router.post('/sign/:appointmentId', auth, async (req, res) => {
       soapNote.plan.treatmentPlan = soapData.plan;
     }
 
+    // Update spine segments, diagnostic codes, and billing codes
+    soapNote.spineSegments = spineSegments;
+    soapNote.diagnosticCodes = diagnosticCodes;
+    soapNote.billingCodes = billingCodes;
+
     // Add signature
     soapNote.signature = {
       data: signatureData,
@@ -207,11 +230,13 @@ router.post('/sign/:appointmentId', auth, async (req, res) => {
 
     await soapNote.save();
 
-    // Update appointment status
+    // Update appointment status to checked-out
     await Appointment.findByIdAndUpdate(appointmentId, {
       hasSOAPNote: true,
       soapNoteStatus: 'completed',
-      doctorSigned: true
+      doctorSigned: true,
+      status: 'checked-out',
+      checkOutTime: new Date().toTimeString().slice(0, 5) // HH:MM format
     });
 
     res.json({
