@@ -262,3 +262,48 @@
   opacity: 0.5;
   font-size: 0.8rem;
 }
+
+/* Billing and Diagnostic Information */
+.billing-info,
+.diagnostic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.billing-label,
+.diagnostic-label {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.billing-codes,
+.diagnostic-codes {
+  color: #1e293b;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.total-amount {
+  color: #059669;
+  font-weight: 600;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.billing-info {
+  border-left: 3px solid #059669;
+}
+
+.diagnostic-info {
+  border-left: 3px solid #dc2626;
+}

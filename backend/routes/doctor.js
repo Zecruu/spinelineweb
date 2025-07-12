@@ -32,15 +32,6 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
     // Note: Removed automatic filtering by current user to show all clinic patients
     // This allows doctors to see all checked-in patients in their clinic
 
-    // Debug logging
-    console.log('Doctor daily patients query:', {
-      date,
-      startOfDay,
-      endOfDay,
-      clinicId,
-      appointmentQuery
-    });
-
     // Fetch appointments with patient data
     let appointments = await Appointment.find(appointmentQuery)
       .populate({
@@ -56,15 +47,6 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
       })
       .populate('providerId', 'name username')
       .sort({ time: 1 }); // Fixed: Use 'time' field instead of 'appointmentTime'
-
-    console.log('Found appointments:', appointments.length);
-    console.log('Appointments:', appointments.map(apt => ({
-      id: apt._id,
-      date: apt.date,
-      time: apt.time,
-      status: apt.status,
-      patientName: apt.patientId ? `${apt.patientId.firstName} ${apt.patientId.lastName}` : 'No patient'
-    })));
 
     // Filter out appointments where patient didn't match search
     appointments = appointments.filter(apt => apt.patientId);
@@ -86,11 +68,27 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
       soapNotesMap[note.appointmentId.toString()] = note;
     });
 
+    // Get diagnostic codes for these appointments
+    const DiagnosticCode = require('../models/DiagnosticCode');
+    const diagnosticCodes = await DiagnosticCode.find({
+      appointmentId: { $in: appointmentIds }
+    });
+
+    // Create diagnostic codes lookup
+    const diagnosticCodesMap = {};
+    diagnosticCodes.forEach(code => {
+      if (!diagnosticCodesMap[code.appointmentId.toString()]) {
+        diagnosticCodesMap[code.appointmentId.toString()] = [];
+      }
+      diagnosticCodesMap[code.appointmentId.toString()].push(code);
+    });
+
     // Process appointments and add additional data
     const processedAppointments = appointments.map(appointment => {
       const patient = appointment.patientId;
       const soapNote = soapNotesMap[appointment._id.toString()];
-      
+      const appointmentDiagnosticCodes = diagnosticCodesMap[appointment._id.toString()] || [];
+
       return {
         _id: appointment._id,
         appointmentTime: appointment.time, // Fixed: Use 'time' field
@@ -110,6 +108,20 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
         provider: appointment.providerId ? {
           name: appointment.providerId.name || appointment.providerId.username,
           id: appointment.providerId._id
+        } : null,
+        // Add billing and diagnostic information for checked-out patients
+        billingCodes: appointment.billingCodes || [],
+        diagnosticCodes: appointmentDiagnosticCodes.map(code => ({
+          code: code.code,
+          description: code.description,
+          severity: code.severity,
+          laterality: code.laterality
+        })),
+        totalAmount: appointment.totalAmount || 0,
+        paymentMethod: appointment.paymentMethod || null,
+        signature: appointment.signature ? {
+          timestamp: appointment.signature.timestamp,
+          isValid: !!appointment.signature.data
         } : null
       };
     });

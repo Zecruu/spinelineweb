@@ -154,7 +154,7 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
                       <div className={`review-status ${reviewStatus.status}`}>
                         <span className="status-icon">{reviewStatus.icon}</span>
                         <div className="status-info">
-                          <span 
+                          <span
                             className="status-label"
                             style={{ color: reviewStatus.color }}
                           >
@@ -164,6 +164,26 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
                             <span className="soap-info">
                               SOAP: {patient.soapNote.isSigned ? 'Signed' : 'Unsigned'}
                             </span>
+                          )}
+                          {/* Display billing and diagnostic codes */}
+                          {patient.billingCodes && patient.billingCodes.length > 0 && (
+                            <div className="billing-info">
+                              <span className="billing-label">Billing:</span>
+                              <span className="billing-codes">
+                                {patient.billingCodes.map(code => code.code).join(', ')}
+                              </span>
+                              {patient.totalAmount > 0 && (
+                                <span className="total-amount">${patient.totalAmount.toFixed(2)}</span>
+                              )}
+                            </div>
+                          )}
+                          {patient.diagnosticCodes && patient.diagnosticCodes.length > 0 && (
+                            <div className="diagnostic-info">
+                              <span className="diagnostic-label">Diagnosis:</span>
+                              <span className="diagnostic-codes">
+                                {patient.diagnosticCodes.map(code => code.code).join(', ')}
+                              </span>
+                            </div>
                           )}
                         </div>
                       </div>
