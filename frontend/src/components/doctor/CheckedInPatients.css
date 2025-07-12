@@ -3,6 +3,9 @@
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .section-header {
@@ -79,11 +82,17 @@
 /* Table Styles */
 .patient-table-container {
   overflow-x: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .patient-table {
   width: 100%;
   min-width: 800px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-header {
@@ -101,8 +110,9 @@
 }
 
 .table-body {
-  max-height: 600px;
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .patient-row {

@@ -3,6 +3,9 @@
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .checked-out .section-header h2 {
@@ -306,4 +309,26 @@
 
 .diagnostic-info {
   border-left: 3px solid #dc2626;
+}
+
+/* Table Layout Styles */
+.checked-out .patient-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+.checked-out .patient-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 800px;
+}
+
+.checked-out .table-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
