@@ -7,16 +7,5 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 
-[[services]]
-name = "backend"
-source = "backend"
-
-[services.build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && npm install"
-
-[services.deploy]
-startCommand = "npm start"
-
-[services.variables]
+[variables]
 NODE_ENV = "production"
-PORT = "$PORT"
