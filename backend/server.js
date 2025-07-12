@@ -12,7 +12,16 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Connect to MongoDB
-connectDB();
+connectDB().then((connection) => {
+  if (connection) {
+    console.log('✅ Database connection established');
+  } else {
+    console.log('⚠️ Server starting without database connection');
+  }
+}).catch((error) => {
+  console.error('❌ Database connection failed:', error.message);
+  console.log('⚠️ Server starting without database connection');
+});
 
 // Security middleware with CSP configuration
 app.use(helmet({
@@ -106,11 +115,24 @@ app.use('/api/soap-notes', soapNotesRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState;
+  const dbStatusText = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
   res.status(200).json({
     status: 'success',
     message: 'SpineLine API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+      status: dbStatusText[dbStatus] || 'unknown',
+      connected: dbStatus === 1
+    }
   });
 });
 
@@ -253,10 +275,27 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+console.log('🔧 Starting server...');
+console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔌 Port: ${PORT}`);
+console.log(`🗄️ MongoDB URI: ${process.env.MONGO_URI ? 'Set' : 'Not set'}`);
+
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SpineLine API server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔍 Database test: http://localhost:${PORT}/api/test-db`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔄 Update 12 - Deployment forced at: ${new Date().toISOString()}`);
+  console.log(`🔄 Update 13 - Deployment fixed at: ${new Date().toISOString()}`);
+});
+
+server.on('error', (error) => {
+  console.error('❌ Server error:', error);
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
 });
