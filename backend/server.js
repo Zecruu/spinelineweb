@@ -52,6 +52,9 @@ app.get('/api/health', (req, res) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from frontend dist
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
 // Routes
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
