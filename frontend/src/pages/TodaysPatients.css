@@ -1,6 +1,6 @@
 /* Today's Patients Page Styles */
 .todays-patients {
-  padding: 2rem;
+  padding: 1rem 0.5rem;
   background: #0f172a;
   height: 100vh;
   overflow: hidden;
@@ -165,154 +165,307 @@
   text-align: center;
 }
 
-/* 4-Table Grid Layout */
-.tables-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 1.5rem;
-  flex: 1;
-  min-height: 0;
-}
 
-.patient-table-container {
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: 400px;
-  max-height: 400px;
-}
-
-.table-header {
-  padding: 1rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(51, 65, 85, 0.5);
-}
-
-.table-header h3 {
-  color: #f1f5f9;
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.count {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.table-actions {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.table-bottom-actions {
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem;
   border-top: 1px solid #374151;
   background: #1f2937;
   justify-content: center;
 }
 
-.btn-add {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
+/* Excel-styled Tables - Dark Mode */
+.excel-tables-container {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 0.25rem !important;
+  margin-top: 2rem;
+  padding: 0 0.25rem;
+  width: 100% !important;
+  max-width: none !important;
 }
 
-.btn-add:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+.excel-table-section {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
 }
 
-.table-content {
-  flex: 1;
-  overflow: hidden;
-  max-height: 300px;
-}
-
-.patients-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.patients-table th {
-  background: rgba(51, 65, 85, 0.8);
-  color: #f1f5f9;
-  padding: 0.5rem 0.25rem;
-  text-align: left;
+.table-title {
+  font-size: 24px;
   font-weight: 600;
-  font-size: 0.8rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  height: 40px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.patients-table td {
-  padding: 0.5rem 0.25rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  color: #e2e8f0;
-  font-size: 0.85rem;
-  height: 50px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-}
-
-/* Remove complex table display changes - keep it simple */
-
-/* Column width control for checked-in patients table */
-.patients-table th:nth-child(1),
-.patients-table td:nth-child(1) {
-  width: 50%; /* Patient Name */
-}
-
-.patients-table th:nth-child(2),
-.patients-table td:nth-child(2) {
-  width: 35%; /* Time */
-}
-
-.patients-table th:nth-child(3),
-.patients-table td:nth-child(3) {
-  width: 15%; /* Signed status */
+  color: #f1f5f9;
+  margin: 0 0 1rem 0;
   text-align: center;
 }
 
-.patient-row {
+.excel-table-wrapper {
+  border: 1px solid #475569;
+  border-radius: 8px;
+  overflow-x: auto;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  background: #1e293b;
+  flex: 1;
+  height: calc(100% - 120px);
+  min-height: 400px;
+  width: 100%;
+}
+
+.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #1e293b;
+  table-layout: auto;
+  min-width: 100%;
+}
+
+.excel-table thead {
+  background: #374151;
+}
+
+.excel-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #f1f5f9;
+  border-bottom: 1px solid #475569;
+  border-right: 1px solid #475569;
+  font-size: 14px;
+}
+
+.excel-table th:last-child {
+  border-right: none;
+}
+
+.excel-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #475569;
+  border-right: 1px solid #475569;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.excel-table td:last-child {
+  border-right: none;
+}
+
+.confirm-cell {
+  text-align: center;
+  padding: 8px !important;
+}
+
+.confirm-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #22c55e;
+}
+
+/* Confirmed patient styling */
+.confirmed-patient {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.confirmed-text {
+  font-weight: bold !important;
+  color: #22c55e !important;
+}
+
+/* Patient type color coding */
+.patient-type-new {
+  border-left: 4px solid #3b82f6 !important; /* Blue for new patients */
+}
+
+.patient-type-regular {
+  border-left: 4px solid #22c55e !important; /* Green for regular patients */
+}
+
+.patient-type-followup {
+  border-left: 4px solid #f59e0b !important; /* Orange for follow-up */
+}
+
+.patient-type-emergency {
+  border-left: 4px solid #ef4444 !important; /* Red for emergency */
+}
+
+.patient-type-default {
+  border-left: 4px solid #6b7280 !important; /* Gray for default */
+}
+
+.excel-table tbody tr:nth-child(even) {
+  background: #0f172a;
+}
+
+.excel-row {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.patient-row:hover {
-  background: rgba(59, 130, 246, 0.05);
+.excel-row:hover {
+  background: #334155 !important;
 }
 
-.patient-row.selected {
-  background: rgba(59, 130, 246, 0.15) !important;
-  border: 2px solid #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+.excel-row.selected {
+  background: #1e40af !important;
 }
+
+.no-data {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 2rem !important;
+}
+
+.completed-cell {
+  text-align: center;
+}
+
+.completed-yes {
+  color: #10b981;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.completed-no {
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.table-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.excel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.check-in-btn {
+  background: #059669;
+  color: white;
+}
+
+.check-in-btn:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.walk-in-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.walk-in-btn:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.checkout-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.checkout-btn:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.uncheck-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.uncheck-btn:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.excel-btn:disabled {
+  background: #9ca3af;
+  color: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design for Excel Tables */
+@media (max-width: 1200px) {
+  .excel-tables-container {
+    flex-wrap: wrap;
+  }
+
+  .excel-table-section {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .excel-tables-container {
+    flex-direction: column !important;
+    padding: 0 0.5rem;
+  }
+
+  .excel-table-section {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: auto;
+    padding: 1rem;
+  }
+
+  .table-title {
+    font-size: 20px;
+  }
+
+  .excel-table th,
+  .excel-table td {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .table-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .excel-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .patient-name {
   font-weight: 600;
@@ -381,61 +534,7 @@
   flex-wrap: wrap;
 }
 
-.btn-action {
-  background: none;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: #94a3b8;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.7rem;
-  font-weight: 500;
-}
 
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(148, 163, 184, 0.1);
-}
-
-.btn-checkin {
-  border-color: rgba(16, 185, 129, 0.5);
-  color: #10b981;
-}
-
-.btn-checkin:hover {
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.btn-checkout {
-  border-color: rgba(59, 130, 246, 0.5);
-  color: #3b82f6;
-}
-
-.btn-checkout:hover {
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.btn-edit, .btn-uncheck {
-  border-color: rgba(148, 163, 184, 0.3);
-  color: #94a3b8;
-}
-
-.btn-edit:hover {
-  background: rgba(148, 163, 184, 0.1);
-  color: #f1f5f9;
-}
-
-.btn-uncheck {
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #ef4444;
-}
-
-.btn-uncheck:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-}
 
 .balance {
   font-family: 'Monaco', 'Menlo', monospace;
@@ -718,29 +817,29 @@
 
 /* Responsive Design */
 @media (min-width: 1920px) {
-  .patient-table-container {
+  .patient-section {
     min-height: 400px;
   }
 }
 
 @media (min-width: 1600px) and (max-width: 1919px) {
-  .patient-table-container {
+  .patient-section {
     min-height: 350px;
   }
 }
 
 @media (min-width: 1401px) and (max-width: 1599px) {
-  .patient-table-container {
+  .patient-section {
     min-height: 300px;
   }
 }
 @media (max-width: 1400px) {
-  .tables-grid {
+  .sections-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
   }
 
-  .patient-table-container {
+  .patient-section {
     min-height: 280px;
   }
 }
@@ -752,13 +851,13 @@
     overflow: hidden;
   }
 
-  .tables-grid {
+  .sections-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     gap: 1rem;
   }
 
-  .patient-table-container {
+  .patient-section {
     min-height: 200px;
   }
   

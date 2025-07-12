@@ -59,11 +59,18 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched appointments data:', data);
+
         const appointmentData = {
           scheduled: data.data.appointments.scheduled || [],
           checkedIn: data.data.appointments.checkedIn || [],
           checkedOut: data.data.appointments.checkedOut || []
         };
+
+        // Log appointment structure for debugging
+        if (appointmentData.scheduled && appointmentData.scheduled.length > 0) {
+          console.log('Sample appointment structure:', appointmentData.scheduled[0]);
+        }
 
         setAppointments(appointmentData);
 
@@ -315,15 +322,118 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
     return `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
   };
 
+  // Get patient type CSS class for color coding
+  const getPatientTypeClass = (appointment) => {
+    // Check multiple possible fields for patient type
+    const patientType = appointment?.type || appointment?.visitType || appointment?.patientType || 'regular';
+    console.log('Patient type for appointment:', appointment._id, 'type:', patientType);
+
+    switch (patientType?.toLowerCase()) {
+      case 'new':
+        return 'patient-type-new';
+      case 'regular':
+        return 'patient-type-regular';
+      case 'follow-up':
+      case 'follow up':
+        return 'patient-type-followup';
+      case 'emergency':
+        return 'patient-type-emergency';
+      case 're-eval':
+      case 'evaluation':
+        return 'patient-type-followup';
+      case 'walk-in':
+        return 'patient-type-emergency';
+      default:
+        return 'patient-type-default';
+    }
+  };
+
   // Handle appointment selection
   const handleAppointmentSelect = (appointment) => {
     setSelectedPatient(appointment);
+  };
+
+  const handleConfirmAppointment = async (appointmentId, confirmed) => {
+    try {
+      console.log('Confirming appointment:', appointmentId, 'confirmed:', confirmed);
+      console.log('Token:', token);
+
+      // Update UI immediately for better UX
+      setAppointments(prev => ({
+        ...prev,
+        scheduled: prev.scheduled.map(apt =>
+          apt._id === appointmentId
+            ? { ...apt, confirmed: confirmed, confirmedAt: confirmed ? new Date() : null }
+            : apt
+        )
+      }));
+
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ confirmed })
+      });
+
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+
+      if (response.ok) {
+        console.log('Appointment confirmation updated successfully');
+        // Optionally refresh to ensure sync with server
+        // fetchAppointments();
+      } else {
+        console.error('Failed to update appointment confirmation:', responseData);
+        // Revert the UI change if API call failed
+        setAppointments(prev => ({
+          ...prev,
+          scheduled: prev.scheduled.map(apt =>
+            apt._id === appointmentId
+              ? { ...apt, confirmed: !confirmed, confirmedAt: !confirmed ? new Date() : null }
+              : apt
+          )
+        }));
+
+        if (response.status === 401) {
+          console.error('Authentication failed');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating appointment confirmation:', error);
+      // Revert the UI change if there was an error
+      setAppointments(prev => ({
+        ...prev,
+        scheduled: prev.scheduled.map(apt =>
+          apt._id === appointmentId
+            ? { ...apt, confirmed: !confirmed, confirmedAt: !confirmed ? new Date() : null }
+            : apt
+        )
+      }));
+    }
   };
 
   // Handle edit patient - navigate to patient management
   const handleEditPatient = (patient) => {
     if (patient && patient._id && onEditPatient) {
       onEditPatient(patient._id);
+    }
+  };
+
+  // Handle checkout - navigate to checkout page
+  const handleCheckout = (appointment) => {
+    if (appointment && appointment._id) {
+      console.log('Navigating to checkout with appointment:', appointment);
+      // Use the onCheckout prop passed from parent component
+      if (onCheckout) {
+        onCheckout(appointment._id);
+      } else {
+        // Fallback: use custom navigation like the app does
+        window.history.pushState({}, '', `/secretary/checkout/${appointment._id}`);
+        window.location.reload();
+      }
     }
   };
 
@@ -362,202 +472,11 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
     }
   };
 
-  // Render scheduled patients table
-  const renderScheduledTable = () => (
-    <div className="patient-table-container">
-      <div className="table-header">
-        <h3>📅 Scheduled Patients</h3>
-        <span className="count">{appointments.scheduled.length}</span>
-      </div>
-      <div className="table-actions">
-        <button className="btn-add" onClick={handleAddPatient}>+ Add Patient</button>
-      </div>
-      <div className="table-content">
-        <table className="patients-table">
-          <thead>
-            <tr>
-              <th>Patient Name</th>
-              <th>Time</th>
-              <th>Visit Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.scheduled.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="no-data">No scheduled patients</td>
-              </tr>
-            ) : (
-              appointments.scheduled.map(appointment => {
-                const hexColor = colorMap[appointment.color] || colorMap.blue;
-                const isSelected = selectedPatient?._id === appointment._id;
-                return (
-                  <tr
-                    key={appointment._id}
-                    className={`patient-row ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleAppointmentSelect(appointment)}
-                    style={{
-                      borderLeft: `4px solid ${hexColor}`,
-                      backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
-                    }}
-                  >
-                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                    <td className="time">{formatTime(appointment.time)}</td>
-                    <td className="visit-type">
-                      <span className={`visit-badge ${appointment.visitType?.toLowerCase()}`}>
-                        {appointment.visitType || 'Regular'}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="table-bottom-actions">
-        <button
-          className="btn-action btn-checkin"
-          onClick={() => selectedPatient && selectedPatient.status === 'scheduled' && handleCheckIn(selectedPatient._id)}
-          disabled={!selectedPatient || selectedPatient.status !== 'scheduled'}
-        >
-          Check In Selected Patient
-        </button>
-        <button
-          className="btn-action btn-edit"
-          disabled={!selectedPatient || selectedPatient.status !== 'scheduled'}
-        >
-          Edit Selected Patient
-        </button>
-      </div>
-    </div>
-  );
 
-  // Render checked-in patients table
-  const renderCheckedInTable = () => (
-    <div className="patient-table-container">
-      <div className="table-header">
-        <h3>✅ Checked-In Patients</h3>
-        <span className="count">{appointments.checkedIn.length}</span>
-      </div>
 
-      <div className="table-content">
-        <table className="patients-table">
-          <thead>
-            <tr>
-              <th>Patient Name</th>
-              <th>Time</th>
-              <th>Signed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.checkedIn.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="no-data">No checked-in patients</td>
-              </tr>
-            ) : (
-              appointments.checkedIn.map(appointment => {
-                const hexColor = colorMap[appointment.color] || colorMap.blue;
-                const isSelected = selectedPatient?._id === appointment._id;
-                const isDoctorSigned = appointment.doctorSigned || appointment.soapNote?.isCompleted || false;
-                return (
-                  <tr
-                    key={appointment._id}
-                    className={`patient-row ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleAppointmentSelect(appointment)}
-                    style={{
-                      borderLeft: `4px solid ${hexColor}`,
-                      backgroundColor: isSelected ? `${hexColor}20` : `${hexColor}08`
-                    }}
-                  >
-                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                    <td className="time">{formatTime(appointment.time)}</td>
-                    <td className="signature-status">
-                      {isDoctorSigned ? (
-                        <span className="signed-checkmark" title="Doctor has signed this visit">✅</span>
-                      ) : (
-                        <span className="unsigned-indicator" title="Awaiting doctor signature">⏳</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="table-bottom-actions">
-        <button
-          className="btn-action btn-checkout"
-          onClick={() => selectedPatient && selectedPatient.status === 'checked-in' && onCheckout && onCheckout(selectedPatient._id)}
-          disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
-        >
-          Checkout Selected Patient
-        </button>
-        <button
-          className="btn-action btn-uncheck"
-          onClick={() => selectedPatient && selectedPatient.status === 'checked-in' && handleUncheckPatient(selectedPatient._id)}
-          disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
-        >
-          Uncheck Selected Patient
-        </button>
-      </div>
-    </div>
-  );
 
-  // Render checked-out patients table
-  const renderCheckedOutTable = () => (
-    <div className="patient-table-container">
-      <div className="table-header">
-        <h3>💳 Checked-Out Patients</h3>
-        <span className="count">{appointments.checkedOut.length}</span>
-      </div>
-      <div className="table-content">
-        <table className="patients-table">
-          <thead>
-            <tr>
-              <th>Patient Name</th>
-              <th>Checkout Time</th>
-              <th>Payment</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.checkedOut.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="no-data">No checked-out patients</td>
-              </tr>
-            ) : (
-              appointments.checkedOut.map(appointment => {
-                const hexColor = colorMap[appointment.color] || colorMap.blue;
-                return (
-                  <tr
-                    key={appointment._id}
-                    className="patient-row"
-                    onClick={() => handleAppointmentSelect(appointment)}
-                    style={{
-                      borderLeft: `4px solid ${hexColor}`,
-                      backgroundColor: `${hexColor}08`
-                    }}
-                  >
-                    <td className="patient-name">{getPatientName(appointment.patientId)}</td>
-                    <td className="time">{formatDateTime(appointment.checkOutTime)}</td>
-                    <td className="payment">
-                      <span className={`payment-badge ${appointment.paymentMethod}`}>
-                        {appointment.paymentMethod || 'N/A'}
-                      </span>
-                    </td>
-                    <td className="balance">
-                      ${((appointment.totalAmount || 0) - (appointment.amountPaid || 0)).toFixed(2)}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+
+
 
   // Render patient info preview
   const renderPatientInfo = () => (
@@ -773,12 +692,197 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
         </div>
       </div>
 
-      <div className="tables-grid">
-        {renderScheduledTable()}
-        {renderCheckedInTable()}
-        {renderCheckedOutTable()}
-        {renderPatientInfo()}
+      {/* Excel-styled Tables */}
+      <div className="excel-tables-container" style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: '0.25rem',
+        width: '100%',
+        height: 'calc(100vh - 200px)',
+        marginTop: '2rem',
+        padding: '0 0.25rem'
+      }}>
+        {/* Scheduled Patients Table */}
+        <div className="excel-table-section" style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <h2 className="table-title">Scheduled Patients</h2>
+          <div className="excel-table-wrapper">
+            <table className="excel-table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Record Number</th>
+                  <th>Confirmed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.scheduled.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="no-data">No scheduled patients</td>
+                  </tr>
+                ) : (
+                  // Sort appointments: confirmed first, then by time
+                  appointments.scheduled
+                    .sort((a, b) => {
+                      if (a.confirmed && !b.confirmed) return -1;
+                      if (!a.confirmed && b.confirmed) return 1;
+                      return new Date(a.appointmentTime) - new Date(b.appointmentTime);
+                    })
+                    .map(appointment => (
+                    <tr
+                      key={appointment._id}
+                      className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''} ${getPatientTypeClass(appointment)} ${appointment.confirmed ? 'confirmed-patient' : ''}`}
+                      onClick={() => handleAppointmentSelect(appointment)}
+                    >
+                      <td className={appointment.confirmed ? 'confirmed-text' : ''}>{getPatientName(appointment.patientId)}</td>
+                      <td className={appointment.confirmed ? 'confirmed-text' : ''}>{appointment.patientId?.recordNumber || 'N/A'}</td>
+                      <td className="confirm-cell">
+                        <input
+                          type="checkbox"
+                          checked={appointment.confirmed || false}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleConfirmAppointment(appointment._id, !appointment.confirmed);
+                          }}
+                          className="confirm-checkbox"
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-buttons">
+            <button
+              className="excel-btn check-in-btn"
+              onClick={() => selectedPatient && selectedPatient.status === 'scheduled' && handleCheckIn(selectedPatient._id)}
+              disabled={!selectedPatient || selectedPatient.status !== 'scheduled'}
+            >
+              Check In
+            </button>
+            <button
+              className="excel-btn walk-in-btn"
+              onClick={handleAddWalkInButton}
+            >
+              Walk In Patient
+            </button>
+          </div>
+        </div>
+
+        {/* Checked In Patients Table */}
+        <div className="excel-table-section" style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <h2 className="table-title">Checked In Patients</h2>
+          <div className="excel-table-wrapper">
+            <table className="excel-table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Patient Type</th>
+                  <th>Completed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.checkedIn.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="no-data">No checked-in patients</td>
+                  </tr>
+                ) : (
+                  appointments.checkedIn.map(appointment => {
+                    const isDoctorSigned = appointment.doctorSigned || appointment.soapNote?.isCompleted || false;
+                    return (
+                      <tr
+                        key={appointment._id}
+                        className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''} ${getPatientTypeClass(appointment)}`}
+                        onClick={() => handleAppointmentSelect(appointment)}
+                      >
+                        <td>{getPatientName(appointment.patientId)}</td>
+                        <td>{appointment.visitType || appointment.type || 'Regular'}</td>
+                        <td className="completed-cell">
+                          {isDoctorSigned ? (
+                            <span className="completed-yes">✓</span>
+                          ) : (
+                            <span className="completed-no">✗</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-buttons">
+            <button
+              className="excel-btn checkout-btn"
+              onClick={() => selectedPatient && handleCheckout(selectedPatient)}
+              disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
+            >
+              Checkout
+            </button>
+            <button
+              className="excel-btn uncheck-btn"
+              onClick={() => selectedPatient && handleUncheckPatient(selectedPatient._id)}
+              disabled={!selectedPatient || selectedPatient.status !== 'checked-in'}
+            >
+              Uncheck Patient
+            </button>
+          </div>
+        </div>
+
+        {/* Checked Out Patients Table */}
+        <div className="excel-table-section" style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <h2 className="table-title">Checked Out Patients</h2>
+          <div className="excel-table-wrapper">
+            <table className="excel-table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Checkout Time</th>
+                  <th>Payment</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.checkedOut.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="no-data">No checked-out patients</td>
+                  </tr>
+                ) : (
+                  appointments.checkedOut.map(appointment => (
+                    <tr
+                      key={appointment._id}
+                      className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''}`}
+                      onClick={() => handleAppointmentSelect(appointment)}
+                    >
+                      <td>{getPatientName(appointment.patientId)}</td>
+                      <td>{formatDateTime(appointment.checkOutTime)}</td>
+                      <td>{appointment.paymentMethod || 'N/A'}</td>
+                      <td>${((appointment.totalAmount || 0) - (appointment.amountPaid || 0)).toFixed(2)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
+
 
       {/* Patient Search Modal */}
       {showPatientSearch && (

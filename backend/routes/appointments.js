@@ -330,7 +330,16 @@ router.put('/:id', async (req, res) => {
     // Update fields
     Object.assign(appointment, req.body);
     appointment.lastModifiedBy = req.user._id;
-    
+
+    // Handle confirmation timestamp
+    if (req.body.confirmed !== undefined) {
+      if (req.body.confirmed && !appointment.confirmed) {
+        appointment.confirmedAt = new Date();
+      } else if (!req.body.confirmed) {
+        appointment.confirmedAt = null;
+      }
+    }
+
     await appointment.save();
     await appointment.populate('patientId', 'firstName lastName recordNumber phone email');
 

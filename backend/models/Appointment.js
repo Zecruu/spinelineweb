@@ -202,6 +202,11 @@ const appointmentSchema = new mongoose.Schema({
     default: false
   },
   confirmationSentAt: Date,
+  confirmed: {
+    type: Boolean,
+    default: false
+  },
+  confirmedAt: Date,
 
   // Billing and Checkout
   billingCodes: [{
