@@ -28,6 +28,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     loadExistingSOAPNote();
     loadPatientHistory();
     loadAvailableCodes();
+    updatePatientStatus('in-progress');
   }, [appointment._id, patient._id]);
 
   // Auto-save functionality
@@ -108,6 +109,21 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       }
     } catch (error) {
       console.error('Error loading available codes:', error);
+    }
+  };
+
+  const updatePatientStatus = async (status) => {
+    try {
+      await fetch(`/api/appointments/${appointment._id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      });
+    } catch (error) {
+      console.error('Error updating patient status:', error);
     }
   };
 

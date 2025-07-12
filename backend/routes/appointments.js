@@ -870,4 +870,51 @@ router.get('/reports/daily/:date', async (req, res) => {
   }
 });
 
+// Update appointment status (for SOAP note workflow)
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      clinicId: req.clinicId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Appointment not found'
+      });
+    }
+
+    // Update status
+    appointment.status = status;
+    appointment.lastModifiedBy = req.user._id;
+    appointment.lastModified = new Date();
+
+    // Set specific timestamps based on status
+    if (status === 'in-progress') {
+      appointment.inProgressTime = new Date().toTimeString().slice(0, 5);
+    } else if (status === 'checked-out') {
+      appointment.checkOutTime = new Date().toTimeString().slice(0, 5);
+    }
+
+    await appointment.save();
+    await appointment.populate('patientId', 'firstName lastName recordNumber phone email');
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Appointment status updated successfully',
+      data: { appointment }
+    });
+
+  } catch (error) {
+    console.error('Update appointment status error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to update appointment status'
+    });
+  }
+});
+
 module.exports = router;
