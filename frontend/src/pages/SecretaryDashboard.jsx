@@ -9,6 +9,7 @@ import Ledger from './Ledger';
 import Audit from './Audit';
 import Settings from './Settings';
 import './SecretaryDashboard.css';
+import './TodaysPatients.css';
 
 const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
   const [activeTab, setActiveTab] = useState('todays-patients');
@@ -169,8 +170,8 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
 
       {!loading && !error && (
         <>
-          <div className="patients-table-container">
-            <table className="patients-table">
+          <div className="excel-table-wrapper">
+            <table className="excel-table">
               <thead>
                 <tr>
                   <th>Record #</th>
@@ -187,13 +188,13 @@ const SecretaryDashboard = ({ token, user, onLogout, onCheckout }) => {
               <tbody>
                 {patients.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="no-patients">
+                    <td colSpan="9" className="no-data">
                       {searchTerm ? 'No patients found matching your search.' : 'No patients found.'}
                     </td>
                   </tr>
                 ) : (
                   patients.map(patient => (
-                    <tr key={patient._id} className="patient-row">
+                    <tr key={patient._id} className="excel-row">
                       <td className="record-number">{patient.recordNumber}</td>
                       <td className="patient-name">
                         <div className="name-container">
