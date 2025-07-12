@@ -10,3 +10,6 @@ restartPolicyType = "on_failure"
 [variables]
 NODE_ENV = "production"
 PORT = "5001"
+MONGO_URI = "mongodb+srv://spinelineuser:spinelinepass123@spineline.mongodb.net/spineline?retryWrites=true&w=majority"
+JWT_SECRET = "your-super-secret-jwt-key-here-make-it-long-and-random"
+CLIENT_URL = "https://spinelineweb-production.up.railway.app"

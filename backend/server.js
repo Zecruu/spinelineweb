@@ -19,6 +19,22 @@ connectDB().catch(error => {
   console.log('⚠️ Database connection failed, continuing without database');
 });
 
+// Load route modules
+const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
+const patientRoutes = require('./routes/patients');
+const appointmentRoutes = require('./routes/appointments');
+const appointmentHistoryRoutes = require('./routes/appointmentHistory');
+const ledgerRoutes = require('./routes/ledger');
+const auditRoutes = require('./routes/audit');
+const billingCodesRoutes = require('./routes/billingCodes');
+const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
+const carePackagesRoutes = require('./routes/carePackages');
+const checkoutRoutes = require('./routes/checkout');
+const referralsRoutes = require('./routes/referrals');
+const doctorRoutes = require('./routes/doctor');
+const soapNotesRoutes = require('./routes/soapNotes');
+
 // Security middleware (simplified)
 app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -55,23 +71,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from frontend dist
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-// Routes
-const adminRoutes = require('./routes/admin');
-const authRoutes = require('./routes/auth');
-const patientRoutes = require('./routes/patients');
-const appointmentRoutes = require('./routes/appointments');
-const appointmentHistoryRoutes = require('./routes/appointmentHistory');
-const ledgerRoutes = require('./routes/ledger');
-const auditRoutes = require('./routes/audit');
-const billingCodesRoutes = require('./routes/billingCodes');
-const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
-const carePackagesRoutes = require('./routes/carePackages');
-const checkoutRoutes = require('./routes/checkout');
-const referralsRoutes = require('./routes/referrals');
-const doctorRoutes = require('./routes/doctor');
-const soapNotesRoutes = require('./routes/soapNotes');
-
-// API Routes - these must come BEFORE static file serving
+// API Routes (must come before catch-all)
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
@@ -86,6 +86,30 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/referrals', referralsRoutes);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/soap-notes', soapNotesRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({
+    status: 'error',
+    message: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message
+  });
+});
+
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: `API endpoint ${req.originalUrl} not found`
+  });
+});
+
+// Catch-all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
+// Routes are already defined above
 
 // Database status endpoint (separate from health check)
 app.get('/api/db-status', (req, res) => {
