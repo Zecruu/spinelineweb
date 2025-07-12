@@ -19,12 +19,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root endpoint
+// Root endpoint (also serves as health check)
 app.get('/', (req, res) => {
-  console.log('🔍 Root requested at', new Date().toISOString());
+  console.log('🔍 Root/Health check requested at', new Date().toISOString());
   res.status(200).json({
+    status: 'ok',
     message: 'Ultra minimal test server is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    health: 'healthy'
   });
 });
 

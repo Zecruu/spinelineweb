@@ -3,7 +3,7 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "cd backend && npm start"
-healthcheckPath = "/api/health"
+healthcheckPath = "/"
 healthcheckTimeout = 600
 restartPolicyType = "on_failure"
 
