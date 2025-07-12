@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import CheckedInPatients from '../components/doctor/CheckedInPatients';
 import CheckedOutPatients from '../components/doctor/CheckedOutPatients';
@@ -7,7 +6,6 @@ import PatientFilters from '../components/doctor/PatientFilters';
 import './DoctorDashboard.css';
 
 const DoctorDashboard = ({ token, user, onLogout }) => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('patient-flow');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [checkedInPatients, setCheckedInPatients] = useState([]);
@@ -71,13 +69,16 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
   const handlePatientAction = (patientId, action) => {
     switch (action) {
       case 'openNote':
-        navigate(`/doctor/encounter/${patientId}`);
+        console.log(`Opening encounter note for patient ${patientId}`);
+        // TODO: Implement encounter navigation when routing is added
         break;
       case 'viewProfile':
-        navigate(`/patients/${patientId}`);
+        console.log(`Viewing profile for patient ${patientId}`);
+        // TODO: Implement patient profile navigation when routing is added
         break;
       case 'startSOAP':
-        navigate(`/doctor/encounter/${patientId}?tab=soap`);
+        console.log(`Starting SOAP note for patient ${patientId}`);
+        // TODO: Implement SOAP note navigation when routing is added
         break;
       default:
         console.log(`Action ${action} for patient ${patientId}`);

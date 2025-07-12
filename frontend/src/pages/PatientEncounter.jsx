@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+// TODO: Add proper routing when React Router is implemented
 import Sidebar from '../components/Sidebar';
 import PatientHeader from '../components/doctor/PatientHeader';
 import PatientHistoryDrawer from '../components/doctor/PatientHistoryDrawer';
@@ -9,12 +9,9 @@ import ProceduresSection from '../components/doctor/ProceduresSection';
 import SpinalListings from '../components/doctor/SpinalListings';
 import './PatientEncounter.css';
 
-const PatientEncounter = () => {
-  const { patientId } = useParams();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const appointmentId = searchParams.get('appointmentId');
-  const activeTab = searchParams.get('tab') || 'soap';
+const PatientEncounter = ({ patientId, appointmentId }) => {
+  // TODO: Get these from props when routing is implemented
+  const activeTab = 'soap';
 
   const [patient, setPatient] = useState(null);
   const [currentAppointment, setCurrentAppointment] = useState(null);
