@@ -31,7 +31,7 @@ router.get('/appointment/:appointmentId', auth, async (req, res) => {
 // Create or update SOAP note (autosave)
 router.post('/autosave', auth, async (req, res) => {
   try {
-    const { appointmentId, patientId, soapData, status = 'in-progress' } = req.body;
+    const { appointmentId, patientId, soapData, spineSegments = {}, status = 'in-progress' } = req.body;
     const clinicId = req.user.clinicId;
     const providerId = req.user.id;
 
@@ -72,6 +72,7 @@ router.post('/autosave', auth, async (req, res) => {
       }
 
       soapNote.status = status;
+      soapNote.spineSegments = spineSegments;
       soapNote.lastModifiedBy = providerId;
       
     } else {
@@ -93,6 +94,7 @@ router.post('/autosave', auth, async (req, res) => {
         plan: {
           treatmentPlan: soapData.plan || ''
         },
+        spineSegments,
         status,
         createdBy: providerId
       });

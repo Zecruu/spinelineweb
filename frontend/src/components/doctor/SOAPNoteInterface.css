@@ -365,6 +365,118 @@
   background: #059669;
 }
 
+/* Spine Listings Section */
+.spine-section {
+  padding: 0;
+}
+
+.spine-section h3 {
+  color: #f1f5f9;
+  margin: 0 0 2rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.spine-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.spine-group {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.spine-group-title {
+  color: #3b82f6;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.spine-segments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.spine-segment {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.3s ease;
+}
+
+.spine-segment:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.segment-header {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.segment-label {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-block;
+  min-width: 50px;
+}
+
+.segment-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-group label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.segment-input {
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  color: #f1f5f9;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.segment-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.segment-input::placeholder {
+  color: #64748b;
+  font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .soap-header {
@@ -372,13 +484,17 @@
     gap: 1rem;
     text-align: center;
   }
-  
+
   .patient-section {
     justify-content: center;
   }
-  
+
   .history-section {
     align-items: center;
+  }
+
+  .spine-segments {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
@@ -386,17 +502,33 @@
   .soap-header {
     padding: 1rem;
   }
-  
+
   .tab-content {
     padding: 1rem;
   }
-  
+
   .soap-actions {
     padding: 1rem;
     flex-direction: column;
   }
-  
+
   .soap-actions button {
     width: 100%;
+  }
+
+  .spine-segments {
+    grid-template-columns: 1fr;
+  }
+
+  .spine-group {
+    padding: 1rem;
+  }
+
+  .spine-segment {
+    padding: 0.75rem;
+  }
+
+  .segment-inputs {
+    gap: 0.5rem;
   }
 }

@@ -9,6 +9,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     assessment: '',
     plan: ''
   });
+  const [spineSegments, setSpineSegments] = useState({});
   const [showHistory, setShowHistory] = useState(false);
   const [patientHistory, setPatientHistory] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
       return () => clearTimeout(timer);
     }
-  }, [soapData, isDirty]);
+  }, [soapData, spineSegments, isDirty]);
 
   const loadExistingSOAPNote = async () => {
     try {
@@ -48,6 +49,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           assessment: existingNote.assessment?.clinicalImpression || '',
           plan: existingNote.plan?.treatmentPlan || ''
         });
+        setSpineSegments(existingNote.spineSegments || {});
       }
     } catch (error) {
       console.error('Error loading existing SOAP note:', error);
@@ -84,6 +86,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           appointmentId: appointment._id,
           patientId: patient._id,
           soapData,
+          spineSegments,
           status: 'in-progress'
         })
       });
@@ -139,8 +142,26 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     { id: 'subjective', label: 'Subjective', icon: '🗣️' },
     { id: 'objective', label: 'Objective', icon: '🔍' },
     { id: 'assessment', label: 'Assessment', icon: '📊' },
-    { id: 'plan', label: 'Plan', icon: '📋' }
+    { id: 'plan', label: 'Plan', icon: '📋' },
+    { id: 'spine', label: 'Spine Listings', icon: '🦴' }
   ];
+
+  const spineSegmentsList = [
+    { group: 'Cervical', segments: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'] },
+    { group: 'Thoracic', segments: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'] },
+    { group: 'Lumbar', segments: ['L1', 'L2', 'L3', 'L4', 'L5'] }
+  ];
+
+  const handleSpineSegmentChange = (segment, field, value) => {
+    setSpineSegments(prev => ({
+      ...prev,
+      [segment]: {
+        ...prev[segment],
+        [field]: value
+      }
+    }));
+    setIsDirty(true);
+  };
 
   return (
     <div className="soap-note-interface">
@@ -247,16 +268,70 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
         {/* Tab Content */}
         <div className="tab-content">
-          <div className="soap-section">
-            <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
-            <textarea
-              className="soap-textarea"
-              value={soapData[activeTab]}
-              onChange={(e) => handleSoapChange(activeTab, e.target.value)}
-              placeholder={`Enter ${activeTab} information...`}
-              rows={15}
-            />
-          </div>
+          {activeTab === 'spine' ? (
+            <div className="spine-section">
+              <h3>Spine Segment Documentation</h3>
+              <div className="spine-groups">
+                {spineSegmentsList.map(group => (
+                  <div key={group.group} className="spine-group">
+                    <h4 className="spine-group-title">{group.group} Spine</h4>
+                    <div className="spine-segments">
+                      {group.segments.map(segment => (
+                        <div key={segment} className="spine-segment">
+                          <div className="segment-header">
+                            <span className="segment-label">{segment}</span>
+                          </div>
+                          <div className="segment-inputs">
+                            <div className="input-group">
+                              <label>Findings:</label>
+                              <input
+                                type="text"
+                                className="segment-input"
+                                value={spineSegments[segment]?.findings || ''}
+                                onChange={(e) => handleSpineSegmentChange(segment, 'findings', e.target.value)}
+                                placeholder="Enter findings..."
+                              />
+                            </div>
+                            <div className="input-group">
+                              <label>Treatment:</label>
+                              <input
+                                type="text"
+                                className="segment-input"
+                                value={spineSegments[segment]?.treatment || ''}
+                                onChange={(e) => handleSpineSegmentChange(segment, 'treatment', e.target.value)}
+                                placeholder="Enter treatment..."
+                              />
+                            </div>
+                            <div className="input-group">
+                              <label>Notes:</label>
+                              <input
+                                type="text"
+                                className="segment-input"
+                                value={spineSegments[segment]?.notes || ''}
+                                onChange={(e) => handleSpineSegmentChange(segment, 'notes', e.target.value)}
+                                placeholder="Additional notes..."
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="soap-section">
+              <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
+              <textarea
+                className="soap-textarea"
+                value={soapData[activeTab]}
+                onChange={(e) => handleSoapChange(activeTab, e.target.value)}
+                placeholder={`Enter ${activeTab} information...`}
+                rows={15}
+              />
+            </div>
+          )}
         </div>
       </div>
 

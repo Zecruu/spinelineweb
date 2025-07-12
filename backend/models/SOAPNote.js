@@ -176,6 +176,12 @@ const soapNoteSchema = new mongoose.Schema({
     }
   }],
 
+  // Spine Segments Documentation
+  spineSegments: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+
   // Digital Signature and Completion
   isSigned: {
     type: Boolean,
