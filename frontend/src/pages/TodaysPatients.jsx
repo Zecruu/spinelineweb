@@ -631,7 +631,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
   return (
     <div className="todays-patients">
       <div className="page-header">
-        <h1>📋 Patient Flow</h1>
+        <h1>📋 Patient Flow (Update 12)</h1>
         <div className="header-actions">
           <input
             type="date"
