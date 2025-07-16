@@ -172,30 +172,32 @@ const PatientOverview = ({ patient, appointment, token }) => {
       {/* Patient Basic Info */}
       <div className="overview-section patient-info">
         <h3>Patient Information</h3>
-        <div className="patient-details">
-          <div className="patient-avatar">
-            <div className="avatar-circle">
-              {patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}
+        <div className="section-content">
+          <div className="patient-details">
+            <div className="patient-avatar">
+              <div className="avatar-circle">
+                {patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}
+              </div>
             </div>
-          </div>
-          <div className="patient-basic-info">
-            <h4>{patient.firstName} {patient.lastName}</h4>
-            <div className="info-grid">
-              <div className="info-item">
-                <span className="label">DOB:</span>
-                <span className="value">{patient.dateOfBirth ? formatDate(patient.dateOfBirth) : 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="label">Age:</span>
-                <span className="value">{calculateAge(patient.dateOfBirth)}</span>
-              </div>
-              <div className="info-item">
-                <span className="label">Record #:</span>
-                <span className="value">{patient.recordNumber || 'N/A'}</span>
-              </div>
-              <div className="info-item">
-                <span className="label">Phone:</span>
-                <span className="value">{patient.phone || 'N/A'}</span>
+            <div className="patient-basic-info">
+              <h4>{patient.firstName} {patient.lastName}</h4>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span className="label">DOB:</span>
+                  <span className="value">{patient.dateOfBirth ? formatDate(patient.dateOfBirth) : 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Age:</span>
+                  <span className="value">{calculateAge(patient.dateOfBirth)}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Record #:</span>
+                  <span className="value">{patient.recordNumber || 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Phone:</span>
+                  <span className="value">{patient.phone || 'N/A'}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -205,55 +207,59 @@ const PatientOverview = ({ patient, appointment, token }) => {
       {/* Active Care Packages */}
       <div className="overview-section care-packages">
         <h3>Active Care Packages</h3>
-        {activePackages.length > 0 ? (
-          <div className="packages-list">
-            {activePackages.map(pkg => (
-              <div key={pkg._id} className="package-item">
-                <div className="package-info">
-                  <span className="package-name">{pkg.name}</span>
-                  <span className="package-sessions">{pkg.remainingSessions}/{pkg.totalSessions} sessions</span>
+        <div className="section-content">
+          {activePackages.length > 0 ? (
+            <div className="packages-list">
+              {activePackages.map(pkg => (
+                <div key={pkg._id} className="package-item">
+                  <div className="package-info">
+                    <span className="package-name">{pkg.name}</span>
+                    <span className="package-sessions">{pkg.remainingSessions}/{pkg.totalSessions} sessions</span>
+                  </div>
+                  <div className="package-progress">
+                    <div
+                      className="progress-bar"
+                      style={{
+                        width: `${((pkg.totalSessions - pkg.remainingSessions) / pkg.totalSessions) * 100}%`
+                      }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="package-progress">
-                  <div 
-                    className="progress-bar"
-                    style={{ 
-                      width: `${((pkg.totalSessions - pkg.remainingSessions) / pkg.totalSessions) * 100}%` 
-                    }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-data">No active care packages</p>
-        )}
+              ))}
+            </div>
+          ) : (
+            <p className="no-data">No active care packages</p>
+          )}
+        </div>
       </div>
 
       {/* Pain Scale Progression */}
       <div className="overview-section pain-scale">
         <h3>Pain Scale Progression</h3>
-        {painScaleHistory.length > 0 ? (
-          <div className="pain-scale-chart">
-            {painScaleHistory.map((entry, index) => (
-              <div key={index} className="pain-entry">
-                <div className="pain-date">{formatDate(entry.date)}</div>
-                <div className="pain-scale-bar">
-                  <div 
-                    className="pain-level"
-                    style={{ 
-                      width: `${(entry.scale / 10) * 100}%`,
-                      backgroundColor: getPainScaleColor(entry.scale)
-                    }}
-                  >
-                    {entry.scale}/10
+        <div className="section-content">
+          {painScaleHistory.length > 0 ? (
+            <div className="pain-scale-chart">
+              {painScaleHistory.map((entry, index) => (
+                <div key={index} className="pain-entry">
+                  <div className="pain-date">{formatDate(entry.date)}</div>
+                  <div className="pain-scale-bar">
+                    <div
+                      className="pain-level"
+                      style={{
+                        width: `${(entry.scale / 10) * 100}%`,
+                        backgroundColor: getPainScaleColor(entry.scale)
+                      }}
+                    >
+                      {entry.scale}/10
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-data">No pain scale history available</p>
-        )}
+              ))}
+            </div>
+          ) : (
+            <p className="no-data">No pain scale history available</p>
+          )}
+        </div>
       </div>
 
       {/* Provider Notes */}
@@ -279,53 +285,57 @@ const PatientOverview = ({ patient, appointment, token }) => {
       {/* Patient History */}
       <div className="overview-section patient-history">
         <h3>Recent Visit History</h3>
-        {patientHistory.length > 0 ? (
-          <div className="history-list">
-            {patientHistory.map(visit => (
-              <div key={visit._id} className="history-item">
-                <div className="visit-date">{formatDate(visit.date)}</div>
-                <div className="visit-type">{visit.visitType}</div>
-                <div className="visit-status">{visit.status}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-data">No visit history available</p>
-        )}
+        <div className="section-content">
+          {patientHistory.length > 0 ? (
+            <div className="history-list">
+              {patientHistory.map(visit => (
+                <div key={visit._id} className="history-item">
+                  <div className="visit-date">{formatDate(visit.date)}</div>
+                  <div className="visit-type">{visit.visitType}</div>
+                  <div className="visit-status">{visit.status}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-data">No visit history available</p>
+          )}
+        </div>
       </div>
 
       {/* Documents Section */}
       <div className="overview-section documents">
         <h3>Documents</h3>
-        <div className="documents-header">
-          <label className="upload-btn">
-            <input
-              type="file"
-              onChange={handleDocumentUpload}
-              disabled={uploadingDocument}
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            />
-            {uploadingDocument ? 'Uploading...' : '📎 Upload Document'}
-          </label>
-        </div>
-        {documents.length > 0 ? (
-          <div className="documents-list">
-            {documents.map(doc => (
-              <div key={doc._id} className="document-item">
-                <div className="doc-icon">📄</div>
-                <div className="doc-info">
-                  <span className="doc-name">{doc.name}</span>
-                  <span className="doc-date">{formatDate(doc.uploadDate)}</span>
-                </div>
-                <button className="doc-download" onClick={() => window.open(doc.url, '_blank')}>
-                  ⬇️
-                </button>
-              </div>
-            ))}
+        <div className="section-content">
+          <div className="documents-header">
+            <label className="upload-btn">
+              <input
+                type="file"
+                onChange={handleDocumentUpload}
+                disabled={uploadingDocument}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              />
+              {uploadingDocument ? 'Uploading...' : '📎 Upload Document'}
+            </label>
           </div>
-        ) : (
-          <p className="no-data">No documents uploaded</p>
-        )}
+          {documents.length > 0 ? (
+            <div className="documents-list">
+              {documents.map(doc => (
+                <div key={doc._id} className="document-item">
+                  <div className="doc-icon">📄</div>
+                  <div className="doc-info">
+                    <span className="doc-name">{doc.name}</span>
+                    <span className="doc-date">{formatDate(doc.uploadDate)}</span>
+                  </div>
+                  <button className="doc-download" onClick={() => window.open(doc.url, '_blank')}>
+                    ⬇️
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-data">No documents uploaded</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 .patient-overview {
   padding: 1.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
   gap: 1.5rem;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
@@ -37,32 +38,42 @@
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
-  height: fit-content;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Specific section sizing */
+/* Specific section positioning - Top row: Patient Info, Active Packages, Pain Scale */
 .overview-section.patient-info {
-  grid-column: span 1;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .overview-section.care-packages {
-  grid-column: span 1;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .overview-section.pain-scale {
-  grid-column: span 1;
+  grid-column: 3;
+  grid-row: 1;
 }
 
-.overview-section.provider-notes {
-  grid-column: span 1;
-}
-
+/* Bottom row: Visit History, Documents */
 .overview-section.patient-history {
-  grid-column: span 1;
+  grid-column: 1 / 3;
+  grid-row: 2;
 }
 
 .overview-section.documents {
-  grid-column: span 1;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+/* Hide provider notes section to match requested layout */
+.overview-section.provider-notes {
+  display: none;
 }
 
 .overview-section h3 {
@@ -75,6 +86,29 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Scrollable content area for each card */
+.overview-section .section-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Apply scrollable content to existing content containers */
+.packages-list,
+.pain-scale-chart,
+.history-list,
+.documents-list,
+.notes-list {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.patient-details {
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .overview-section h3::before {
@@ -311,8 +345,19 @@
 }
 
 /* Documents Section */
+.overview-section.documents .section-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .documents-header {
   margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.documents-list {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .upload-btn {
@@ -394,7 +439,34 @@
 /* Responsive Design */
 @media (max-width: 1200px) {
   .patient-overview {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto auto;
+  }
+
+  /* Adjust positioning for medium screens */
+  .overview-section.patient-info {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .overview-section.care-packages {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .overview-section.pain-scale {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .overview-section.patient-history {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .overview-section.documents {
+    grid-column: 1 / 3;
+    grid-row: 3;
   }
 }
 
@@ -403,11 +475,34 @@
     padding: 1rem;
     gap: 1rem;
     grid-template-columns: 1fr;
+    grid-template-rows: repeat(5, auto);
   }
 
   .overview-section {
     padding: 1rem;
-    grid-column: span 1 !important;
+    grid-column: 1 !important;
+    height: 250px;
+  }
+
+  /* Stack all sections vertically on mobile */
+  .overview-section.patient-info {
+    grid-row: 1;
+  }
+
+  .overview-section.care-packages {
+    grid-row: 2;
+  }
+
+  .overview-section.pain-scale {
+    grid-row: 3;
+  }
+
+  .overview-section.patient-history {
+    grid-row: 4;
+  }
+
+  .overview-section.documents {
+    grid-row: 5;
   }
 
   .patient-details {
@@ -441,9 +536,10 @@
 @media (min-width: 1400px) {
   .patient-overview {
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
   }
 
-  .overview-section.patient-info {
-    grid-column: span 2;
+  .overview-section {
+    height: 350px;
   }
 }
