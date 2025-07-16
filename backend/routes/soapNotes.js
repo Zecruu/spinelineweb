@@ -3,10 +3,10 @@ const router = express.Router();
 const SOAPNote = require('../models/SOAPNote');
 const Appointment = require('../models/Appointment');
 const Patient = require('../models/Patient');
-const auth = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 // Get SOAP note by appointment ID
-router.get('/appointment/:appointmentId', auth, async (req, res) => {
+router.get('/appointment/:appointmentId', authenticateToken, async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const clinicId = req.user.clinicId;
@@ -29,7 +29,7 @@ router.get('/appointment/:appointmentId', auth, async (req, res) => {
 });
 
 // Create or update SOAP note (autosave)
-router.post('/autosave', auth, async (req, res) => {
+router.post('/autosave', authenticateToken, async (req, res) => {
   try {
     const {
       appointmentId,
@@ -136,7 +136,7 @@ router.post('/autosave', auth, async (req, res) => {
 });
 
 // Get patient history for SOAP note interface
-router.get('/patient-history/:patientId', auth, async (req, res) => {
+router.get('/patient-history/:patientId', authenticateToken, async (req, res) => {
   try {
     const { patientId } = req.params;
     const clinicId = req.user.clinicId;
@@ -168,7 +168,7 @@ router.get('/patient-history/:patientId', auth, async (req, res) => {
 });
 
 // Complete and sign SOAP note
-router.post('/sign/:appointmentId', auth, async (req, res) => {
+router.post('/sign/:appointmentId', authenticateToken, async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const {
@@ -256,7 +256,7 @@ router.post('/sign/:appointmentId', auth, async (req, res) => {
 });
 
 // Get SOAP note templates
-router.get('/templates', auth, async (req, res) => {
+router.get('/templates', authenticateToken, async (req, res) => {
   try {
     const templates = {
       subjective: [
