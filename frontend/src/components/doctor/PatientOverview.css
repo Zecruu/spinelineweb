@@ -1,10 +1,11 @@
 .patient-overview {
   padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+  align-items: start;
 }
 
 .patient-overview.loading {
@@ -36,6 +37,32 @@
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
+  height: fit-content;
+}
+
+/* Specific section sizing */
+.overview-section.patient-info {
+  grid-column: span 1;
+}
+
+.overview-section.care-packages {
+  grid-column: span 1;
+}
+
+.overview-section.pain-scale {
+  grid-column: span 1;
+}
+
+.overview-section.provider-notes {
+  grid-column: span 1;
+}
+
+.overview-section.patient-history {
+  grid-column: span 1;
+}
+
+.overview-section.documents {
+  grid-column: span 1;
 }
 
 .overview-section h3 {
@@ -45,6 +72,17 @@
   margin: 0 0 1rem 0;
   border-bottom: 1px solid rgba(59, 130, 246, 0.2);
   padding-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.overview-section h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
 }
 
 .no-data {
@@ -351,4 +389,61 @@
 .doc-download:hover {
   background: rgba(34, 197, 94, 0.2);
   border-color: #22c55e;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .patient-overview {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-overview {
+    padding: 1rem;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .overview-section {
+    padding: 1rem;
+    grid-column: span 1 !important;
+  }
+
+  .patient-details {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .pain-entry {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
+
+  .pain-date {
+    min-width: auto;
+    text-align: center;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1400px) {
+  .patient-overview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .overview-section.patient-info {
+    grid-column: span 2;
+  }
 }
