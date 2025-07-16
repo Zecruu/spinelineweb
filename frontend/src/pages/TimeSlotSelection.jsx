@@ -232,15 +232,14 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
             </h3>
           </div>
 
-          <div className="appointments-table">
+          <div className="appointments-table" style={{ minHeight: '60vh', maxHeight: '70vh', overflowY: 'auto' }}>
             <div className="table-headers">
-              <div className="header-cell">Time</div>
-              <div className="header-cell">Patient</div>
-              <div className="header-cell">Visit Type</div>
-              <div className="header-cell">Doctor</div>
-              <div className="header-cell">Status</div>
-              <div className="header-cell">Actions</div>
-            </div>
+  <div className="header-cell" style={{ minWidth: '100px', whiteSpace: 'nowrap' }}>Time</div>
+  <div className="header-cell" style={{ minWidth: '160px', whiteSpace: 'nowrap' }}>Patient</div>
+  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Visit Type</div>
+  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Doctor</div>
+  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Status</div>
+</div>
 
             <div className="table-body">
               {Object.values(appointments).flat().length === 0 ? (
@@ -284,29 +283,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
                         {appointment.status || 'Scheduled'}
                       </span>
                     </div>
-                    <div className="table-cell actions-cell">
-                      <button
-                        className="action-btn edit-btn"
-                        onClick={() => handleEditAppointment(appointment)}
-                        title="Edit Appointment"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="action-btn reschedule-btn"
-                        onClick={() => handleRescheduleAppointment(appointment)}
-                        title="Reschedule"
-                      >
-                        📅
-                      </button>
-                      <button
-                        className="action-btn cancel-btn"
-                        onClick={() => handleCancelAppointment(appointment)}
-                        title="Cancel Appointment"
-                      >
-                        ❌
-                      </button>
-                    </div>
+                    
                   </div>
                 ))
               )}
