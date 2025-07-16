@@ -323,75 +323,43 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
   return (
     <div className="soap-note-interface">
-      {/* Sticky Header */}
+      {/* Compact Header */}
       <div className="soap-header">
-        {/* Left: Insurance Info */}
-        <div className="insurance-section">
-          <div className="insurance-info">
-            <h4>Insurance Coverage</h4>
-            <div className="coverage-details">
-              <span className="insurance-name">
-                {patient.insurance?.primary?.name || 'Self Pay'}
-              </span>
-              {patient.insurance?.primary?.copay && (
-                <span className="copay-info">
-                  Copay: ${patient.insurance.primary.copay}
-                </span>
-              )}
-            </div>
-            <div className="covered-codes">
-              <small>Covered: CPT 98941, 98942, 98943</small>
-            </div>
+        {/* Left: Patient Info */}
+        <div className="patient-info-compact">
+          <div className="avatar-circle-small">
+            {getPatientInitials(patient.firstName, patient.lastName)}
           </div>
-        </div>
-
-        {/* Center: Patient Info */}
-        <div className="patient-section">
-          <div className="patient-avatar-large">
-            <div className="avatar-circle-large">
-              {getPatientInitials(patient.firstName, patient.lastName)}
-            </div>
-          </div>
-          <div className="patient-details-main">
-            <h2 className="patient-name-large">
+          <div className="patient-details-compact">
+            <span className="patient-name-compact">
               {patient.firstName} {patient.lastName}
-            </h2>
-            <div className="patient-meta">
-              <span className="dob">DOB: {new Date(patient.dob).toLocaleDateString()}</span>
-              <span className="age">Age: {calculateAge(patient.dob)}</span>
-              <span className="record">#{patient.recordNumber}</span>
-            </div>
-            <div className="visit-info">
-              <span className="visit-type">{appointment.visitType || 'Standard Visit'}</span>
-              <span className="visit-time">{formatTime(appointment.time)}</span>
-            </div>
+            </span>
+            <span className="patient-meta-compact">
+              #{patient.recordNumber} • {calculateAge(patient.dob)}y • {patient.insurance?.primary?.name || 'Self Pay'}
+            </span>
           </div>
         </div>
 
-        {/* Right: History Toggle & Settings */}
-        <div className="history-section">
-          <div className="header-buttons">
-            <button
-              className="settings-toggle"
-              onClick={() => setShowSettings(true)}
-              title="Settings"
-            >
-              ⚙️ Settings
-            </button>
-            <button
-              className={`history-toggle ${showHistory ? 'active' : ''}`}
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              📚 Patient History
-            </button>
-          </div>
+        {/* Right: Actions */}
+        <div className="header-actions">
+          <button
+            className="header-btn settings-btn"
+            onClick={() => setShowSettings(true)}
+            title="Settings"
+          >
+            ⚙️
+          </button>
+          <button
+            className={`header-btn history-btn ${showHistory ? 'active' : ''}`}
+            onClick={() => setShowHistory(!showHistory)}
+            title="Patient History"
+          >
+            📚
+          </button>
           {lastSaved && (
-            <div className="save-status">
-              <span className="save-indicator">
-                {loading ? '💾 Saving...' : '✅ Saved'}
-              </span>
-              <small>Last saved: {lastSaved.toLocaleTimeString()}</small>
-            </div>
+            <span className="save-indicator-compact">
+              {loading ? '💾' : '✅'}
+            </span>
           )}
         </div>
       </div>
