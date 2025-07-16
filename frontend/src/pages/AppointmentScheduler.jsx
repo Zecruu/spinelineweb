@@ -249,6 +249,25 @@ const AppointmentScheduler = ({ token, user }) => {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
+  // Get appointment color based on visit type
+  const getAppointmentColor = (appointment) => {
+    const visitType = appointment.visitType?.toLowerCase();
+    switch (visitType) {
+      case 'consultation':
+        return 'bg-blue';
+      case 'follow-up':
+        return 'bg-green';
+      case 'therapy':
+        return 'bg-orange';
+      case 'emergency':
+        return 'bg-red';
+      case 'check-up':
+        return 'bg-purple';
+      default:
+        return 'bg-blue';
+    }
+  };
+
   // Render time slot selection if in timeslots view
   if (currentView === 'timeslots') {
     return (
