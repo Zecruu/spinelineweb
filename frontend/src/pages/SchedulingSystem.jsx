@@ -555,13 +555,8 @@ const SchedulingSystem = ({ token, user }) => {
                 >
                   <div className="day-number">{day.day}</div>
                   {day.appointmentCount > 0 && (
-                    <div className="appointment-count">
-                      {day.appointmentCount} patient{day.appointmentCount !== 1 ? 's' : ''}
-                    </div>
-                  )}
-                  {day.dominantType && (
-                    <div className="dominant-type">
-                      {day.dominantType}
+                    <div className="appointment-count" title={`${day.appointmentCount} appointment${day.appointmentCount !== 1 ? 's' : ''}`}>
+                      {day.appointmentCount}
                     </div>
                   )}
                 </div>
