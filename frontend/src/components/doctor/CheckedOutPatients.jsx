@@ -5,18 +5,24 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
+    // Parse the date string properly to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
+
     const today = new Date();
-    const yesterday = new Date(today);
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const yesterday = new Date(todayDate);
     yesterday.setDate(yesterday.getDate() - 1);
-    const tomorrow = new Date(today);
+
+    const tomorrow = new Date(todayDate);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (date.toDateString() === today.toDateString()) {
+    if (date.getTime() === todayDate.getTime()) {
       return 'today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
+    } else if (date.getTime() === yesterday.getTime()) {
       return 'yesterday';
-    } else if (date.toDateString() === tomorrow.toDateString()) {
+    } else if (date.getTime() === tomorrow.getTime()) {
       return 'tomorrow';
     } else {
       return date.toLocaleDateString('en-US', {
