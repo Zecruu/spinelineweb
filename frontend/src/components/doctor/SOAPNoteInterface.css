@@ -322,6 +322,12 @@
   margin-bottom: 1rem;
 }
 
+.header-tools {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .soap-section h3 {
   color: #f1f5f9;
   margin: 0;

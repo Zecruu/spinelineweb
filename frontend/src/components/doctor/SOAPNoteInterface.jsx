@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './SOAPNoteInterface.css';
 import MacroSelector from './MacroSelector';
+import SmartTemplate from './SmartTemplate';
 import DoctorSettings from './DoctorSettings';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
@@ -725,12 +726,20 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
             <div className="soap-section">
               <div className="soap-section-header">
                 <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
-                {['subjective', 'objective', 'assessment', 'plan'].includes(activeTab) && (
-                  <MacroSelector
-                    onInsertMacro={handleInsertMacro}
-                    soapSection={activeTab}
-                  />
-                )}
+                <div className="header-tools">
+                  {['subjective', 'objective', 'assessment', 'plan'].includes(activeTab) && (
+                    <>
+                      <SmartTemplate
+                        onInsertTemplate={handleInsertMacro}
+                        soapSection={activeTab}
+                      />
+                      <MacroSelector
+                        onInsertMacro={handleInsertMacro}
+                        soapSection={activeTab}
+                      />
+                    </>
+                  )}
+                </div>
               </div>
               <textarea
                 className="soap-textarea"
