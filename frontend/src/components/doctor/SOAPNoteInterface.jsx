@@ -3,10 +3,11 @@ import './SOAPNoteInterface.css';
 import MacroSelector from './MacroSelector';
 import SmartTemplate from './SmartTemplate';
 import CodeTable from './CodeTable';
+import PatientOverview from './PatientOverview';
 import DoctorSettings from './DoctorSettings';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
-  const [activeTab, setActiveTab] = useState('subjective');
+  const [activeTab, setActiveTab] = useState('overview');
   const [soapData, setSoapData] = useState({
     subjective: '',
     objective: '',
@@ -21,7 +22,6 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   const [isReadyToSign, setIsReadyToSign] = useState(false);
   const [signatureData, setSignatureData] = useState(null);
   const [isSigned, setIsSigned] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const [patientHistory, setPatientHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
@@ -186,7 +186,8 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       await handleAutoSave();
     }
 
-    // Close without changing patient status (keeps them in checked-in)
+    // DO NOT change patient status - keep them checked-in
+    // The patient should remain in the checked-in table for continued work
     onClose();
   };
 
@@ -219,6 +220,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   };
 
   const tabs = [
+    { id: 'overview', label: 'Overview', icon: '📋' },
     { id: 'subjective', label: 'Subjective', icon: '🗣️' },
     { id: 'objective', label: 'Objective', icon: '🔍' },
     { id: 'assessment', label: 'Assessment', icon: '📊' },
@@ -364,13 +366,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           >
             ⚙️
           </button>
-          <button
-            className={`header-btn history-btn ${showHistory ? 'active' : ''}`}
-            onClick={() => setShowHistory(!showHistory)}
-            title="Patient History"
-          >
-            📚
-          </button>
+
           {lastSaved && (
             <span className="save-indicator-compact">
               {loading ? '💾' : '✅'}
@@ -379,26 +375,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
         </div>
       </div>
 
-      {/* Collapsible History Panel */}
-      {showHistory && (
-        <div className="history-panel">
-          <div className="history-content">
-            <h3>Previous Visits</h3>
-            <div className="history-list">
-              {patientHistory.length === 0 ? (
-                <p className="no-history">No previous visits found</p>
-              ) : (
-                patientHistory.map((visit, index) => (
-                  <div key={index} className="history-item">
-                    <div className="visit-date">{visit.date}</div>
-                    <div className="visit-summary">{visit.summary}</div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Main Content Area */}
       <div className="soap-content">
@@ -418,7 +395,13 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
         {/* Tab Content */}
         <div className="tab-content">
-          {activeTab === 'codes' ? (
+          {activeTab === 'overview' ? (
+            <PatientOverview
+              patient={patient}
+              appointment={appointment}
+              token={token}
+            />
+          ) : activeTab === 'codes' ? (
             <div className="codes-section">
               <h3>Diagnosis & Billing Codes</h3>
 

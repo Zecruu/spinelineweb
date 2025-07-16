@@ -444,4 +444,107 @@ router.put('/:id/alerts/:alertId', async (req, res) => {
   }
 });
 
+// Get patient history for overview
+router.get('/:id/history', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const Appointment = require('../models/Appointment');
+
+    const appointments = await Appointment.find({
+      patientId: id,
+      clinicId: req.clinicId,
+      status: { $in: ['checked-out', 'completed'] }
+    })
+    .sort({ date: -1 })
+    .limit(10)
+    .populate('providerId', 'name');
+
+    const history = appointments.map(apt => ({
+      _id: apt._id,
+      date: apt.date,
+      visitType: apt.visitType,
+      status: apt.status,
+      provider: apt.providerId?.name || 'Unknown',
+      summary: `${apt.visitType} visit with ${apt.providerId?.name || 'Unknown'}`
+    }));
+
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching patient history:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get provider notes for patient
+router.get('/:id/provider-notes', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // This would typically come from a provider notes collection
+    // For now, return mock data
+    const notes = [
+      {
+        _id: '1',
+        date: new Date(),
+        providerName: 'Dr. Smith',
+        content: 'Patient showing good progress with treatment plan.'
+      }
+    ];
+
+    res.json(notes);
+  } catch (error) {
+    console.error('Error fetching provider notes:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get pain scale history for patient
+router.get('/:id/pain-scale-history', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // This would typically come from SOAP notes or pain scale tracking
+    // For now, return mock data
+    const painHistory = [
+      { date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), scale: 8 },
+      { date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), scale: 7 },
+      { date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000), scale: 6 },
+      { date: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000), scale: 9 }
+    ];
+
+    res.json(painHistory);
+  } catch (error) {
+    console.error('Error fetching pain scale history:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get patient documents
+router.get('/:id/documents', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // This would typically come from a documents collection
+    // For now, return mock data
+    const documents = [];
+
+    res.json(documents);
+  } catch (error) {
+    console.error('Error fetching patient documents:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Upload patient document
+router.post('/documents/upload', async (req, res) => {
+  try {
+    // This would handle file upload
+    // For now, return success
+    res.json({ message: 'Document uploaded successfully' });
+  } catch (error) {
+    console.error('Error uploading document:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
