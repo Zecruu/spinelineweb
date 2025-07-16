@@ -176,6 +176,79 @@ const AppointmentScheduler = ({ token, user }) => {
 
   const calendarDays = generateCalendarDays();
 
+  // Get appointments for selected dates
+  const getSelectedDatesAppointments = () => {
+    const appointments = [];
+    selectedDates.forEach(dateStr => {
+      const dateAppointments = monthlyAppointments[dateStr] || [];
+      dateAppointments.forEach(apt => {
+        appointments.push({
+          ...apt,
+          date: dateStr
+        });
+      });
+    });
+
+    // Sort by date and time
+    appointments.sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.time.localeCompare(b.time);
+    });
+
+    return appointments;
+  };
+
+  // Handle appointment actions
+  const handleEditAppointment = (appointment) => {
+    // TODO: Implement edit appointment modal
+    console.log('Edit appointment:', appointment);
+    alert('Edit appointment functionality will be implemented');
+  };
+
+  const handleRescheduleAppointment = (appointment) => {
+    // TODO: Implement reschedule appointment modal
+    console.log('Reschedule appointment:', appointment);
+    alert('Reschedule appointment functionality will be implemented');
+  };
+
+  const handleCancelAppointment = async (appointment) => {
+    if (!confirm(`Are you sure you want to cancel the appointment for ${appointment.patientId?.firstName} ${appointment.patientId?.lastName}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointment._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        // Refresh appointments
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        fetchMonthlyAppointments(year, month);
+        alert('Appointment cancelled successfully');
+      } else {
+        alert('Failed to cancel appointment');
+      }
+    } catch (error) {
+      console.error('Cancel appointment error:', error);
+      alert('Failed to cancel appointment');
+    }
+  };
+
+  // Format time for display
+  const formatTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
   // Render time slot selection if in timeslots view
   if (currentView === 'timeslots') {
     return (
@@ -222,7 +295,166 @@ const AppointmentScheduler = ({ token, user }) => {
 
       {error && <div className="error-message">{error}</div>}
 
+      {/* Calendar Month View */}
+      <div className="calendar-container">
+        <div className="calendar-header">
+          <button
+            className="nav-button"
+            onClick={() => navigateMonth(-1)}
+          >
+            ←
+          </button>
+          <h2>
+            {currentDate.toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
+            })}
+          </h2>
+          <button
+            className="nav-button"
+            onClick={() => navigateMonth(1)}
+          >
+            →
+          </button>
+        </div>
 
+        <div className="calendar-grid">
+          <div className="calendar-weekdays">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="weekday">{day}</div>
+            ))}
+          </div>
+
+          <div className="calendar-days">
+            {calendarDays.map((day, index) => {
+              const isSelected = selectedDates.includes(day.dateStr);
+              return (
+                <div
+                  key={index}
+                  className={`calendar-day ${
+                    !day.isCurrentMonth ? 'other-month' : ''
+                  } ${
+                    day.isToday ? 'today' : ''
+                  } ${
+                    isSelected ? 'selected' : ''
+                  } ${
+                    day.isPastDate ? 'past-date' : ''
+                  }`}
+                  onClick={() => day.isCurrentMonth && handleDateSelect(day.dateStr, day)}
+                >
+                  <div className="day-number">{day.day}</div>
+                  {day.appointmentCount > 0 && (
+                    <div className="appointment-count">
+                      {day.appointmentCount} patient{day.appointmentCount !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Selected Dates Appointments Table */}
+      {selectedDates.length > 0 && (
+        <div className="appointments-table-container">
+          <div className="table-header">
+            <h3>
+              {selectedDates.length === 1
+                ? `Appointments for ${new Date(selectedDates[0] + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+                : `Appointments for ${selectedDates.length} Selected Dates`
+              }
+            </h3>
+            <button
+              className="clear-selection-btn"
+              onClick={() => setSelectedDates([])}
+            >
+              Clear Selection
+            </button>
+          </div>
+
+          <div className="appointments-table">
+            <div className="table-headers">
+              <div className="header-cell">Time</div>
+              <div className="header-cell">Patient</div>
+              <div className="header-cell">Visit Type</div>
+              <div className="header-cell">Doctor</div>
+              <div className="header-cell">Status</div>
+              <div className="header-cell">Actions</div>
+            </div>
+
+            <div className="table-body">
+              {getSelectedDatesAppointments().length === 0 ? (
+                <div className="no-appointments">
+                  No appointments scheduled for selected date{selectedDates.length > 1 ? 's' : ''}
+                </div>
+              ) : (
+                getSelectedDatesAppointments().map(appointment => (
+                  <div key={appointment._id} className="table-row">
+                    <div className="table-cell time-cell">
+                      <div className="appointment-time">
+                        {formatTime(appointment.time)}
+                      </div>
+                      <div className="appointment-date">
+                        {new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                    <div className="table-cell patient-cell">
+                      <div className="patient-avatar">
+                        {appointment.patientId?.firstName?.[0]}{appointment.patientId?.lastName?.[0]}
+                      </div>
+                      <div className="patient-info">
+                        <div className="patient-name">
+                          {appointment.patientId?.firstName} {appointment.patientId?.lastName}
+                        </div>
+                        <div className="patient-record">
+                          Record #{appointment.patientId?.recordNumber}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="table-cell visit-type-cell">
+                      <span className={`visit-type-badge ${getAppointmentColor(appointment)}`}>
+                        {appointment.visitType}
+                      </span>
+                    </div>
+                    <div className="table-cell doctor-cell">
+                      {appointment.doctorName || 'Not Assigned'}
+                    </div>
+                    <div className="table-cell status-cell">
+                      <span className={`status-badge ${appointment.status || 'scheduled'}`}>
+                        {appointment.status || 'Scheduled'}
+                      </span>
+                    </div>
+                    <div className="table-cell actions-cell">
+                      <button
+                        className="action-btn edit-btn"
+                        onClick={() => handleEditAppointment(appointment)}
+                        title="Edit Appointment"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="action-btn reschedule-btn"
+                        onClick={() => handleRescheduleAppointment(appointment)}
+                        title="Reschedule"
+                      >
+                        📅
+                      </button>
+                      <button
+                        className="action-btn cancel-btn"
+                        onClick={() => handleCancelAppointment(appointment)}
+                        title="Cancel Appointment"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selected Dates Section */}
       {selectedDates.length > 0 && (
