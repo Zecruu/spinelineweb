@@ -137,42 +137,49 @@
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  margin-bottom: 1rem;
+  background: rgba(51, 65, 85, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
 }
 
 .weekday {
   text-align: center;
-  padding: 0.75rem;
-  color: #94a3b8;
-  font-weight: 600;
-  font-size: 0.9rem;
+  padding: 1rem 0.5rem;
+  color: #f1f5f9;
+  font-weight: 700;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border-right: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(51, 65, 85, 0.8);
+}
+
+.weekday:last-child {
+  border-right: none;
 }
 
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  background: rgba(148, 163, 184, 0.1);
-  padding: 2px;
-  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
 }
 
 .calendar-day {
-  background: rgba(15, 23, 42, 0.9);
-  min-height: 100px;
-  height: 100px;
-  padding: 0.5rem;
+  background: rgba(15, 23, 42, 0.8);
+  min-height: 120px;
+  height: 120px;
+  padding: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 6px;
-  overflow: hidden;
+  border-right: 1px solid rgba(148, 163, 184, 0.3);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
   position: relative;
 }
 
@@ -217,36 +224,52 @@
 }
 
 .day-number {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #e2e8f0;
-  margin-bottom: 0.25rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #f1f5f9;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.calendar-day.other-month {
+  background: rgba(15, 23, 42, 0.4);
 }
 
 .calendar-day.other-month .day-number {
   color: #64748b;
+  opacity: 0.6;
+}
+
+.calendar-day.today {
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .calendar-day.today .day-number {
-  color: #3b82f6;
-  font-weight: 700;
+  color: #60a5fa;
+  font-weight: 800;
+}
+
+/* Remove right border from last column */
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+/* Remove bottom border from last row */
+.calendar-day:nth-last-child(-n+7) {
+  border-bottom: none;
 }
 
 .appointment-count {
   position: absolute;
-  bottom: 0.25rem;
-  right: 0.25rem;
-  background: rgba(59, 130, 246, 0.9);
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: rgba(34, 197, 94, 0.9);
   color: white;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.5);
 }
 
 /* Color-coded calendar backgrounds */
@@ -812,7 +835,8 @@
 .appointments-column {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
+  align-items: flex-start;
 }
 
 .empty-slot {
@@ -828,13 +852,14 @@
 }
 
 .appointment-block {
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 6px;
   border-left: 4px solid;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 40px;
-  display: flex;
+  max-width: 300px;
+  width: fit-content;
+  display: inline-flex;
   flex-direction: column;
   justify-content: center;
 }
@@ -846,16 +871,18 @@
 
 .appointment-patient {
   font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 0.1rem;
-  line-height: 1.2;
+  font-size: 0.8rem;
+  margin-bottom: 0.05rem;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .appointment-type {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   opacity: 0.8;
   margin-bottom: 0;
-  line-height: 1.1;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .appointment-notes {
@@ -924,18 +951,23 @@
   }
   
   .calendar-day {
-    min-height: 70px;
-    height: 70px;
+    min-height: 80px;
+    height: 80px;
+    padding: 0.5rem;
   }
 
   .day-number {
-    font-size: 0.9rem;
+    font-size: 1rem;
+  }
+
+  .weekday {
+    padding: 0.75rem 0.25rem;
+    font-size: 0.85rem;
   }
 
   .appointment-count {
-    width: 16px;
-    height: 16px;
     font-size: 0.6rem;
+    padding: 0.15rem 0.3rem;
   }
 }
 
