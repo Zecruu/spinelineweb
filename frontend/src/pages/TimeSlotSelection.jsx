@@ -228,6 +228,101 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
 
   return (
     <div className="time-slot-selection">
+      {/* Appointments Table for Selected Dates */}
+      {appointments && Object.keys(appointments).length > 0 && (
+        <div className="appointments-table-container">
+          <div className="table-header">
+            <h3>
+              {Object.keys(appointments).length === 1
+                ? `Appointments for ${new Date(Object.keys(appointments)[0] + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+                : `Appointments for ${Object.keys(appointments).length} Selected Dates`
+              }
+            </h3>
+          </div>
+
+          <div className="appointments-table">
+            <div className="table-headers">
+              <div className="header-cell">Time</div>
+              <div className="header-cell">Patient</div>
+              <div className="header-cell">Visit Type</div>
+              <div className="header-cell">Doctor</div>
+              <div className="header-cell">Status</div>
+              <div className="header-cell">Actions</div>
+            </div>
+
+            <div className="table-body">
+              {Object.values(appointments).flat().length === 0 ? (
+                <div className="no-appointments">
+                  No appointments scheduled for selected date{Object.keys(appointments).length > 1 ? 's' : ''}
+                </div>
+              ) : (
+                Object.values(appointments).flat().map(appointment => (
+                  <div key={appointment._id} className="table-row">
+                    <div className="table-cell time-cell">
+                      <div className="appointment-time">
+                        {formatTime(appointment.time)}
+                      </div>
+                      <div className="appointment-date">
+                        {new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                    <div className="table-cell patient-cell">
+                      <div className="patient-avatar">
+                        {appointment.patientId?.firstName?.[0]}{appointment.patientId?.lastName?.[0]}
+                      </div>
+                      <div className="patient-info">
+                        <div className="patient-name">
+                          {appointment.patientId?.firstName} {appointment.patientId?.lastName}
+                        </div>
+                        <div className="patient-record">
+                          Record #{appointment.patientId?.recordNumber}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="table-cell visit-type-cell">
+                      <span className={`visit-type-badge ${getAppointmentColor(appointment)}`}>
+                        {appointment.visitType}
+                      </span>
+                    </div>
+                    <div className="table-cell doctor-cell">
+                      {appointment.doctorName || 'Not Assigned'}
+                    </div>
+                    <div className="table-cell status-cell">
+                      <span className={`status-badge ${appointment.status || 'scheduled'}`}>
+                        {appointment.status || 'Scheduled'}
+                      </span>
+                    </div>
+                    <div className="table-cell actions-cell">
+                      <button
+                        className="action-btn edit-btn"
+                        onClick={() => handleEditAppointment(appointment)}
+                        title="Edit Appointment"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="action-btn reschedule-btn"
+                        onClick={() => handleRescheduleAppointment(appointment)}
+                        title="Reschedule"
+                      >
+                        📅
+                      </button>
+                      <button
+                        className="action-btn cancel-btn"
+                        onClick={() => handleCancelAppointment(appointment)}
+                        title="Cancel Appointment"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="timeslot-header">
         <div className="header-left">
           <button
