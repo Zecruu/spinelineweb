@@ -86,15 +86,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
     setTimeSlots(slots);
   };
 
-  // Format time for display
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
-  };
+
 
   // Generate time slots when settings change
   useEffect(() => {
