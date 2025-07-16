@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import './SOAPNoteInterface.css';
+import MacroSelector from './MacroSelector';
+import DoctorSettings from './DoctorSettings';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
   const [activeTab, setActiveTab] = useState('subjective');
@@ -22,6 +24,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Load existing SOAP note and patient history on mount
   useEffect(() => {
@@ -164,6 +167,25 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       [section]: value
     }));
     setIsDirty(true);
+  };
+
+  const handleInsertMacro = (macroText) => {
+    const currentValue = soapData[activeTab] || '';
+    const newValue = currentValue + (currentValue ? '\n\n' : '') + macroText;
+    handleSoapChange(activeTab, newValue);
+  };
+
+  const handleClose = async () => {
+    // Save progress before closing if there's any content
+    const hasContent = soapData.subjective || soapData.objective || soapData.assessment || soapData.plan;
+    const hasCodes = diagnosticCodes.length > 0 || billingCodes.length > 0;
+
+    if (hasContent || hasCodes) {
+      await handleAutoSave();
+    }
+
+    // Close without changing patient status (keeps them in checked-in)
+    onClose();
   };
 
   const formatTime = (timeString) => {
@@ -346,14 +368,23 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           </div>
         </div>
 
-        {/* Right: History Toggle */}
+        {/* Right: History Toggle & Settings */}
         <div className="history-section">
-          <button 
-            className={`history-toggle ${showHistory ? 'active' : ''}`}
-            onClick={() => setShowHistory(!showHistory)}
-          >
-            📚 Patient History
-          </button>
+          <div className="header-buttons">
+            <button
+              className="settings-toggle"
+              onClick={() => setShowSettings(true)}
+              title="Settings"
+            >
+              ⚙️ Settings
+            </button>
+            <button
+              className={`history-toggle ${showHistory ? 'active' : ''}`}
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              📚 Patient History
+            </button>
+          </div>
           {lastSaved && (
             <div className="save-status">
               <span className="save-indicator">
@@ -711,7 +742,15 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
             </div>
           ) : (
             <div className="soap-section">
-              <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
+              <div className="soap-section-header">
+                <h3>{tabs.find(t => t.id === activeTab)?.label} Notes</h3>
+                {['subjective', 'objective', 'assessment', 'plan'].includes(activeTab) && (
+                  <MacroSelector
+                    onInsertMacro={handleInsertMacro}
+                    soapSection={activeTab}
+                  />
+                )}
+              </div>
               <textarea
                 className="soap-textarea"
                 value={soapData[activeTab]}
@@ -726,8 +765,8 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
       {/* Action Buttons */}
       <div className="soap-actions">
-        <button className="btn-secondary" onClick={onClose}>
-          Close
+        <button className="btn-secondary" onClick={handleClose}>
+          Close & Save Progress
         </button>
         <button className="btn-primary" onClick={() => handleAutoSave()}>
           Save Progress
@@ -746,6 +785,11 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
           </button>
         )}
       </div>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <DoctorSettings onClose={() => setShowSettings(false)} />
+      )}
     </div>
   );
 };

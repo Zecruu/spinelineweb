@@ -17,15 +17,16 @@
 .soap-header {
   background: #1e293b;
   border-bottom: 2px solid rgba(59, 130, 246, 0.3);
-  padding: 1.5rem 2rem;
+  padding: 0.75rem 2rem;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-height: 60px;
 }
 
 /* Insurance Section */
@@ -145,7 +146,14 @@
   gap: 0.5rem;
 }
 
-.history-toggle {
+.header-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.history-toggle,
+.settings-toggle {
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.3);
   color: #3b82f6;
@@ -154,11 +162,24 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.settings-toggle {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
 }
 
 .history-toggle:hover {
   background: rgba(59, 130, 246, 0.2);
   border-color: #3b82f6;
+}
+
+.settings-toggle:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
 }
 
 .history-toggle.active {
@@ -288,9 +309,22 @@
   overflow-y: auto;
 }
 
+.soap-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.soap-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .soap-section h3 {
   color: #f1f5f9;
-  margin: 0 0 1rem 0;
+  margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
 }
