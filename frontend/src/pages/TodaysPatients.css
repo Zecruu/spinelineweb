@@ -364,6 +364,16 @@
   transform: translateY(-1px);
 }
 
+.schedule-today-btn {
+  background: #8b5cf6;
+  color: white;
+}
+
+.schedule-today-btn:hover:not(:disabled) {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
 .walk-in-btn {
   background: #3b82f6;
   color: white;

@@ -182,6 +182,12 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
     setShowPatientSearch(true);
   };
 
+  // Handle schedule for today button
+  const handleScheduleForToday = () => {
+    setSearchType('add-patient');
+    setShowPatientSearch(true);
+  };
+
   // Handle add walk-in button
   const handleAddWalkInButton = () => {
     setSearchType('add-walkin');
@@ -766,6 +772,12 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
               Check In
             </button>
             <button
+              className="excel-btn schedule-today-btn"
+              onClick={handleScheduleForToday}
+            >
+              Schedule for Today
+            </button>
+            <button
               className="excel-btn walk-in-btn"
               onClick={handleAddWalkInButton}
             >
@@ -889,7 +901,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient to Schedule'}</h3>
+              <h3>{searchType === 'add-walkin' ? 'Select Patient for Walk-In' : 'Select Patient to Schedule for Today'}</h3>
               <button
                 className="btn-close"
                 onClick={handleCancelPatientSelection}
