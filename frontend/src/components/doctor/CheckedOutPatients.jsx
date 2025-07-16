@@ -4,6 +4,30 @@ import './CheckedOutPatients.css';
 const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'yesterday';
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return 'tomorrow';
+    } else {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  };
+
   const formatTime = (timeString) => {
     if (!timeString) return 'N/A';
     const time = new Date(`2000-01-01T${timeString}`);
@@ -73,7 +97,7 @@ const CheckedOutPatients = ({ patients, onPatientAction, selectedDate }) => {
         </div>
         <div className="empty-state">
           <div className="empty-icon">📋</div>
-          <p>No patients checked out for {new Date(selectedDate).toLocaleDateString()}</p>
+          <p>No patients checked out for {formatDate(selectedDate)}</p>
           <small>Completed visits will appear here for documentation review</small>
         </div>
       </div>

@@ -31,6 +31,15 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
     fetchDailyPatients();
   }, [selectedDate, filters]);
 
+  // Auto-refresh every 30 seconds to keep data synchronized
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDailyPatients();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [selectedDate, filters]);
+
   const fetchDailyPatients = async () => {
     try {
       setLoading(true);
@@ -50,6 +59,13 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('📊 Daily patients data received:', {
+          date: selectedDate,
+          checkedIn: data.data.checkedIn?.length || 0,
+          checkedOut: data.data.checkedOut?.length || 0,
+          needsReview: data.data.checkedOut?.filter(p => p.needsReview)?.length || 0
+        });
+
         setCheckedInPatients(data.data.checkedIn || []);
         setCheckedOutPatients(data.data.checkedOut || []);
         setStats({
