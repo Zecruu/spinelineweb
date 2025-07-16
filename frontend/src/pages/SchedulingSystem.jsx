@@ -301,16 +301,38 @@ const SchedulingSystem = ({ token, user }) => {
   // Generate time slots for day view
   const generateTimeSlots = () => {
     const slots = [];
+
+    // Generate 30-minute intervals from 8:00 AM to 6:30 PM
     for (let hour = 8; hour <= 18; hour++) {
-      const timeStr = `${hour.toString().padStart(2, '0')}:00`;
-      const appointments = dailyAppointments.filter(apt => apt.time === timeStr);
-      
-      slots.push({
-        time: timeStr,
-        displayTime: formatTime(timeStr),
-        appointments
-      });
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (hour === 18 && minute > 0) break; // Stop at 6:00 PM
+
+        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const appointments = dailyAppointments.filter(apt => apt.time === timeStr);
+
+        slots.push({
+          time: timeStr,
+          displayTime: formatTime(timeStr),
+          appointments
+        });
+      }
     }
+
+    // Add any appointments that don't fall on standard time slots
+    const standardTimes = slots.map(slot => slot.time);
+    const orphanedAppointments = dailyAppointments.filter(apt => !standardTimes.includes(apt.time));
+
+    orphanedAppointments.forEach(apt => {
+      slots.push({
+        time: apt.time,
+        displayTime: formatTime(apt.time),
+        appointments: [apt]
+      });
+    });
+
+    // Sort slots by time
+    slots.sort((a, b) => a.time.localeCompare(b.time));
+
     return slots;
   };
 
@@ -482,23 +504,23 @@ const SchedulingSystem = ({ token, user }) => {
       {/* Calendar Month View */}
       <div className="calendar-container">
         <div className="calendar-header">
-          <button 
+          <button
             className="nav-button"
             onClick={() => navigateMonth(-1)}
           >
-            ← Previous
+            ←
           </button>
           <h2>
-            {currentDate.toLocaleDateString('en-US', { 
-              month: 'long', 
-              year: 'numeric' 
+            {currentDate.toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
             })}
           </h2>
-          <button 
+          <button
             className="nav-button"
             onClick={() => navigateMonth(1)}
           >
-            Next →
+            →
           </button>
         </div>
 

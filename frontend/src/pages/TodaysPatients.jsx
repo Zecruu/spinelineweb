@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../config/api';
 import { downloadDailyReport } from '../utils/reportGenerator';
 import PatientSearch from '../components/PatientSearch';
 import PatientForm from '../components/PatientForm';
+import PatientDetailsModal from '../components/PatientDetailsModal';
 import './TodaysPatients.css';
 
 const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
@@ -33,6 +34,8 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
   });
   const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
+  const [showPatientDetails, setShowPatientDetails] = useState(false);
+  const [selectedPatientForDetails, setSelectedPatientForDetails] = useState(null);
   const [searchType, setSearchType] = useState(''); // 'add-patient' or 'add-walkin'
   const [selectedPatientForAction, setSelectedPatientForAction] = useState(null);
   const [appointmentDetails, setAppointmentDetails] = useState({
@@ -220,7 +223,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
 
         const appointmentData = {
           patientId: selectedPatientForAction._id,
-          date: today, // Send as Date object
+          date: today.toISOString().split('T')[0], // Send as date string YYYY-MM-DD
           time: appointmentDetails.time || timeString,
           type: appointmentDetails.visitType.toLowerCase().replace(' ', '-'), // Convert to enum format
           visitType: appointmentDetails.visitType,
@@ -293,6 +296,26 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
   const handlePatientSave = () => {
     setShowPatientForm(false);
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Handle double-click on patient row
+  const handlePatientDoubleClick = (appointment) => {
+    if (appointment.patientId) {
+      setSelectedPatientForDetails(appointment.patientId);
+      setShowPatientDetails(true);
+    }
+  };
+
+  // Handle patient details save
+  const handlePatientDetailsSave = (updatedPatient) => {
+    setRefreshTrigger(prev => prev + 1);
+    // Update any local state if needed
+  };
+
+  // Handle patient details close
+  const handlePatientDetailsClose = () => {
+    setShowPatientDetails(false);
+    setSelectedPatientForDetails(null);
   };
 
   // Handle unchecking a patient
@@ -743,6 +766,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
                       key={appointment._id}
                       className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''} ${getPatientTypeClass(appointment)} ${appointment.confirmed ? 'confirmed-patient' : ''}`}
                       onClick={() => handleAppointmentSelect(appointment)}
+                      onDoubleClick={() => handlePatientDoubleClick(appointment)}
                     >
                       <td className={appointment.confirmed ? 'confirmed-text' : ''}>{getPatientName(appointment.patientId)}</td>
                       <td className={appointment.confirmed ? 'confirmed-text' : ''}>{appointment.patientId?.recordNumber || 'N/A'}</td>
@@ -816,6 +840,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
                         key={appointment._id}
                         className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''} ${getPatientTypeClass(appointment)}`}
                         onClick={() => handleAppointmentSelect(appointment)}
+                        onDoubleClick={() => handlePatientDoubleClick(appointment)}
                       >
                         <td>{getPatientName(appointment.patientId)}</td>
                         <td>{appointment.visitType || appointment.type || 'Regular'}</td>
@@ -880,6 +905,7 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
                       key={appointment._id}
                       className={`excel-row ${selectedPatient?._id === appointment._id ? 'selected' : ''}`}
                       onClick={() => handleAppointmentSelect(appointment)}
+                      onDoubleClick={() => handlePatientDoubleClick(appointment)}
                     >
                       <td>{getPatientName(appointment.patientId)}</td>
                       <td>{formatDateTime(appointment.checkOutTime)}</td>
@@ -1029,6 +1055,15 @@ const TodaysPatients = ({ token, user, onCheckout, onEditPatient }) => {
           </div>
         </div>
       )}
+
+      {/* Patient Details Modal */}
+      <PatientDetailsModal
+        patient={selectedPatientForDetails}
+        isOpen={showPatientDetails}
+        onClose={handlePatientDetailsClose}
+        onSave={handlePatientDetailsSave}
+        token={token}
+      />
     </div>
   );
 };

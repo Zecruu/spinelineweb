@@ -154,7 +154,8 @@
 
 .calendar-day {
   background: rgba(15, 23, 42, 0.8);
-  min-height: 80px;
+  min-height: 120px;
+  height: 120px;
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -162,6 +163,7 @@
   flex-direction: column;
   justify-content: space-between;
   border: 2px solid transparent;
+  overflow: hidden;
 }
 
 .calendar-day:hover {
@@ -873,7 +875,8 @@
   }
   
   .calendar-day {
-    min-height: 60px;
+    min-height: 80px;
+    height: 80px;
   }
 }
 
