@@ -162,31 +162,31 @@
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.4);
   border-top: none;
   border-radius: 0 0 8px 8px;
   overflow: hidden;
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(148, 163, 184, 0.4);
   gap: 1px;
 }
 
 .calendar-day {
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(15, 23, 42, 1);
   min-height: 120px;
   height: 120px;
-  padding: 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   position: relative;
   border: none;
+  margin: 0;
 }
 
 .calendar-day:hover {
   background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .calendar-day.other-month {
@@ -196,22 +196,18 @@
 
 .calendar-day.other-month:hover {
   background: rgba(15, 23, 42, 0.8);
-  border-color: transparent;
 }
 
 .calendar-day.today {
   background: rgba(59, 130, 246, 0.2);
-  border-color: #3b82f6;
 }
 
 .calendar-day.selected {
   background: rgba(59, 130, 246, 0.3);
-  border-color: #3b82f6;
 }
 
 .calendar-day.booking-selected {
   background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
 }
 
 .calendar-day.past-date {
@@ -221,7 +217,6 @@
 
 .calendar-day.past-date:hover {
   background: rgba(15, 23, 42, 0.8);
-  border-color: transparent;
 }
 
 .day-number {
@@ -250,6 +245,8 @@
   font-weight: 800;
 }
 
+
+
 .appointment-count {
   position: absolute;
   bottom: 0.5rem;
@@ -266,32 +263,26 @@
 /* Color-coded calendar backgrounds */
 .calendar-day.bg-blue {
   background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .calendar-day.bg-green {
   background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.4);
 }
 
 .calendar-day.bg-orange {
   background: rgba(249, 115, 22, 0.2);
-  border-color: rgba(249, 115, 22, 0.4);
 }
 
 .calendar-day.bg-purple {
   background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
 }
 
 .calendar-day.bg-yellow {
   background: rgba(245, 158, 11, 0.2);
-  border-color: rgba(245, 158, 11, 0.4);
 }
 
 .calendar-day.bg-red {
   background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .dominant-type {
