@@ -501,70 +501,7 @@ const SchedulingSystem = ({ token, user }) => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {/* Calendar Month View */}
-      <div className="calendar-container">
-        <div className="calendar-header">
-          <button
-            className="nav-button"
-            onClick={() => navigateMonth(-1)}
-          >
-            ←
-          </button>
-          <h2>
-            {currentDate.toLocaleDateString('en-US', {
-              month: 'long',
-              year: 'numeric'
-            })}
-          </h2>
-          <button
-            className="nav-button"
-            onClick={() => navigateMonth(1)}
-          >
-            →
-          </button>
-        </div>
 
-        <div className="calendar-grid">
-          <div className="calendar-weekdays">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="weekday">{day}</div>
-            ))}
-          </div>
-          
-          <div className="calendar-days">
-            {calendarDays.map((day, index) => {
-              const dominantColorClass = day.dominantType ? VISIT_TYPE_COLORS[day.dominantType]?.bgClass : '';
-              return (
-                <div
-                  key={index}
-                  className={`calendar-day ${
-                    !day.isCurrentMonth ? 'other-month' : ''
-                  } ${
-                    day.isToday ? 'today' : ''
-                  } ${
-                    day.isSelected ? 'selected' : ''
-                  } ${
-                    showBookingFlow && selectedDates.includes(day.dateStr) ? 'booking-selected' : ''
-                  } ${
-                    day.appointmentCount > 0 ? dominantColorClass : ''
-                  } ${
-                    showBookingFlow && day.isPastDate ? 'past-date' : ''
-                  }`}
-                  onClick={() => day.isCurrentMonth && handleDateSelect(day.date, day)}
-                  title={day.dominantType ? `Dominant type: ${day.dominantType}` : ''}
-                >
-                  <div className="day-number">{day.day}</div>
-                  {day.appointmentCount > 0 && (
-                    <div className="appointment-count" title={`${day.appointmentCount} appointment${day.appointmentCount !== 1 ? 's' : ''}`}>
-                      {day.appointmentCount}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       {/* Booking Flow */}
       {showBookingFlow && (
