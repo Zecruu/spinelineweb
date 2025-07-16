@@ -875,6 +875,16 @@ const SchedulingSystem = ({ token, user }) => {
                     ))
                   )}
                 </div>
+                <button
+                  className="add-appointment-btn"
+                  onClick={() => {
+                    setSelectedTimeSlot(slot.time);
+                    setShowBookingModal(true);
+                  }}
+                  title="Add appointment to this time slot"
+                >
+                  + Add
+                </button>
               </div>
             ))}
           </div>
