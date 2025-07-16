@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import './SOAPNoteInterface.css';
 import MacroSelector from './MacroSelector';
 import SmartTemplate from './SmartTemplate';
-import DiagnosticCodeSearch from './DiagnosticCodeSearch';
-import BillingCodeSearch from './BillingCodeSearch';
+import CodeTable from './CodeTable';
 import DoctorSettings from './DoctorSettings';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
@@ -423,125 +422,25 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
             <div className="codes-section">
               <h3>Diagnosis & Billing Codes</h3>
 
-              {/* Diagnostic Codes */}
-              <div className="codes-group">
-                <h4>Diagnostic Codes (ICD-10)</h4>
-                <div className="codes-list">
-                  {diagnosticCodes.map(code => (
-                    <div key={code.id} className="code-item diagnostic">
-                      <div className="code-info">
-                        <span className="code-number">{code.code}</span>
-                        <span className="code-description">{code.description}</span>
-                      </div>
-                      <button
-                        className="remove-code-btn"
-                        onClick={() => removeDiagnosticCode(code.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="add-code-section">
-                  <DiagnosticCodeSearch
-                    onAddCode={addDiagnosticCode}
-                    availableCodes={availableDiagnosticCodes}
-                  />
-                </div>
+              {/* Diagnostic Codes Table */}
+              <CodeTable
+                codes={diagnosticCodes}
+                availableCodes={availableDiagnosticCodes}
+                onAddCode={addDiagnosticCode}
+                onRemoveCode={removeDiagnosticCode}
+                type="diagnostic"
+                title="Diagnostic Codes (ICD-10)"
+              />
 
-                {/* Quick Add Common Diagnostic Codes */}
-                <div className="quick-codes">
-                  <h5>Common Codes:</h5>
-                  <div className="quick-code-buttons">
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addDiagnosticCode({code: 'M54.5', description: 'Low back pain'})}
-                    >
-                      M54.5 - Low back pain
-                    </button>
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addDiagnosticCode({code: 'M54.2', description: 'Cervicalgia'})}
-                    >
-                      M54.2 - Cervicalgia
-                    </button>
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addDiagnosticCode({code: 'M25.50', description: 'Pain in unspecified joint'})}
-                    >
-                      M25.50 - Joint pain
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Billing Codes */}
-              <div className="codes-group">
-                <h4>Billing Codes (CPT)</h4>
-                <div className="codes-list">
-                  {billingCodes.map(code => (
-                    <div key={code.id} className="code-item billing">
-                      <div className="code-info">
-                        <span className="code-number">{code.code}</span>
-                        <span className="code-description">{code.description}</span>
-                      </div>
-                      <div className="code-units">
-                        <label>Units:</label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={code.units}
-                          onChange={(e) => updateBillingCodeUnits(code.id, e.target.value)}
-                          className="units-input"
-                        />
-                      </div>
-                      <button
-                        className="remove-code-btn"
-                        onClick={() => removeBillingCode(code.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="add-code-section">
-                  <BillingCodeSearch
-                    onAddCode={addBillingCode}
-                    availableCodes={availableBillingCodes}
-                  />
-                </div>
-
-                {/* Quick Add Common Billing Codes */}
-                <div className="quick-codes">
-                  <h5>Common Codes:</h5>
-                  <div className="quick-code-buttons">
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addBillingCode({code: '98940', description: 'Chiropractic manipulative treatment; spinal, 1-2 regions'})}
-                    >
-                      98940 - CMT 1-2 regions
-                    </button>
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addBillingCode({code: '98941', description: 'Chiropractic manipulative treatment; spinal, 3-4 regions'})}
-                    >
-                      98941 - CMT 3-4 regions
-                    </button>
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addBillingCode({code: '98942', description: 'Chiropractic manipulative treatment; spinal, 5 regions'})}
-                    >
-                      98942 - CMT 5 regions
-                    </button>
-                    <button
-                      className="quick-code-btn"
-                      onClick={() => addBillingCode({code: '97140', description: 'Manual therapy techniques'})}
-                    >
-                      97140 - Manual therapy
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {/* Billing Codes Table */}
+              <CodeTable
+                codes={billingCodes}
+                availableCodes={availableBillingCodes}
+                onAddCode={addBillingCode}
+                onRemoveCode={removeBillingCode}
+                type="billing"
+                title="Billing Codes (CPT)"
+              />
             </div>
           ) : activeTab === 'spine' ? (
             <div className="spine-section">

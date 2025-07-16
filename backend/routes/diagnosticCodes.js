@@ -6,6 +6,15 @@ const { authenticateToken } = require('../middleware/auth');
 // Master list of ICD-10 diagnostic codes
 const masterDiagnosticCodes = [
   // Musculoskeletal and connective tissue disorders (M00-M99)
+  { code: 'M99.01', description: 'Segmental and somatic dysfunction of cervical region' },
+  { code: 'M99.02', description: 'Segmental and somatic dysfunction of thoracic region' },
+  { code: 'M99.03', description: 'Segmental and somatic dysfunction of lumbar region' },
+  { code: 'M99.04', description: 'Segmental and somatic dysfunction of sacral region' },
+  { code: 'M99.05', description: 'Segmental and somatic dysfunction of pelvic region' },
+  { code: 'M99.06', description: 'Segmental and somatic dysfunction of lower extremity' },
+  { code: 'M99.07', description: 'Segmental and somatic dysfunction of upper extremity' },
+  { code: 'M99.08', description: 'Segmental and somatic dysfunction of rib cage' },
+  { code: 'M99.09', description: 'Segmental and somatic dysfunction of abdomen and other regions' },
   { code: 'M54.2', description: 'Cervicalgia' },
   { code: 'M54.5', description: 'Low back pain' },
   { code: 'M54.6', description: 'Pain in thoracic spine' },
