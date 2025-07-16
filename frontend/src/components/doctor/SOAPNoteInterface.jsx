@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import './SOAPNoteInterface.css';
 import MacroSelector from './MacroSelector';
 import SmartTemplate from './SmartTemplate';
+import DiagnosticCodeSearch from './DiagnosticCodeSearch';
+import BillingCodeSearch from './BillingCodeSearch';
 import DoctorSettings from './DoctorSettings';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
@@ -441,41 +443,10 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
                   ))}
                 </div>
                 <div className="add-code-section">
-                  <input
-                    type="text"
-                    className="code-search"
-                    placeholder="Search diagnostic codes..."
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const searchTerm = e.target.value.toLowerCase();
-                        const foundCode = availableDiagnosticCodes.find(code =>
-                          code.code.toLowerCase().includes(searchTerm) ||
-                          code.description.toLowerCase().includes(searchTerm)
-                        );
-                        if (foundCode) {
-                          addDiagnosticCode(foundCode);
-                          e.target.value = '';
-                        }
-                      }
-                    }}
+                  <DiagnosticCodeSearch
+                    onAddCode={addDiagnosticCode}
+                    availableCodes={availableDiagnosticCodes}
                   />
-                  <button
-                    className="add-code-btn"
-                    onClick={() => {
-                      const input = document.querySelector('.code-search');
-                      const searchTerm = input.value.toLowerCase();
-                      const foundCode = availableDiagnosticCodes.find(code =>
-                        code.code.toLowerCase().includes(searchTerm) ||
-                        code.description.toLowerCase().includes(searchTerm)
-                      );
-                      if (foundCode) {
-                        addDiagnosticCode(foundCode);
-                        input.value = '';
-                      }
-                    }}
-                  >
-                    Add Code
-                  </button>
                 </div>
 
                 {/* Quick Add Common Diagnostic Codes */}
@@ -534,41 +505,10 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
                   ))}
                 </div>
                 <div className="add-code-section">
-                  <input
-                    type="text"
-                    className="code-search billing-search"
-                    placeholder="Search billing codes..."
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const searchTerm = e.target.value.toLowerCase();
-                        const foundCode = availableBillingCodes.find(code =>
-                          code.code.toLowerCase().includes(searchTerm) ||
-                          code.description.toLowerCase().includes(searchTerm)
-                        );
-                        if (foundCode) {
-                          addBillingCode(foundCode);
-                          e.target.value = '';
-                        }
-                      }
-                    }}
+                  <BillingCodeSearch
+                    onAddCode={addBillingCode}
+                    availableCodes={availableBillingCodes}
                   />
-                  <button
-                    className="add-code-btn"
-                    onClick={() => {
-                      const input = document.querySelector('.billing-search');
-                      const searchTerm = input.value.toLowerCase();
-                      const foundCode = availableBillingCodes.find(code =>
-                        code.code.toLowerCase().includes(searchTerm) ||
-                        code.description.toLowerCase().includes(searchTerm)
-                      );
-                      if (foundCode) {
-                        addBillingCode(foundCode);
-                        input.value = '';
-                      }
-                    }}
-                  >
-                    Add Code
-                  </button>
                 </div>
 
                 {/* Quick Add Common Billing Codes */}
