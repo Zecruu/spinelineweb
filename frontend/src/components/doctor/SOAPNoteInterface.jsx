@@ -325,17 +325,30 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
     <div className="soap-note-interface">
       {/* Compact Header */}
       <div className="soap-header">
-        {/* Left: Patient Info */}
-        <div className="patient-info-compact">
+        {/* Left: Insurance Info */}
+        <div className="insurance-info-compact">
+          <div className="insurance-name-compact">
+            {patient.insurance?.primary?.name || 'Self Pay'}
+          </div>
+          <div className="coverage-details-compact">
+            {patient.insurance?.primary?.copay && (
+              <span className="copay-compact">Copay: ${patient.insurance.primary.copay}</span>
+            )}
+            <span className="covered-codes-compact">CPT 98941, 98942, 98943</span>
+          </div>
+        </div>
+
+        {/* Center: Patient Info */}
+        <div className="patient-info-center">
           <div className="avatar-circle-small">
             {getPatientInitials(patient.firstName, patient.lastName)}
           </div>
-          <div className="patient-details-compact">
-            <span className="patient-name-compact">
+          <div className="patient-details-center">
+            <span className="patient-name-center">
               {patient.firstName} {patient.lastName}
             </span>
-            <span className="patient-meta-compact">
-              #{patient.recordNumber} • {calculateAge(patient.dob)}y • {patient.insurance?.primary?.name || 'Self Pay'}
+            <span className="patient-meta-center">
+              #{patient.recordNumber} • {calculateAge(patient.dob)}y • DOB: {new Date(patient.dob).toLocaleDateString()}
             </span>
           </div>
         </div>
