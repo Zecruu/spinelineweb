@@ -3,7 +3,7 @@ import { API_BASE_URL } from '../config/api';
 import './TimeSlotSelection.css';
 import PatientSearch from '../components/PatientSearch';
 
-const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBack }) => {
+const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBack, appointments: propAppointments, formatTime, getAppointmentColor, handleEditAppointment, handleRescheduleAppointment, handleCancelAppointment }) => {
   // Color mapping for appointment colors
   const colorMap = {
     blue: '#3b82f6',
