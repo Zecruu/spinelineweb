@@ -222,73 +222,7 @@ const AppointmentScheduler = ({ token, user }) => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {/* Calendar Month View */}
-      <div className="calendar-container">
-        <div className="calendar-header">
-          <button 
-            className="nav-button"
-            onClick={() => navigateMonth(-1)}
-          >
-            ← Previous
-          </button>
-          <h2>
-            {currentDate.toLocaleDateString('en-US', { 
-              month: 'long', 
-              year: 'numeric' 
-            })}
-          </h2>
-          <button 
-            className="nav-button"
-            onClick={() => navigateMonth(1)}
-          >
-            Next →
-          </button>
-        </div>
 
-        <div className="calendar-grid">
-          <div className="calendar-weekdays">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="weekday">{day}</div>
-            ))}
-          </div>
-          
-          <div className="calendar-days">
-            {calendarDays.map((day, index) => {
-              const dominantColorClass = day.dominantType ? VISIT_TYPE_COLORS[day.dominantType]?.bgClass : '';
-              return (
-                <div
-                  key={index}
-                  className={`calendar-day ${
-                    !day.isCurrentMonth ? 'other-month' : ''
-                  } ${
-                    day.isToday ? 'today' : ''
-                  } ${
-                    day.isSelected ? 'selected' : ''
-                  } ${
-                    day.appointmentCount > 0 ? dominantColorClass : ''
-                  } ${
-                    day.isPastDate ? 'past-date' : ''
-                  }`}
-                  onClick={() => handleDateSelect(day.dateStr, day)}
-                  title={day.dominantType ? `Dominant type: ${day.dominantType}` : ''}
-                >
-                  <div className="day-number">{day.day}</div>
-                  {day.appointmentCount > 0 && (
-                    <div className="appointment-count">
-                      {day.appointmentCount} patient{day.appointmentCount !== 1 ? 's' : ''}
-                    </div>
-                  )}
-                  {day.dominantType && (
-                    <div className="dominant-type">
-                      {day.dominantType}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       {/* Selected Dates Section */}
       {selectedDates.length > 0 && (
