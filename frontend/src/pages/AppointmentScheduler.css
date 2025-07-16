@@ -379,11 +379,11 @@
   }
 }
 
-/* New Calendar Styles */
+/* SIMPLE CALENDAR - NO GAPS */
 .calendar-container {
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
   overflow: hidden;
   margin-bottom: 2rem;
 }
@@ -392,107 +392,83 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  background: rgba(51, 65, 85, 0.5);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1rem;
+  background: #1e293b;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .calendar-header h2 {
   color: #f1f5f9;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
 .nav-button {
-  background: transparent;
-  border: none;
+  background: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.3);
   color: #f1f5f9;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: color 0.2s ease;
-  font-weight: 400;
-  font-size: 1.5rem;
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 4px;
+  font-size: 1rem;
 }
 
 .nav-button:hover {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+  background: #475569;
 }
 
 .calendar-grid {
-  padding: 0;
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  background: rgba(51, 65, 85, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  display: table-row;
+  background: #1e293b;
 }
 
 .weekday {
+  display: table-cell;
   text-align: center;
-  padding: 1rem 0.5rem;
+  padding: 0.75rem;
   color: #f1f5f9;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-right: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(51, 65, 85, 0.8);
-}
-
-.weekday:last-child {
-  border-right: none;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: #1e293b;
 }
 
 .calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  overflow: hidden;
-  background: #0f172a;
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar-week {
+  display: table-row;
 }
 
 .calendar-day {
+  display: table-cell;
   background: #0f172a;
-  min-height: 120px;
-  height: 120px;
+  height: 100px;
   padding: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  vertical-align: top;
   position: relative;
-  border-right: 1px solid rgba(148, 163, 184, 0.3);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-  margin: 0;
-}
-
-.calendar-day:nth-child(7n) {
-  border-right: none;
 }
 
 .calendar-day:hover {
-  background: rgba(59, 130, 246, 0.1);
+  background: #1e293b;
 }
 
 .calendar-day.other-month {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: default;
-  background: #0f172a;
 }
 
 .calendar-day.other-month:hover {
@@ -505,29 +481,31 @@
 
 .calendar-day.selected {
   background: rgba(16, 185, 129, 0.3) !important;
-  border-color: #10b981 !important;
 }
 
 .calendar-day.past-date {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
 .day-number {
   color: #f1f5f9;
   font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
 }
 
 .appointment-count {
   color: #94a3b8;
   font-size: 0.75rem;
+  background: rgba(51, 65, 85, 0.8);
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  right: 0.25rem;
   text-align: center;
-  background: rgba(51, 65, 85, 0.6);
-  padding: 0.25rem;
-  border-radius: 4px;
-  margin-top: auto;
 }
 
 /* Appointments Table Styles */

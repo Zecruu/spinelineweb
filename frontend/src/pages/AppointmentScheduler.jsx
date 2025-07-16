@@ -337,41 +337,46 @@ const AppointmentScheduler = ({ token, user }) => {
           </button>
         </div>
 
-        <div className="calendar-grid">
-          <div className="calendar-weekdays">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="weekday">{day}</div>
+        <table className="calendar-grid">
+          <thead>
+            <tr className="calendar-weekdays">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <th key={day} className="weekday">{day}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="calendar-days">
+            {Array.from({ length: Math.ceil(calendarDays.length / 7) }, (_, weekIndex) => (
+              <tr key={weekIndex} className="calendar-week">
+                {calendarDays.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => {
+                  const isSelected = selectedDates.includes(day.dateStr);
+                  return (
+                    <td
+                      key={weekIndex * 7 + dayIndex}
+                      className={`calendar-day ${
+                        !day.isCurrentMonth ? 'other-month' : ''
+                      } ${
+                        day.isToday ? 'today' : ''
+                      } ${
+                        isSelected ? 'selected' : ''
+                      } ${
+                        day.isPastDate ? 'past-date' : ''
+                      }`}
+                      onClick={() => day.isCurrentMonth && handleDateSelect(day.dateStr, day)}
+                    >
+                      <div className="day-number">{day.day}</div>
+                      {day.appointmentCount > 0 && (
+                        <div className="appointment-count">
+                          {day.appointmentCount}
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
             ))}
-          </div>
-
-          <div className="calendar-days">
-            {calendarDays.map((day, index) => {
-              const isSelected = selectedDates.includes(day.dateStr);
-              return (
-                <div
-                  key={index}
-                  className={`calendar-day ${
-                    !day.isCurrentMonth ? 'other-month' : ''
-                  } ${
-                    day.isToday ? 'today' : ''
-                  } ${
-                    isSelected ? 'selected' : ''
-                  } ${
-                    day.isPastDate ? 'past-date' : ''
-                  }`}
-                  onClick={() => day.isCurrentMonth && handleDateSelect(day.dateStr, day)}
-                >
-                  <div className="day-number">{day.day}</div>
-                  {day.appointmentCount > 0 && (
-                    <div className="appointment-count">
-                      {day.appointmentCount} patient{day.appointmentCount !== 1 ? 's' : ''}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
 
       {/* Selected Dates Appointments Table */}
