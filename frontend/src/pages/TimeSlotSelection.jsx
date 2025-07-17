@@ -292,6 +292,19 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
         </div>
       )}
 
+      {/* Action Bar Below Table */}
+      <div className="appointment-actions-bar" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '2rem' }}>
+        <button className="action-btn checkin-btn" style={{ background: '#64748b', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem', opacity: 0.7, cursor: 'not-allowed' }} disabled>
+          Check In
+        </button>
+        <button className="action-btn schedule-btn" style={{ background: 'linear-gradient(90deg, #a78bfa, #6366f1)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem' }}>
+          Schedule for Today
+        </button>
+        <button className="action-btn walkin-btn" style={{ background: 'linear-gradient(90deg, #38bdf8, #2563eb)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem' }}>
+          Walk In Patient
+        </button>
+      </div>
+
       {/* Settings Modal */}
       {showSettings && (
         <div className="modal-overlay">
