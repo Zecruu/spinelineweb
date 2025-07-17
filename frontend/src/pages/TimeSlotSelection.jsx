@@ -258,7 +258,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
                   No appointments scheduled for selected date{Object.keys(appointments).length > 1 ? 's' : ''}
                 </div>
               ) : (
-                {Object.values(appointments).flat().map(appointment => (
+                Object.values(appointments).flat().map(appointment => (
   <div
     key={appointment._id}
     className={`table-row${selectedAppointment && selectedAppointment._id === appointment._id ? ' selected' : ''}`}
