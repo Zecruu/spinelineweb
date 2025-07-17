@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
 import './AppointmentScheduler.css';
 import TimeSlotSelection from './TimeSlotSelection';
+import EnhancedCalendar from '../components/EnhancedCalendar';
 
 const AppointmentScheduler = ({ token, user }) => {
   const [currentView, setCurrentView] = useState('calendar'); // 'calendar' or 'timeslots'
@@ -320,60 +321,24 @@ const AppointmentScheduler = ({ token, user }) => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {/* Calendar Month View */}
+      {/* Enhanced Calendar with Year/Month Dropdowns */}
       <div className="calendar-container">
-        <div className="calendar-header">
-          <button
-            className="nav-button"
-            onClick={() => navigateMonth(-1)}
-          >
-            ←
-          </button>
-          <h2>
-            {currentDate.toLocaleDateString('en-US', {
-              month: 'long',
-              year: 'numeric'
-            })}
-          </h2>
-          <button
-            className="nav-button"
-            onClick={() => navigateMonth(1)}
-          >
-            →
-          </button>
-        </div>
-        <div className="calendar-weekdays">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="weekday">{day}</div>
-          ))}
-        </div>
-        <div className="calendar-days">
-          {calendarDays.map((day, idx) => {
-            const isSelected = selectedDates.includes(day.dateStr);
-            return (
-              <div
-                key={idx}
-                className={`calendar-day ${
-                  !day.isCurrentMonth ? 'other-month' : ''
-                } ${
-                  day.isToday ? 'today' : ''
-                } ${
-                  isSelected ? 'selected' : ''
-                } ${
-                  day.isPastDate ? 'past-date' : ''
-                }`}
-                onClick={() => day.isCurrentMonth && handleDateSelect(day.dateStr, day)}
-              >
-                <div className="day-number">{day.day}</div>
-                {day.appointmentCount > 0 && (
-                  <div className="appointment-count">
-                    {day.appointmentCount}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <EnhancedCalendar
+          selectedDates={selectedDates}
+          onDateSelect={(date) => {
+            if (date) {
+              const dateStr = date.toISOString().split('T')[0];
+              handleDateSelect(dateStr, { date, dateStr });
+            }
+          }}
+          currentDate={currentDate}
+          onNavigate={(date) => {
+            setCurrentDate(date);
+            fetchMonthlyAppointments(date.getFullYear(), date.getMonth() + 1);
+          }}
+          dailyCounts={dailyCounts}
+          className="w-full"
+        />
       </div>
 
       {error && <div className="error-message">{error}</div>}
