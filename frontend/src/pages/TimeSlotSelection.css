@@ -134,9 +134,15 @@
 /* Time Slot Rows */
 .timeslot-row {
   display: grid;
+  transition: background 0.2s, border 0.2s;
   grid-template-columns: 120px repeat(var(--date-count, 1), 1fr);
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   min-height: 60px;
+}
+
+.timeslot-row.selected {
+  background: rgba(59,130,246,0.15);
+  border-left: 4px solid #6366f1;
 }
 
 .time-label {

@@ -218,6 +218,8 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
     alert('✅ Settings saved successfully!');
   };
 
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
   return (
     <div className="time-slot-selection">
       {/* Appointments Table for Selected Dates */}
@@ -248,7 +250,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
                 </div>
               ) : (
                 Object.values(appointments).flat().map(appointment => (
-                  <div key={appointment._id} className="table-row">
+                  <div key={appointment._id} className={`table-row${selectedAppointment && selectedAppointment._id === appointment._id ? ' selected' : ''}`} onClick={() => setSelectedAppointment(appointment)} style={{ cursor: 'pointer' }}>
                     <div className="table-cell time-cell">
                       <div className="appointment-time">
                         {formatTime(appointment.time)}
@@ -294,14 +296,29 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
 
       {/* Action Bar Below Table */}
       <div className="appointment-actions-bar" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '2rem' }}>
-        <button className="action-btn checkin-btn" style={{ background: '#64748b', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem', opacity: 0.7, cursor: 'not-allowed' }} disabled>
-          Check In
+        <button
+          className="action-btn edit-btn"
+          style={{ background: '#6366f1', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem', opacity: selectedAppointment ? 1 : 0.7, cursor: selectedAppointment ? 'pointer' : 'not-allowed' }}
+          disabled={!selectedAppointment}
+          onClick={() => selectedAppointment && handleEditAppointment(selectedAppointment)}
+        >
+          Edit Patient Details
         </button>
-        <button className="action-btn schedule-btn" style={{ background: 'linear-gradient(90deg, #a78bfa, #6366f1)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem' }}>
-          Schedule for Today
+        <button
+          className="action-btn reschedule-btn"
+          style={{ background: 'linear-gradient(90deg, #fbbf24, #f59e42)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem', opacity: selectedAppointment ? 1 : 0.7, cursor: selectedAppointment ? 'pointer' : 'not-allowed' }}
+          disabled={!selectedAppointment}
+          onClick={() => selectedAppointment && handleRescheduleAppointment(selectedAppointment)}
+        >
+          Reschedule
         </button>
-        <button className="action-btn walkin-btn" style={{ background: 'linear-gradient(90deg, #38bdf8, #2563eb)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem' }}>
-          Walk In Patient
+        <button
+          className="action-btn cancel-btn"
+          style={{ background: 'linear-gradient(90deg, #ef4444, #f87171)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, border: 'none', fontSize: '1rem', opacity: selectedAppointment ? 1 : 0.7, cursor: selectedAppointment ? 'pointer' : 'not-allowed' }}
+          disabled={!selectedAppointment}
+          onClick={() => selectedAppointment && handleCancelAppointment(selectedAppointment)}
+        >
+          Cancel
         </button>
       </div>
 
