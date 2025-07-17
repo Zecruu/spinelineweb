@@ -310,7 +310,7 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
       </span>
     </div>
   </div>
-))}
+))
               )}
             </div>
           </div>
