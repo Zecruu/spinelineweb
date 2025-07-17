@@ -32,9 +32,22 @@ const EnhancedCalendar = ({
   };
 
   const handleDateChange = (newDate) => {
-    setDate(newDate);
+    // Ensure newDate is a proper Date object
+    let dateObj;
+    if (newDate instanceof Date) {
+      dateObj = newDate;
+    } else if (typeof newDate === 'string') {
+      dateObj = new Date(newDate);
+    } else if (newDate && typeof newDate === 'object' && newDate.getTime) {
+      dateObj = newDate;
+    } else {
+      console.warn('Invalid date object:', newDate);
+      return;
+    }
+
+    setDate(dateObj);
     if (onDateSelect) {
-      onDateSelect(newDate);
+      onDateSelect(dateObj);
     }
   };
 
@@ -48,18 +61,31 @@ const EnhancedCalendar = ({
 
   // Custom day component to show appointment counts
   const CustomDay = ({ day, modifiers, ...props }) => {
-    const dateStr = day.toISOString().split('T')[0];
+    // Ensure day is a proper Date object
+    let dateObj;
+    if (day instanceof Date) {
+      dateObj = day;
+    } else if (typeof day === 'string') {
+      dateObj = new Date(day);
+    } else if (day && typeof day === 'object' && day.getTime) {
+      dateObj = day;
+    } else {
+      console.warn('Invalid day object:', day);
+      return null;
+    }
+
+    const dateStr = dateObj.toISOString().split('T')[0];
     const appointmentCount = dailyCounts[dateStr] || 0;
     const isSelected = selectedDates.includes(dateStr);
-    
+
     return (
-      <div 
-        className={`custom-day ${modifiers.selected ? 'selected' : ''} ${
-          modifiers.today ? 'today' : ''
+      <div
+        className={`custom-day ${modifiers?.selected ? 'selected' : ''} ${
+          modifiers?.today ? 'today' : ''
         } ${isSelected ? 'multi-selected' : ''}`}
         {...props}
       >
-        <div className="day-number">{day.getDate()}</div>
+        <div className="day-number">{dateObj.getDate()}</div>
         {appointmentCount > 0 && (
           <div className="appointment-count">
             {appointmentCount}

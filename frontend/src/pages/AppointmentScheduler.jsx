@@ -327,8 +327,14 @@ const AppointmentScheduler = ({ token, user }) => {
           selectedDates={selectedDates}
           onDateSelect={(date) => {
             if (date) {
-              const dateStr = date.toISOString().split('T')[0];
-              handleDateSelect(dateStr, { date, dateStr });
+              try {
+                // Ensure date is a proper Date object
+                const dateObj = date instanceof Date ? date : new Date(date);
+                const dateStr = dateObj.toISOString().split('T')[0];
+                handleDateSelect(dateStr, { date: dateObj, dateStr });
+              } catch (error) {
+                console.error('Error processing date:', error, date);
+              }
             }
           }}
           currentDate={currentDate}
