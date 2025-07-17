@@ -235,13 +235,22 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
           </div>
 
           <div className="appointments-table" style={{ minHeight: '60vh', maxHeight: '70vh', overflowY: 'auto' }}>
-            <div className="table-headers">
-  <div className="header-cell" style={{ minWidth: '100px', whiteSpace: 'nowrap' }}>Time</div>
-  <div className="header-cell" style={{ minWidth: '160px', whiteSpace: 'nowrap' }}>Patient</div>
-  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Visit Type</div>
-  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Doctor</div>
-  <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap' }}>Status</div>
-</div>
+  <div className="table-headers" style={{
+    display: 'grid',
+    gridTemplateColumns: '120px 1fr 150px 150px 100px 120px',
+    gap: '1rem',
+    padding: '1rem',
+    background: 'rgba(51, 65, 85, 0.3)',
+    borderRadius: '8px',
+    marginBottom: '1rem',
+    alignItems: 'center'
+  }}>
+    <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap', textAlign: 'left' }}>Time</div>
+    <div className="header-cell" style={{ minWidth: '150px', whiteSpace: 'nowrap', textAlign: 'left' }}>Patient</div>
+    <div className="header-cell" style={{ minWidth: '150px', whiteSpace: 'nowrap', textAlign: 'left' }}>Visit Type</div>
+    <div className="header-cell" style={{ minWidth: '100px', whiteSpace: 'nowrap', textAlign: 'left' }}>Doctor</div>
+    <div className="header-cell" style={{ minWidth: '120px', whiteSpace: 'nowrap', textAlign: 'left' }}>Status</div>
+  </div>
 
             <div className="table-body">
               {Object.values(appointments).flat().length === 0 ? (
@@ -249,45 +258,59 @@ const TimeSlotSelection = ({ token, user, selectedDates: propSelectedDates, onBa
                   No appointments scheduled for selected date{Object.keys(appointments).length > 1 ? 's' : ''}
                 </div>
               ) : (
-                Object.values(appointments).flat().map(appointment => (
-                  <div key={appointment._id} className={`table-row${selectedAppointment && selectedAppointment._id === appointment._id ? ' selected' : ''}`} onClick={() => setSelectedAppointment(appointment)} style={{ cursor: 'pointer' }}>
-                    <div className="table-cell time-cell">
-                      <div className="appointment-time">
-                        {formatTime(appointment.time)}
-                      </div>
-                      <div className="appointment-date">
-                        {new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </div>
-                    </div>
-                    <div className="table-cell patient-cell">
-                      <div className="patient-avatar">
-                        {appointment.patientId?.firstName?.[0]}{appointment.patientId?.lastName?.[0]}
-                      </div>
-                      <div className="patient-info">
-                        <div className="patient-name">
-                          {appointment.patientId?.firstName} {appointment.patientId?.lastName}
-                        </div>
-                        <div className="patient-record">
-                          Record #{appointment.patientId?.recordNumber}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="table-cell visit-type-cell">
-                      <span className={`visit-type-badge ${getAppointmentColor(appointment)}`}>
-                        {appointment.visitType}
-                      </span>
-                    </div>
-                    <div className="table-cell doctor-cell">
-                      {appointment.doctorName || 'Not Assigned'}
-                    </div>
-                    <div className="table-cell status-cell">
-                      <span className={`status-badge ${appointment.status || 'scheduled'}`}>
-                        {appointment.status || 'Scheduled'}
-                      </span>
-                    </div>
-                    
-                  </div>
-                ))
+                {Object.values(appointments).flat().map(appointment => (
+  <div
+    key={appointment._id}
+    className={`table-row${selectedAppointment && selectedAppointment._id === appointment._id ? ' selected' : ''}`}
+    onClick={() => setSelectedAppointment(appointment)}
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '120px 1fr 150px 150px 100px 120px',
+      gap: '1rem',
+      alignItems: 'center',
+      cursor: 'pointer',
+      background: selectedAppointment && selectedAppointment._id === appointment._id ? 'rgba(59,130,246,0.15)' : 'rgba(15, 23, 42, 0.5)',
+      borderLeft: selectedAppointment && selectedAppointment._id === appointment._id ? '4px solid #6366f1' : '1px solid rgba(148, 163, 184, 0.1)',
+      borderRadius: '8px',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    <div className="table-cell time-cell">
+      <div className="appointment-time">
+        {formatTime(appointment.time)}
+      </div>
+      <div className="appointment-date">
+        {new Date(appointment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </div>
+    </div>
+    <div className="table-cell patient-cell">
+      <div className="patient-avatar">
+        {appointment.patientId?.firstName?.[0]}{appointment.patientId?.lastName?.[0]}
+      </div>
+      <div className="patient-info">
+        <div className="patient-name">
+          {appointment.patientId?.firstName} {appointment.patientId?.lastName}
+        </div>
+        <div className="patient-record">
+          Record #{appointment.patientId?.recordNumber}
+        </div>
+      </div>
+    </div>
+    <div className="table-cell visit-type-cell">
+      <span className={`visit-type-badge ${getAppointmentColor(appointment)}`}>
+        {appointment.visitType}
+      </span>
+    </div>
+    <div className="table-cell doctor-cell">
+      {appointment.doctorName || 'Not Assigned'}
+    </div>
+    <div className="table-cell status-cell">
+      <span className={`status-badge ${appointment.status || 'scheduled'}`}>
+        {appointment.status || 'Scheduled'}
+      </span>
+    </div>
+  </div>
+))}
               )}
             </div>
           </div>
