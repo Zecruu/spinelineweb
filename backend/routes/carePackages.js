@@ -35,22 +35,41 @@ router.get('/patient/:patientId', authenticateToken, async (req, res) => {
 router.get('/patient/:patientId/active', authenticateToken, async (req, res) => {
   try {
     const { patientId } = req.params;
+    const clinicId = req.user?.clinicId;
+
+    console.log('🔍 Active care packages request:', {
+      patientId,
+      clinicId,
+      user: req.user ? 'exists' : 'missing',
+      userKeys: req.user ? Object.keys(req.user) : 'none'
+    });
+
+    if (!clinicId) {
+      console.log('❌ No clinicId found in user object');
+      return res.status(400).json({
+        status: 'error',
+        message: 'User clinic ID not found'
+      });
+    }
 
     const carePackages = await CarePackage.find({
       patientId,
-      clinicId: req.user.clinicId,
+      clinicId,
       status: 'active',
       remainingSessions: { $gt: 0 }
     }).populate('addedBy', 'name username')
       .populate('sessionHistory.usedBy', 'name username')
       .sort({ createdAt: -1 });
 
+    console.log('📦 Found care packages:', carePackages.length);
+
     res.status(200).json(carePackages);
   } catch (error) {
-    console.error('Get active care packages error:', error);
+    console.error('❌ Get active care packages error:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Failed to fetch active care packages'
+      message: 'Failed to fetch active care packages',
+      error: error.message
     });
   }
 });

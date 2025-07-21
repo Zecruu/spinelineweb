@@ -11,11 +11,15 @@ router.get('/appointment/:appointmentId', authenticateToken, async (req, res) =>
     const { appointmentId } = req.params;
     const clinicId = req.user.clinicId;
 
+    console.log('🔍 SOAP note request:', { appointmentId, clinicId });
+
     const soapNote = await SOAPNote.findOne({
       appointmentId,
       clinicId
     }).populate('patientId', 'firstName lastName recordNumber')
       .populate('providerId', 'firstName lastName');
+
+    console.log('📝 Found SOAP note:', soapNote ? 'Yes' : 'No');
 
     if (!soapNote) {
       return res.status(404).json({ message: 'SOAP note not found' });
@@ -23,8 +27,8 @@ router.get('/appointment/:appointmentId', authenticateToken, async (req, res) =>
 
     res.json(soapNote);
   } catch (error) {
-    console.error('Error fetching SOAP note:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error fetching SOAP note:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -143,8 +147,23 @@ router.post('/autosave', authenticateToken, async (req, res) => {
 router.get('/patient-history/:patientId', authenticateToken, async (req, res) => {
   try {
     const { patientId } = req.params;
-    const clinicId = req.user.clinicId;
+    const clinicId = req.user?.clinicId;
     const limit = parseInt(req.query.limit) || 10;
+
+    console.log('🔍 Patient history request:', {
+      patientId,
+      clinicId,
+      limit,
+      user: req.user ? 'exists' : 'missing',
+      userKeys: req.user ? Object.keys(req.user) : 'none'
+    });
+
+    if (!clinicId) {
+      console.log('❌ No clinicId found in user object');
+      return res.status(400).json({
+        message: 'User clinic ID not found'
+      });
+    }
 
     const history = await SOAPNote.find({
       patientId,
@@ -156,9 +175,11 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
     .populate('providerId', 'firstName lastName')
     .select('createdAt subjective objective assessment plan status');
 
+    console.log('📋 Found history records:', history.length);
+
     const formattedHistory = history.map(note => ({
       date: note.createdAt.toLocaleDateString(),
-      provider: `${note.providerId.firstName} ${note.providerId.lastName}`,
+      provider: note.providerId ? `${note.providerId.firstName} ${note.providerId.lastName}` : 'Unknown Provider',
       summary: note.subjective?.chiefComplaint || note.subjective?.historyOfPresentIllness || 'No summary available',
       assessment: note.assessment?.clinicalImpression || '',
       plan: note.plan?.treatmentPlan || ''
@@ -166,8 +187,8 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
 
     res.json(formattedHistory);
   } catch (error) {
-    console.error('Error fetching patient history:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error fetching patient history:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
