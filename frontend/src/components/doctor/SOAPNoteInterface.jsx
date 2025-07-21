@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './SOAPNoteInterface.css';
 import MacroSelector from './MacroSelector';
 import SmartTemplate from './SmartTemplate';
-import CodeTable from './CodeTable';
+import DiagnosisAndBillingCodes from './CodeTable';
 import PatientOverview from './PatientOverview';
 import DoctorSettings from './DoctorSettings';
 
@@ -402,29 +402,16 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
               token={token}
             />
           ) : activeTab === 'codes' ? (
-            <div className="codes-section">
-              <h3>Diagnosis & Billing Codes</h3>
-
-              {/* Diagnostic Codes Table */}
-              <CodeTable
-                codes={diagnosticCodes}
-                availableCodes={availableDiagnosticCodes}
-                onAddCode={addDiagnosticCode}
-                onRemoveCode={removeDiagnosticCode}
-                type="diagnostic"
-                title="Diagnostic Codes (ICD-10)"
-              />
-
-              {/* Billing Codes Table */}
-              <CodeTable
-                codes={billingCodes}
-                availableCodes={availableBillingCodes}
-                onAddCode={addBillingCode}
-                onRemoveCode={removeBillingCode}
-                type="billing"
-                title="Billing Codes (CPT)"
-              />
-            </div>
+            <DiagnosisAndBillingCodes
+              diagnosticCodes={diagnosticCodes}
+              billingCodes={billingCodes}
+              availableDiagnosticCodes={availableDiagnosticCodes}
+              availableBillingCodes={availableBillingCodes}
+              onAddDiagnosticCode={addDiagnosticCode}
+              onRemoveDiagnosticCode={removeDiagnosticCode}
+              onAddBillingCode={addBillingCode}
+              onRemoveBillingCode={removeBillingCode}
+            />
           ) : activeTab === 'spine' ? (
             <div className="spine-section">
               <h3>Spine Segment Documentation</h3>
