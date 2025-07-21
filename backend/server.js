@@ -34,6 +34,8 @@ const checkoutRoutes = require('./routes/checkout');
 const referralsRoutes = require('./routes/referrals');
 const doctorRoutes = require('./routes/doctor');
 const soapNotesRoutes = require('./routes/soapNotes');
+const macrosRoutes = require('./routes/macros');
+const debugRoutes = require('./debug-endpoints');
 
 // Security middleware (simplified)
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -119,6 +121,8 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/referrals', referralsRoutes);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/soap-notes', soapNotesRoutes);
+app.use('/api/macros', macrosRoutes);
+app.use('/api', debugRoutes);
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
