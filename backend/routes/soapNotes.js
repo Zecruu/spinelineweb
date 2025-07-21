@@ -47,6 +47,30 @@ router.post('/autosave', authenticateToken, async (req, res) => {
     const clinicId = req.user.clinicId;
     const providerId = req.user.id;
 
+    // Input validation
+    if (!appointmentId || !patientId) {
+      return res.status(400).json({ 
+        message: 'Missing required fields: appointmentId and patientId are required' 
+      });
+    }
+
+    // Validate ObjectId format
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(appointmentId) || !mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ 
+        message: 'Invalid appointmentId or patientId format' 
+      });
+    }
+
+    console.log('💾 SOAP autosave request:', {
+      appointmentId,
+      patientId,
+      clinicId,
+      providerId,
+      hasSOAPData: !!soapData,
+      timestamp: new Date().toISOString()
+    });
+
     // Validate appointment exists
     const appointment = await Appointment.findOne({
       _id: appointmentId,
@@ -120,13 +144,30 @@ router.post('/autosave', authenticateToken, async (req, res) => {
       });
     }
 
-    await soapNote.save();
+    // Save SOAP note with error handling
+    const savedSOAPNote = await soapNote.save();
+    console.log('✅ SOAP note saved successfully:', savedSOAPNote._id);
 
     // Update appointment status to indicate SOAP note in progress
-    await Appointment.findByIdAndUpdate(appointmentId, {
-      hasSOAPNote: true,
-      soapNoteStatus: status
-    });
+    // Use safer update method with validation
+    const updatedAppointment = await Appointment.findOneAndUpdate(
+      { _id: appointmentId, clinicId }, // Ensure clinic ownership
+      {
+        hasSOAPNote: true,
+        soapNoteStatus: status,
+        lastModified: new Date()
+      },
+      { 
+        new: true, // Return updated document
+        runValidators: true // Run schema validators
+      }
+    );
+
+    if (!updatedAppointment) {
+      console.warn('⚠️ Failed to update appointment status - appointment not found or access denied');
+    } else {
+      console.log('✅ Appointment status updated:', updatedAppointment._id);
+    }
 
     res.json({
       message: 'SOAP note saved successfully',
@@ -138,8 +179,20 @@ router.post('/autosave', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error saving SOAP note:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error saving SOAP note:', {
+      error: error.message,
+      stack: error.stack,
+      appointmentId: req.body.appointmentId,
+      patientId: req.body.patientId,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Return specific error information to help with debugging
+    res.status(500).json({ 
+      message: 'Failed to save SOAP note',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

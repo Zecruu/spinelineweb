@@ -135,6 +135,12 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   const handleAutoSave = async () => {
     try {
       setLoading(true);
+      console.log('💾 Starting SOAP note autosave...', {
+        appointmentId: appointment._id,
+        patientId: patient._id,
+        timestamp: new Date().toISOString()
+      });
+
       const response = await fetch('/api/soap-notes/autosave', {
         method: 'POST',
         headers: {
@@ -153,11 +159,28 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log('✅ SOAP note autosave successful:', result);
         setLastSaved(new Date());
         setIsDirty(false);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('❌ SOAP note autosave failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        // Don't clear the form data on error - keep user's work safe
+        alert(`Failed to save progress: ${errorData.message || 'Server error'}. Your work is preserved.`);
       }
     } catch (error) {
-      console.error('Auto-save failed:', error);
+      console.error('❌ SOAP note autosave network error:', {
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
+      // Don't clear the form data on network error - keep user's work safe
+      alert('Network error while saving. Your work is preserved and will be saved when connection is restored.');
     } finally {
       setLoading(false);
     }

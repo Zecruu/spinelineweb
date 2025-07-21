@@ -66,15 +66,27 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
           needsReview: data.data.checkedOut?.filter(p => p.needsReview)?.length || 0
         });
 
-        setCheckedInPatients(data.data.checkedIn || []);
-        setCheckedOutPatients(data.data.checkedOut || []);
-        setStats({
-          totalCheckedIn: data.data.checkedIn?.length || 0,
-          totalCheckedOut: data.data.checkedOut?.length || 0,
-          needsReview: data.data.checkedOut?.filter(p => p.needsReview)?.length || 0
-        });
+        // Only update patient data if we received valid data
+        if (data.data && (data.data.checkedIn || data.data.checkedOut)) {
+          setCheckedInPatients(data.data.checkedIn || []);
+          setCheckedOutPatients(data.data.checkedOut || []);
+          setStats({
+            totalCheckedIn: data.data.checkedIn?.length || 0,
+            totalCheckedOut: data.data.checkedOut?.length || 0,
+            needsReview: data.data.checkedOut?.filter(p => p.needsReview)?.length || 0
+          });
+        } else {
+          console.warn('⚠️ Received empty or invalid patient data, keeping existing data');
+        }
       } else {
-        console.error('Failed to fetch daily patients');
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error('❌ Failed to fetch daily patients:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        });
+        // Don't clear existing patient data on server error
+        console.log('🔒 Preserving existing patient data due to server error');
       }
     } catch (error) {
       console.error('Error fetching daily patients:', error);
