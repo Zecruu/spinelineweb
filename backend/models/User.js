@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  // Support both ObjectId and String clinic references
+  // Clinic reference - standardized to ObjectId
   clinicId: {
-    type: mongoose.Schema.Types.Mixed, // Can be ObjectId or String
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Clinic',
+    required: true,
     index: true
   },
   // Support both old and new user structures

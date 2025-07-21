@@ -33,7 +33,7 @@ const authenticateToken = async (req, res, next) => {
         });
       }
       
-      // Ensure clinicId is properly set and valid
+      // Ensure clinicId is properly set and valid ObjectId format
       if (!user.clinicId) {
         console.error('❌ User missing clinicId:', {
           userId: user._id,
@@ -44,6 +44,22 @@ const authenticateToken = async (req, res, next) => {
         return res.status(403).json({
           status: 'error',
           message: 'User not associated with a clinic. Please contact administrator.'
+        });
+      }
+      
+      // Validate clinicId is proper ObjectId format
+      const mongoose = require('mongoose');
+      if (!mongoose.Types.ObjectId.isValid(user.clinicId)) {
+        console.error('❌ User has invalid clinicId format:', {
+          userId: user._id,
+          email: user.email,
+          clinicId: user.clinicId,
+          clinicIdType: typeof user.clinicId,
+          timestamp: new Date().toISOString()
+        });
+        return res.status(403).json({
+          status: 'error',
+          message: 'Invalid clinic association. Please contact administrator to fix your account.'
         });
       }
       
