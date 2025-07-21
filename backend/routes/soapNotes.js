@@ -67,15 +67,19 @@ router.post('/autosave', authenticateToken, async (req, res) => {
 
       // Update SOAP content based on existing schema
       if (soapData.subjective) {
+        if (!soapNote.subjective) soapNote.subjective = {};
         soapNote.subjective.historyOfPresentIllness = soapData.subjective;
       }
       if (soapData.objective) {
+        if (!soapNote.objective) soapNote.objective = {};
         soapNote.objective.physicalExam = soapData.objective;
       }
       if (soapData.assessment) {
+        if (!soapNote.assessment) soapNote.assessment = {};
         soapNote.assessment.clinicalImpression = soapData.assessment;
       }
       if (soapData.plan) {
+        if (!soapNote.plan) soapNote.plan = {};
         soapNote.plan.treatmentPlan = soapData.plan;
       }
 
@@ -196,15 +200,19 @@ router.post('/sign/:appointmentId', authenticateToken, async (req, res) => {
 
     // Update final SOAP content
     if (soapData.subjective) {
+      if (!soapNote.subjective) soapNote.subjective = {};
       soapNote.subjective.historyOfPresentIllness = soapData.subjective;
     }
     if (soapData.objective) {
+      if (!soapNote.objective) soapNote.objective = {};
       soapNote.objective.physicalExam = soapData.objective;
     }
     if (soapData.assessment) {
+      if (!soapNote.assessment) soapNote.assessment = {};
       soapNote.assessment.clinicalImpression = soapData.assessment;
     }
     if (soapData.plan) {
+      if (!soapNote.plan) soapNote.plan = {};
       soapNote.plan.treatmentPlan = soapData.plan;
     }
 
@@ -214,17 +222,11 @@ router.post('/sign/:appointmentId', authenticateToken, async (req, res) => {
     soapNote.billingCodes = billingCodes;
 
     // Add signature
-    soapNote.signature = {
-      data: signatureData,
-      timestamp: new Date(),
-      signedBy: providerId,
-      signedByName: `${req.user.firstName} ${req.user.lastName}`,
-      ipAddress: req.ip,
-      userAgent: req.get('User-Agent')
-    };
-
+    soapNote.digitalSignature = signatureData;
+    soapNote.signedAt = new Date();
+    soapNote.signedBy = providerId;
     soapNote.isSigned = true;
-    soapNote.isCompleted = true;
+    soapNote.isComplete = true;
     soapNote.status = 'completed';
     soapNote.lastModifiedBy = providerId;
 
@@ -245,7 +247,7 @@ router.post('/sign/:appointmentId', authenticateToken, async (req, res) => {
         _id: soapNote._id,
         status: soapNote.status,
         isSigned: soapNote.isSigned,
-        signedAt: soapNote.signature.timestamp
+        signedAt: soapNote.signedAt
       }
     });
 

@@ -7,15 +7,15 @@ const { authenticateToken } = require('../middleware/auth');
 router.get('/patient/:patientId', authenticateToken, async (req, res) => {
   try {
     const { patientId } = req.params;
-    
-    const carePackages = await CarePackage.find({ 
+
+    const carePackages = await CarePackage.find({
       patientId,
       clinicId: req.user.clinicId,
       status: { $in: ['active', 'completed'] }
     }).populate('addedBy', 'name username')
       .populate('sessionHistory.usedBy', 'name username')
       .sort({ createdAt: -1 });
-    
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -27,6 +27,30 @@ router.get('/patient/:patientId', authenticateToken, async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch care packages'
+    });
+  }
+});
+
+// Get active care packages for a patient
+router.get('/patient/:patientId/active', authenticateToken, async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const carePackages = await CarePackage.find({
+      patientId,
+      clinicId: req.user.clinicId,
+      status: 'active',
+      remainingSessions: { $gt: 0 }
+    }).populate('addedBy', 'name username')
+      .populate('sessionHistory.usedBy', 'name username')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(carePackages);
+  } catch (error) {
+    console.error('Get active care packages error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch active care packages'
     });
   }
 });
