@@ -871,13 +871,13 @@ router.get('/reports/daily/:date', async (req, res) => {
 });
 
 // Update appointment status (for SOAP note workflow)
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', authenticateToken, async (req, res) => {
   try {
     const { status } = req.body;
 
     const appointment = await Appointment.findOne({
       _id: req.params.id,
-      clinicId: req.clinicId
+      clinicId: req.user.clinicId
     });
 
     if (!appointment) {

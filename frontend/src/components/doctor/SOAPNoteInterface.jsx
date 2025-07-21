@@ -184,10 +184,24 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
     if (hasContent || hasCodes) {
       await handleAutoSave();
+
+      // Update patient status to 'in-progress' to show work has been started
+      try {
+        await fetch(`/api/appointments/${appointment._id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            status: 'in-progress'
+          })
+        });
+      } catch (error) {
+        console.error('Error updating appointment status:', error);
+      }
     }
 
-    // DO NOT change patient status - keep them checked-in
-    // The patient should remain in the checked-in table for continued work
     onClose();
   };
 

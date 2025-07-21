@@ -123,6 +123,10 @@
   flex-shrink: 0;
 }
 
+.added-codes-table .table-header {
+  display: none;
+}
+
 .header-cell {
   padding: 0.5rem 0.75rem;
   color: #94a3b8;
@@ -143,6 +147,13 @@
   min-height: 0;
 }
 
+.added-codes-table .table-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .table-row {
   display: grid;
   grid-template-columns: 80px 1fr 80px;
@@ -151,7 +162,25 @@
   min-height: 36px;
 }
 
-.table-row:hover {
+.table-row.added-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(51, 65, 85, 0.4);
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+  min-height: auto;
+}
+
+.table-row.added-row:hover {
+  background: rgba(51, 65, 85, 0.6);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.table-row:not(.added-row):hover {
   background: rgba(59, 130, 246, 0.05);
 }
 
@@ -168,35 +197,53 @@
   border-right: none;
 }
 
+.added-row .table-cell {
+  padding: 0;
+  border: none;
+}
+
+.added-row .code-col {
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.added-row .description-col {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.added-row .action-col {
+  flex-shrink: 0;
+}
+
 /* Code Numbers */
 .code-number {
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 0.65rem;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  color: white;
+  background: #10b981;
   display: inline-block;
+  border: none;
 }
 
 .code-number.diagnostic {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: #10b981;
 }
 
 .code-number.billing {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
+  background: #10b981;
 }
 
 .code-number:not(.diagnostic):not(.billing) {
-  background: rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
+  background: #10b981;
 }
 
 .code-description {
-  color: #f1f5f9;
-  font-size: 0.75rem;
-  line-height: 1.3;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 /* Action Buttons */
@@ -231,37 +278,41 @@
 }
 
 .remove-code-btn {
-  background: transparent;
+  background: #ef4444;
+  color: white;
   border: none;
-  color: #ef4444;
-  padding: 0;
-  border-radius: 4px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 1rem;
-  width: 24px;
-  height: 24px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.remove-code-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.875rem;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.remove-code-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-/* Empty State */
-.empty-state {
-  padding: 1.5rem;
-  text-align: center;
-  color: #94a3b8;
-  font-style: italic;
-}
-
 .empty-state p {
   margin: 0;
-  font-size: 0.75rem;
 }
 
 /* Pagination */
