@@ -87,10 +87,10 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
     setSelectedDate(event.target.value);
   };
 
-  const handlePatientAction = async (patientId, action) => {
+  const handlePatientAction = async (appointmentId, action) => {
     try {
-      const patient = [...checkedInPatients, ...checkedOutPatients].find(p => p._id === patientId);
-      if (!patient) {
+      const appointmentData = [...checkedInPatients, ...checkedOutPatients].find(p => p._id === appointmentId);
+      if (!appointmentData) {
         alert('Patient not found');
         return;
       }
@@ -99,12 +99,21 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
         case 'openNote':
         case 'startSOAP':
           // Open SOAP Note Interface
-          setSelectedPatientForSOAP(patient);
+          // Create patient object from appointment data
+          const patientForSOAP = {
+            _id: appointmentData.patientId, // Use actual patient ID from backend
+            firstName: appointmentData.firstName,
+            lastName: appointmentData.lastName,
+            recordNumber: appointmentData.recordNumber,
+            // Add other patient fields as needed
+          };
+
+          setSelectedPatientForSOAP(patientForSOAP);
           setSelectedAppointmentForSOAP({
-            _id: patient.appointmentId || patient._id,
-            time: patient.appointmentTime,
-            visitType: patient.visitType,
-            status: patient.status
+            _id: appointmentData._id, // This is the appointment ID
+            time: appointmentData.appointmentTime,
+            visitType: appointmentData.visitType,
+            status: appointmentData.status
           });
           setShowSOAPInterface(true);
           break;

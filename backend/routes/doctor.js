@@ -91,6 +91,7 @@ router.get('/daily-patients', authenticateToken, async (req, res) => {
 
       return {
         _id: appointment._id,
+        patientId: patient._id, // Add the actual patient ID
         appointmentTime: appointment.time, // Fixed: Use 'time' field
         checkOutTime: appointment.checkOutTime,
         visitType: appointment.visitType,
