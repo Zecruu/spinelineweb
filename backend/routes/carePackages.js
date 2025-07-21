@@ -37,16 +37,33 @@ router.get('/patient/:patientId/active', authenticateToken, async (req, res) => 
     const { patientId } = req.params;
     const clinicId = req.user?.clinicId;
 
+    // Validate input
+    if (!patientId) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Patient ID is required'
+      });
+    }
+
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid patient ID format'
+      });
+    }
+
     console.log('🔍 Active care packages request:', {
       patientId,
       clinicId,
       user: req.user ? 'exists' : 'missing',
-      userKeys: req.user ? Object.keys(req.user) : 'none'
+      userKeys: req.user ? Object.keys(req.user) : 'none',
+      timestamp: new Date().toISOString()
     });
 
     if (!clinicId) {
       console.log('❌ No clinicId found in user object');
-      return res.status(400).json({
+      return res.status(403).json({
         status: 'error',
         message: 'User clinic ID not found'
       });

@@ -11,7 +11,21 @@ router.get('/appointment/:appointmentId', authenticateToken, async (req, res) =>
     const { appointmentId } = req.params;
     const clinicId = req.user.clinicId;
 
-    console.log('🔍 SOAP note request:', { appointmentId, clinicId });
+    // Validate input
+    if (!appointmentId) {
+      return res.status(400).json({ message: 'Appointment ID is required' });
+    }
+
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      return res.status(400).json({ message: 'Invalid appointment ID format' });
+    }
+
+    if (!clinicId) {
+      return res.status(403).json({ message: 'User not associated with a clinic' });
+    }
+
+    console.log('🔍 SOAP note request:', { appointmentId, clinicId, timestamp: new Date().toISOString() });
 
     const soapNote = await SOAPNote.findOne({
       appointmentId,
@@ -203,18 +217,33 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
     const clinicId = req.user?.clinicId;
     const limit = parseInt(req.query.limit) || 10;
 
+    // Validate input
+    if (!patientId) {
+      return res.status(400).json({
+        message: 'Patient ID is required'
+      });
+    }
+
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({
+        message: 'Invalid patient ID format'
+      });
+    }
+
     console.log('🔍 Patient history request:', {
       patientId,
       clinicId,
       limit,
       user: req.user ? 'exists' : 'missing',
-      userKeys: req.user ? Object.keys(req.user) : 'none'
+      userKeys: req.user ? Object.keys(req.user) : 'none',
+      timestamp: new Date().toISOString()
     });
 
     if (!clinicId) {
       console.log('❌ No clinicId found in user object');
-      return res.status(400).json({
-        message: 'User clinic ID not found'
+      return res.status(403).json({
+        message: 'User not associated with a clinic. Please contact administrator.'
       });
     }
 

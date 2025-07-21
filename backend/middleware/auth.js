@@ -32,6 +32,29 @@ const authenticateToken = async (req, res, next) => {
           message: 'Invalid or inactive user'
         });
       }
+      
+      // Ensure clinicId is properly set and valid
+      if (!user.clinicId) {
+        console.error('❌ User missing clinicId:', {
+          userId: user._id,
+          email: user.email,
+          role: user.role,
+          timestamp: new Date().toISOString()
+        });
+        return res.status(403).json({
+          status: 'error',
+          message: 'User not associated with a clinic. Please contact administrator.'
+        });
+      }
+      
+      console.log('✅ User authenticated:', {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        clinicId: user.clinicId,
+        timestamp: new Date().toISOString()
+      });
+      
       req.user = user;
     } else {
       // For admin users, use decoded data
