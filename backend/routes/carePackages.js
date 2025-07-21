@@ -37,6 +37,19 @@ router.get('/patient/:patientId/active', authenticateToken, async (req, res) => 
     const { patientId } = req.params;
     const clinicId = req.user?.clinicId;
 
+    // Handle missing clinicId during migration period
+    if (!clinicId) {
+      console.warn('⚠️ User missing clinicId for care packages (migration period):', {
+        userId: req.user._id,
+        email: req.user.email,
+        timestamp: new Date().toISOString()
+      });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Account setup incomplete. Please contact administrator to complete clinic association.'
+      });
+    }
+
     // Validate input
     if (!patientId) {
       return res.status(400).json({

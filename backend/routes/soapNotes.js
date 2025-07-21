@@ -61,6 +61,19 @@ router.post('/autosave', authenticateToken, async (req, res) => {
     const clinicId = req.user.clinicId;
     const providerId = req.user.id;
 
+    // Handle missing clinicId during migration period
+    if (!clinicId) {
+      console.warn('⚠️ User missing clinicId for SOAP note autosave (migration period):', {
+        userId: req.user._id,
+        email: req.user.email,
+        timestamp: new Date().toISOString()
+      });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Account setup incomplete. Please contact administrator to complete clinic association.'
+      });
+    }
+
     // Input validation
     if (!appointmentId || !patientId) {
       return res.status(400).json({ 
@@ -240,10 +253,16 @@ router.get('/patient-history/:patientId', authenticateToken, async (req, res) =>
       timestamp: new Date().toISOString()
     });
 
-    if (!clinicId) {
-      console.log('❌ No clinicId found in user object');
-      return res.status(403).json({
-        message: 'User not associated with a clinic. Please contact administrator.'
+    // Handle missing clinicId during migration period
+    if (!req.user.clinicId) {
+      console.warn('⚠️ User missing clinicId for SOAP note patient history (migration period):', {
+        userId: req.user._id,
+        email: req.user.email,
+        timestamp: new Date().toISOString()
+      });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Account setup incomplete. Please contact administrator to complete clinic association.'
       });
     }
 

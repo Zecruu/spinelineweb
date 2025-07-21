@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   clinicId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Clinic',
-    required: true,
+    required: false, // Temporarily optional during migration
     index: true
   },
   // Support both old and new user structures

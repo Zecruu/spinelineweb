@@ -33,34 +33,29 @@ const authenticateToken = async (req, res, next) => {
         });
       }
       
-      // Ensure clinicId is properly set and valid ObjectId format
+      // Check clinicId during migration period - warn but don't block
       if (!user.clinicId) {
-        console.error('❌ User missing clinicId:', {
+        console.warn('⚠️ User missing clinicId (migration period):', {
           userId: user._id,
           email: user.email,
           role: user.role,
           timestamp: new Date().toISOString()
         });
-        return res.status(403).json({
-          status: 'error',
-          message: 'User not associated with a clinic. Please contact administrator.'
-        });
-      }
-      
-      // Validate clinicId is proper ObjectId format
-      const mongoose = require('mongoose');
-      if (!mongoose.Types.ObjectId.isValid(user.clinicId)) {
-        console.error('❌ User has invalid clinicId format:', {
-          userId: user._id,
-          email: user.email,
-          clinicId: user.clinicId,
-          clinicIdType: typeof user.clinicId,
-          timestamp: new Date().toISOString()
-        });
-        return res.status(403).json({
-          status: 'error',
-          message: 'Invalid clinic association. Please contact administrator to fix your account.'
-        });
+        // During migration, allow authentication but endpoints may fail gracefully
+      } else {
+        // Validate clinicId is proper ObjectId format if present
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(user.clinicId)) {
+          console.warn('⚠️ User has invalid clinicId format (migration period):', {
+            userId: user._id,
+            email: user.email,
+            clinicId: user.clinicId,
+            clinicIdType: typeof user.clinicId,
+            timestamp: new Date().toISOString()
+          });
+          // During migration, set clinicId to null to avoid query errors
+          user.clinicId = null;
+        }
       }
       
       console.log('✅ User authenticated:', {
