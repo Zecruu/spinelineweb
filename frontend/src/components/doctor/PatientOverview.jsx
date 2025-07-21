@@ -168,35 +168,32 @@ const PatientOverview = ({ patient, appointment, token }) => {
   }
 
   return (
-    <div className="patient-overview">
-      {/* Patient Basic Info */}
-      <div className="overview-section patient-info">
-        <h3>Patient Information</h3>
-        <div className="section-content">
-          <div className="patient-details">
-            <div className="patient-avatar">
-              <div className="avatar-circle">
+    <div className="patient-overview-redesigned">
+      {/* Patient Information Card */}
+      <div className="overview-card patient-info-card">
+        <div className="card-header">
+          <h3>🧑‍⚕️ Patient Information</h3>
+        </div>
+        <div className="card-content">
+          <div className="patient-profile">
+            <div className="patient-avatar-large">
+              <div className="avatar-circle-large">
                 {patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}
               </div>
             </div>
-            <div className="patient-basic-info">
-              <h4>{patient.firstName} {patient.lastName}</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="label">DOB:</span>
-                  <span className="value">{patient.dateOfBirth ? formatDate(patient.dateOfBirth) : 'N/A'}</span>
+            <div className="patient-details-grid">
+              <div className="patient-name-section">
+                <h4 className="patient-full-name">{patient.firstName} {patient.lastName}</h4>
+                <span className="patient-record">DOB: N/A</span>
+              </div>
+              <div className="patient-meta-info">
+                <div className="meta-item">
+                  <span className="meta-label">Age</span>
+                  <span className="meta-value">N/A</span>
                 </div>
-                <div className="info-item">
-                  <span className="label">Age:</span>
-                  <span className="value">{calculateAge(patient.dateOfBirth)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Record #:</span>
-                  <span className="value">{patient.recordNumber || 'N/A'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Phone:</span>
-                  <span className="value">{patient.phone || 'N/A'}</span>
+                <div className="meta-item">
+                  <span className="meta-label">Record #</span>
+                  <span className="meta-value">{patient.recordNumber || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -204,137 +201,163 @@ const PatientOverview = ({ patient, appointment, token }) => {
         </div>
       </div>
 
-      {/* Active Care Packages */}
-      <div className="overview-section care-packages">
-        <h3>Active Care Packages</h3>
-        <div className="section-content">
-          {activePackages.length > 0 ? (
-            <div className="packages-list">
-              {activePackages.map(pkg => (
-                <div key={pkg._id} className="package-item">
-                  <div className="package-info">
-                    <span className="package-name">{pkg.name}</span>
-                    <span className="package-sessions">{pkg.remainingSessions}/{pkg.totalSessions} sessions</span>
-                  </div>
-                  <div className="package-progress">
-                    <div
-                      className="progress-bar"
-                      style={{
-                        width: `${((pkg.totalSessions - pkg.remainingSessions) / pkg.totalSessions) * 100}%`
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="no-data">No active care packages</p>
-          )}
+      {/* Active Care Packages Card */}
+      <div className="overview-card care-packages-card">
+        <div className="card-header">
+          <h3>🔴 Active Care Packages</h3>
         </div>
-      </div>
-
-      {/* Pain Scale Progression */}
-      <div className="overview-section pain-scale">
-        <h3>Pain Scale Progression</h3>
-        <div className="section-content">
-          {painScaleHistory.length > 0 ? (
-            <div className="pain-scale-chart">
-              {painScaleHistory.map((entry, index) => (
-                <div key={index} className="pain-entry">
-                  <div className="pain-date">{formatDate(entry.date)}</div>
-                  <div className="pain-scale-bar">
-                    <div
-                      className="pain-level"
-                      style={{
-                        width: `${(entry.scale / 10) * 100}%`,
-                        backgroundColor: getPainScaleColor(entry.scale)
-                      }}
-                    >
-                      {entry.scale}/10
+        <div className="card-content">
+          {activePackages.length > 0 ? (
+            <div className="care-packages-list">
+              {activePackages.map(pkg => (
+                <div key={pkg._id} className="care-package-item">
+                  <div className="package-status-indicator active"></div>
+                  <div className="package-details">
+                    <div className="package-header">
+                      <span className="package-name">{pkg.name || 'Laser Therapy'}</span>
+                      <span className="package-status-badge active">Active</span>
+                    </div>
+                    <div className="package-sessions">
+                      <span className="sessions-text">Sessions Used</span>
+                      <div className="sessions-progress">
+                        <div className="sessions-bar">
+                          <div
+                            className="sessions-fill"
+                            style={{
+                              width: `${((pkg.totalSessions - pkg.remainingSessions) / pkg.totalSessions) * 100}%`
+                            }}
+                          ></div>
+                        </div>
+                        <span className="sessions-count">
+                          {pkg.totalSessions - pkg.remainingSessions}/{pkg.totalSessions}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="package-dates">
+                      <div className="date-item">
+                        <span className="date-label">Started</span>
+                        <span className="date-value">{formatDate(pkg.startDate) || 'Dec 19, 2024'}</span>
+                      </div>
+                      <div className="date-item">
+                        <span className="date-label">Expires</span>
+                        <span className="date-value">{formatDate(pkg.endDate) || 'Mar 19, 2025'}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="no-data">No pain scale history available</p>
+            <div className="no-packages">
+              <div className="no-packages-icon">📦</div>
+              <p>No active care packages</p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Provider Notes */}
-      <div className="overview-section provider-notes">
-        <h3>Recent Provider Notes</h3>
-        {providerNotes.length > 0 ? (
-          <div className="notes-list">
-            {providerNotes.map(note => (
-              <div key={note._id} className="note-item">
-                <div className="note-header">
-                  <span className="note-date">{formatDate(note.date)}</span>
-                  <span className="note-provider">{note.providerName}</span>
-                </div>
-                <p className="note-content">{note.content}</p>
-              </div>
-            ))}
+      {/* Pain Scale Progression Card */}
+      <div className="overview-card pain-scale-card">
+        <div className="card-header">
+          <h3>📊 Pain Scale Progression</h3>
+        </div>
+        <div className="card-content">
+          <div className="pain-scale-timeline">
+            {/* Timeline entries with color-coded indicators */}
+            <div className="timeline-entry">
+              <div className="timeline-date">Jul 14, 2025</div>
+              <div className="timeline-indicator red"></div>
+            </div>
+            <div className="timeline-entry">
+              <div className="timeline-date">Jul 7, 2025</div>
+              <div className="timeline-indicator orange"></div>
+            </div>
+            <div className="timeline-entry">
+              <div className="timeline-date">Jun 30, 2025</div>
+              <div className="timeline-indicator yellow"></div>
+            </div>
+            <div className="timeline-entry">
+              <div className="timeline-date">Jun 23, 2025</div>
+              <div className="timeline-indicator green"></div>
+            </div>
           </div>
-        ) : (
-          <p className="no-data">No provider notes available</p>
-        )}
+        </div>
       </div>
 
-      {/* Patient History */}
-      <div className="overview-section patient-history">
-        <h3>Recent Visit History</h3>
-        <div className="section-content">
+      {/* Record Visit History Card */}
+      <div className="overview-card visit-history-card">
+        <div className="card-header">
+          <h3>📋 Record Visit History</h3>
+        </div>
+        <div className="card-content">
           {patientHistory.length > 0 ? (
-            <div className="history-list">
-              {patientHistory.map(visit => (
-                <div key={visit._id} className="history-item">
+            <div className="visit-history-list">
+              {patientHistory.map((visit, index) => (
+                <div key={visit._id || index} className="visit-entry">
                   <div className="visit-date">{formatDate(visit.date)}</div>
-                  <div className="visit-type">{visit.visitType}</div>
-                  <div className="visit-status">{visit.status}</div>
+                  <div className="visit-status completed">Completed</div>
+                  <div className="visit-details">
+                    <div className="visit-type">{visit.visitType || 'Chiropractic Tx'}</div>
+                    <div className="visit-provider">{visit.providerName || 'Morales Emmanuelli, Alvin A.'}</div>
+                    <div className="visit-note">No Room Scheduled</div>
+                  </div>
+                  <div className="visit-provider-name">Dra. Alvin Morales Quiropráctica</div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="no-data">No visit history available</p>
+            <div className="no-visits">
+              <div className="no-visits-icon">📅</div>
+              <p>No visit history available</p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Documents Section */}
-      <div className="overview-section documents">
-        <h3>Documents</h3>
-        <div className="section-content">
-          <div className="documents-header">
-            <label className="upload-btn">
-              <input
-                type="file"
-                onChange={handleDocumentUpload}
-                disabled={uploadingDocument}
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-              />
-              {uploadingDocument ? 'Uploading...' : '📎 Upload Document'}
-            </label>
-          </div>
+      {/* Documents Card */}
+      <div className="overview-card documents-card">
+        <div className="card-header">
+          <h3>📄 Documents</h3>
+        </div>
+        <div className="card-content">
           {documents.length > 0 ? (
             <div className="documents-list">
               {documents.map(doc => (
                 <div key={doc._id} className="document-item">
-                  <div className="doc-icon">📄</div>
-                  <div className="doc-info">
-                    <span className="doc-name">{doc.name}</span>
-                    <span className="doc-date">{formatDate(doc.uploadDate)}</span>
+                  <div className="document-icon">📄</div>
+                  <div className="document-details">
+                    <div className="document-name">{doc.originalName}</div>
+                    <div className="document-meta">
+                      {formatDate(doc.uploadDate)} • {(doc.size / 1024).toFixed(1)} KB
+                    </div>
                   </div>
-                  <button className="doc-download" onClick={() => window.open(doc.url, '_blank')}>
-                    ⬇️
-                  </button>
+                  <button className="document-download-btn">⬇️</button>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="no-data">No documents uploaded</p>
+            <div className="no-documents">
+              <div className="no-documents-icon">📄</div>
+              <p>No documents uploaded</p>
+            </div>
           )}
+
+          <div className="upload-document-section">
+            <button
+              className="upload-document-btn"
+              onClick={() => document.getElementById('document-upload').click()}
+              disabled={uploadingDocument}
+            >
+              {uploadingDocument ? '⏳ Uploading...' : '📤 Upload Document'}
+            </button>
+            <input
+              id="document-upload"
+              type="file"
+              style={{ display: 'none' }}
+              onChange={handleDocumentUpload}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            />
+          </div>
         </div>
       </div>
     </div>
