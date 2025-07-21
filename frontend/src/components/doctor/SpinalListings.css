@@ -1,0 +1,332 @@
+/* Spine Listings - Figma Design */
+.spine-listings-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 120px);
+  padding: 1rem;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+/* Left Side - Interactive Spine Diagram */
+.spine-diagram-section {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.section-title {
+  color: #f1f5f9;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.spine-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.spine-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.spine-label {
+  color: #3b82f6;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.spine-section.thoracic .spine-label {
+  color: #10b981;
+  border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+.spine-section.lumbar .spine-label {
+  color: #f59e0b;
+  border-bottom-color: rgba(245, 158, 11, 0.3);
+}
+
+.spine-section.sacral .spine-label {
+  color: #8b5cf6;
+  border-bottom-color: rgba(139, 92, 246, 0.3);
+}
+
+.spine-segments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 0.5rem;
+}
+
+.spine-segment-btn {
+  background: rgba(51, 65, 85, 0.6);
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  color: #94a3b8;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spine-segment-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.spine-segment-btn.selected {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.spine-segment-btn.documented {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.spine-segment-btn.documented.selected {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+/* Right Side - Documentation Section */
+.spine-documentation-section {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.documentation-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.documentation-header h3 {
+  color: #f1f5f9;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.spine-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.spine-type-tab {
+  background: rgba(51, 65, 85, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #94a3b8;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.spine-type-tab:hover {
+  background: rgba(var(--tab-color), 0.1);
+  border-color: var(--tab-color);
+  color: var(--tab-color);
+}
+
+.spine-type-tab.active {
+  background: var(--tab-color);
+  border-color: var(--tab-color);
+  color: white;
+}
+
+.segment-info {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.segment-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.segment-label {
+  background: #3b82f6;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.segment-title {
+  color: #f1f5f9;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.documentation-fields {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-group label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-group textarea {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  color: #f1f5f9;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.3s ease;
+}
+
+.field-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.field-group textarea::placeholder {
+  color: #64748b;
+}
+
+.quick-navigation {
+  background: rgba(15, 23, 42, 0.5);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1rem 1.5rem;
+}
+
+.nav-title {
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.nav-segments {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.nav-segment-btn {
+  background: rgba(51, 65, 85, 0.6);
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  color: #94a3b8;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.nav-segment-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.nav-segment-btn.selected {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.nav-segment-btn.documented {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.nav-segment-btn.documented.selected {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.nav-status {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .spine-listings-container {
+    grid-template-columns: 250px 1fr;
+    gap: 1rem;
+  }
+  
+  .spine-diagram-section {
+    padding: 1rem;
+  }
+  
+  .documentation-fields {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .spine-listings-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+  }
+  
+  .spine-diagram-section {
+    max-height: 300px;
+  }
+  
+  .spine-type-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .nav-segments {
+    flex-wrap: wrap;
+  }
+}
