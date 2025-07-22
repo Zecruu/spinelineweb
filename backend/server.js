@@ -66,14 +66,41 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint
+// Health check endpoint - works even without database
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState;
+  const dbStatusText = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
+  const healthStatus = {
     status: 'success',
     message: 'SpineLine API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+    environment: process.env.NODE_ENV || 'development',
+    server: {
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      pid: process.pid
+    },
+    database: {
+      status: dbStatusText[dbStatus] || 'unknown',
+      connected: dbStatus === 1,
+      host: mongoose.connection.host || 'not connected'
+    },
+    config: {
+      mongoUri: process.env.MONGO_URI ? 'configured' : 'missing',
+      port: process.env.PORT || 5001
+    }
+  };
+
+  // Always return 200 OK for health check, even if DB is down
+  // This allows the deployment to succeed and we can debug DB issues separately
+  res.status(200).json(healthStatus);
 });
 
 // Database status endpoint
@@ -151,10 +178,18 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
+// Add error handling for server startup
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SpineLine API server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📋 MONGO_URI configured: ${process.env.MONGO_URI ? 'Yes' : 'No'}`);
+}).on('error', (err) => {
+  console.error('❌ Server startup error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+  }
+  process.exit(1);
 });
 
 // Handle graceful shutdown
