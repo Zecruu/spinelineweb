@@ -1,0 +1,96 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const User = require('./models/User');
+const Clinic = require('./models/Clinic');
+
+const router = express.Router();
+
+// Create test clinic and user for immediate login
+router.post('/create-test-account', async (req, res) => {
+  try {
+    console.log('🧪 Creating test account...');
+    
+    // Create or find test clinic
+    let testClinic = await Clinic.findOne({ clinicCode: 'TEST' });
+    
+    if (!testClinic) {
+      testClinic = new Clinic({
+        clinicName: 'Test Clinic',
+        name: 'Test Clinic',
+        clinicCode: 'TEST',
+        clinicId: 'TEST',
+        address: {
+          street: '123 Test St',
+          city: 'Test City',
+          state: 'TS',
+          zipCode: '12345'
+        }
+      });
+      await testClinic.save();
+      console.log('✅ Test clinic created');
+    } else {
+      console.log('✅ Test clinic already exists');
+    }
+    
+    // Create or update test user
+    let testUser = await User.findOne({ username: 'testdoc', clinicId: testClinic._id });
+    
+    if (!testUser) {
+      const hashedPassword = await bcrypt.hash('password123', 10);
+      
+      testUser = new User({
+        username: 'testdoc',
+        email: 'testdoc@test.com',
+        password: hashedPassword,
+        role: 'doctor',
+        clinicId: testClinic._id,
+        isActive: true,
+        profile: {
+          firstName: 'Test',
+          lastName: 'Doctor'
+        },
+        name: 'Test Doctor'
+      });
+      await testUser.save();
+      console.log('✅ Test user created');
+    } else {
+      // Update password in case it changed
+      const hashedPassword = await bcrypt.hash('password123', 10);
+      testUser.password = hashedPassword;
+      testUser.isActive = true;
+      await testUser.save();
+      console.log('✅ Test user updated');
+    }
+    
+    res.json({
+      status: 'success',
+      message: 'Test account created successfully',
+      credentials: {
+        clinicCode: 'TEST',
+        username: 'testdoc',
+        password: 'password123'
+      },
+      clinic: {
+        id: testClinic._id,
+        name: testClinic.clinicName,
+        code: testClinic.clinicCode
+      },
+      user: {
+        id: testUser._id,
+        username: testUser.username,
+        email: testUser.email,
+        role: testUser.role,
+        isActive: testUser.isActive
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Error creating test account:', error);
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
+module.exports = router;
