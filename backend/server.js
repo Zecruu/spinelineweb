@@ -37,6 +37,7 @@ try {
   carePackagesRoutes = require('./routes/carePackages');
   doctorRoutes = require('./routes/doctor');
   debugRoutes = require('./debug-endpoints');
+  authDebugRoutes = require('./auth-debug');
   macrosRoutes = require('./routes/macros');
   referralsRoutes = require('./routes/referrals');
   checkoutRoutes = require('./routes/checkout');
@@ -161,6 +162,7 @@ try {
   if (soapNotesRoutes) app.use('/api/soap-notes', soapNotesRoutes);
   if (macrosRoutes) app.use('/api/macros', macrosRoutes);
   if (debugRoutes) app.use('/api', debugRoutes);
+  if (authDebugRoutes) app.use('/api', authDebugRoutes);
   console.log('✅ API routes registered successfully');
 } catch (error) {
   console.error('⚠️ Error registering some API routes:', error.message);
