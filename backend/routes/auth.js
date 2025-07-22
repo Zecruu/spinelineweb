@@ -9,6 +9,7 @@ const router = express.Router();
 // User login (doctors and secretaries)
 router.post('/login', async (req, res) => {
   try {
+    console.log('🔑 Login attempt:', { username: req.body.username, clinicCode: req.body.clinicCode });
     const { username, password, clinicCode } = req.body;
 
     // Validate required fields
@@ -34,16 +35,18 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Find user by username and clinic
+    // Find user by username and clinic - handle ObjectId format
+    console.log('🔍 Looking for user:', { username, clinicId: clinic._id });
+    
     const user = await User.findOne({
       $or: [
         { clinicId: clinic._id, username },
-        { clinicId: clinic.clinicId || clinic.clinicCode, username },
-        { clinicId: clinic._id, email: username },
-        { clinicId: clinic.clinicId || clinic.clinicCode, email: username }
+        { clinicId: clinic._id, email: username }
       ],
       isActive: true
     });
+    
+    console.log('👤 User found:', user ? 'Yes' : 'No');
 
     if (!user) {
       return res.status(401).json({
@@ -98,10 +101,16 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      timestamp: new Date().toISOString()
+    });
     res.status(500).json({
       status: 'error',
-      message: 'Internal server error'
+      message: 'Login failed. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 });
