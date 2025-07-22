@@ -19,23 +19,33 @@ connectDB().catch(error => {
   console.log('⚠️ Database connection failed, continuing without database');
 });
 
-// Load route modules
-const adminRoutes = require('./routes/admin');
-const authRoutes = require('./routes/auth');
-const patientRoutes = require('./routes/patients');
-const appointmentRoutes = require('./routes/appointments');
-const appointmentHistoryRoutes = require('./routes/appointmentHistory');
-const ledgerRoutes = require('./routes/ledger');
-const auditRoutes = require('./routes/audit');
-const billingCodesRoutes = require('./routes/billingCodes');
-const diagnosticCodesRoutes = require('./routes/diagnosticCodes');
-const carePackagesRoutes = require('./routes/carePackages');
-const checkoutRoutes = require('./routes/checkout');
-const referralsRoutes = require('./routes/referrals');
-const doctorRoutes = require('./routes/doctor');
-const soapNotesRoutes = require('./routes/soapNotes');
-const macrosRoutes = require('./routes/macros');
-const debugRoutes = require('./debug-endpoints');
+// Load route modules with error handling
+let adminRoutes, authRoutes, patientRoutes, appointmentRoutes, appointmentHistoryRoutes;
+let ledgerRoutes, auditRoutes, billingCodesRoutes, soapNotesRoutes, carePackagesRoutes;
+let doctorRoutes, debugRoutes, macrosRoutes, referralsRoutes, checkoutRoutes, diagnosticCodesRoutes;
+
+try {
+  adminRoutes = require('./routes/admin');
+  authRoutes = require('./routes/auth');
+  patientRoutes = require('./routes/patients');
+  appointmentRoutes = require('./routes/appointments');
+  appointmentHistoryRoutes = require('./routes/appointmentHistory');
+  ledgerRoutes = require('./routes/ledger');
+  auditRoutes = require('./routes/audit');
+  billingCodesRoutes = require('./routes/billingCodes');
+  soapNotesRoutes = require('./routes/soapNotes');
+  carePackagesRoutes = require('./routes/carePackages');
+  doctorRoutes = require('./routes/doctor');
+  debugRoutes = require('./debug-endpoints');
+  macrosRoutes = require('./routes/macros');
+  referralsRoutes = require('./routes/referrals');
+  checkoutRoutes = require('./routes/checkout');
+  diagnosticCodesRoutes = require('./routes/diagnosticCodes');
+  console.log('✅ All route modules loaded successfully');
+} catch (error) {
+  console.error('⚠️ Error loading some route modules:', error.message);
+  console.log('🔄 Server will continue with available routes');
+}
 
 // Security middleware (simplified)
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -133,23 +143,29 @@ app.get('/api/db-status', (req, res) => {
   }
 });
 
-// API Routes (MUST come before static files)
-app.use('/api/admin', adminRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/patients', patientRoutes);
-app.use('/api/appointments', appointmentRoutes);
-app.use('/api/appointment-history', appointmentHistoryRoutes);
-app.use('/api/ledger', ledgerRoutes);
-app.use('/api/audit', auditRoutes);
-app.use('/api/billing-codes', billingCodesRoutes);
-app.use('/api/diagnostic-codes', diagnosticCodesRoutes);
-app.use('/api/care-packages', carePackagesRoutes);
-app.use('/api/checkout', checkoutRoutes);
-app.use('/api/referrals', referralsRoutes);
-app.use('/api/doctor', doctorRoutes);
-app.use('/api/soap-notes', soapNotesRoutes);
-app.use('/api/macros', macrosRoutes);
-app.use('/api', debugRoutes);
+// API Routes (MUST come before static files) - with error handling
+try {
+  if (adminRoutes) app.use('/api/admin', adminRoutes);
+  if (authRoutes) app.use('/api/auth', authRoutes);
+  if (patientRoutes) app.use('/api/patients', patientRoutes);
+  if (appointmentRoutes) app.use('/api/appointments', appointmentRoutes);
+  if (appointmentHistoryRoutes) app.use('/api/appointment-history', appointmentHistoryRoutes);
+  if (ledgerRoutes) app.use('/api/ledger', ledgerRoutes);
+  if (auditRoutes) app.use('/api/audit', auditRoutes);
+  if (billingCodesRoutes) app.use('/api/billing-codes', billingCodesRoutes);
+  if (diagnosticCodesRoutes) app.use('/api/diagnostic-codes', diagnosticCodesRoutes);
+  if (carePackagesRoutes) app.use('/api/care-packages', carePackagesRoutes);
+  if (checkoutRoutes) app.use('/api/checkout', checkoutRoutes);
+  if (referralsRoutes) app.use('/api/referrals', referralsRoutes);
+  if (doctorRoutes) app.use('/api/doctor', doctorRoutes);
+  if (soapNotesRoutes) app.use('/api/soap-notes', soapNotesRoutes);
+  if (macrosRoutes) app.use('/api/macros', macrosRoutes);
+  if (debugRoutes) app.use('/api', debugRoutes);
+  console.log('✅ API routes registered successfully');
+} catch (error) {
+  console.error('⚠️ Error registering some API routes:', error.message);
+  console.log('🔄 Server will continue with available routes');
+}
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
