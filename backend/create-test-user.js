@@ -126,4 +126,71 @@ router.get('/debug/users-and-clinics', async (req, res) => {
   }
 });
 
+// Fix user clinic association
+router.post('/fix-user-clinic', async (req, res) => {
+  try {
+    const { userEmail, clinicCode } = req.body;
+
+    if (!userEmail || !clinicCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'userEmail and clinicCode are required'
+      });
+    }
+
+    // Find the clinic
+    const clinic = await Clinic.findOne({
+      $or: [
+        { clinicCode: clinicCode.toUpperCase() },
+        { clinicId: clinicCode.toUpperCase() }
+      ]
+    });
+
+    if (!clinic) {
+      return res.status(404).json({
+        success: false,
+        message: `Clinic with code ${clinicCode} not found`
+      });
+    }
+
+    // Find and update the user
+    const user = await User.findOneAndUpdate(
+      { email: userEmail },
+      { clinicId: clinic._id },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `User with email ${userEmail} not found`
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'User clinic association fixed',
+      user: {
+        id: user._id,
+        email: user.email,
+        clinicId: user.clinicId,
+        role: user.role
+      },
+      clinic: {
+        id: clinic._id,
+        name: clinic.clinicName,
+        code: clinic.clinicCode || clinic.clinicId
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error fixing user clinic association:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fix user clinic association',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
