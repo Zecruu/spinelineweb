@@ -5,6 +5,7 @@ import SmartTemplate from './SmartTemplate';
 import DiagnosisAndBillingCodes from './CodeTable';
 import PatientOverview from './PatientOverview';
 import DoctorSettings from './DoctorSettings';
+import { API_BASE_URL } from '../../config/api';
 
 const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -49,7 +50,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
   const loadExistingSOAPNote = async () => {
     try {
-      const response = await fetch(`/api/soap-notes/appointment/${appointment._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/soap-notes/appointment/${appointment._id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -74,7 +75,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
   const loadPatientHistory = async () => {
     try {
-      const response = await fetch(`/api/soap-notes/patient-history/${patient._id}?limit=5`, {
+      const response = await fetch(`${API_BASE_URL}/api/soap-notes/patient-history/${patient._id}?limit=5`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -92,7 +93,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
   const loadAvailableCodes = async () => {
     try {
       // Load diagnostic codes
-      const diagnosticResponse = await fetch('/api/diagnostic-codes', {
+      const diagnosticResponse = await fetch(`${API_BASE_URL}/api/diagnostic-codes`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -103,7 +104,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       }
 
       // Load billing codes
-      const billingResponse = await fetch('/api/billing-codes', {
+      const billingResponse = await fetch(`${API_BASE_URL}/api/billing-codes`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -119,7 +120,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
   const updatePatientStatus = async (status) => {
     try {
-      await fetch(`/api/appointments/${appointment._id}/status`, {
+      await fetch(`${API_BASE_URL}/api/appointments/${appointment._id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +142,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
         timestamp: new Date().toISOString()
       });
 
-      const response = await fetch('/api/soap-notes/autosave', {
+      const response = await fetch(`${API_BASE_URL}/api/soap-notes/autosave`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -210,7 +211,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
 
       // Update patient status to 'in-progress' to show work has been started
       try {
-        await fetch(`/api/appointments/${appointment._id}/status`, {
+        await fetch(`${API_BASE_URL}/api/appointments/${appointment._id}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -332,7 +333,7 @@ const SOAPNoteInterface = ({ patient, appointment, onClose, onSave, token }) => 
       // Create a simple text signature for now (in production, this would be a digital signature pad)
       const signature = `${patient.firstName} ${patient.lastName} - ${new Date().toLocaleString()} - Dr. ${user.firstName} ${user.lastName}`;
 
-      const response = await fetch(`/api/soap-notes/sign/${appointment._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/soap-notes/sign/${appointment._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

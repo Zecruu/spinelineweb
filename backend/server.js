@@ -1,6 +1,19 @@
 console.log('🔄 Starting SpineLine server...');
 
+// Load environment variables first
 require('dotenv').config();
+console.log('✅ Environment variables loaded');
+
+// Check critical environment variables
+if (!process.env.MONGO_URI && !process.env.MONGODB_URI) {
+  console.error('❌ MONGO_URI or MONGODB_URI environment variable is required');
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️ JWT_SECRET not set, using default (not secure for production)');
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,34 +33,37 @@ connectDB().catch(error => {
 });
 
 // Load route modules with error handling
-let adminRoutes, authRoutes, patientRoutes, appointmentRoutes, appointmentHistoryRoutes;
-let ledgerRoutes, auditRoutes, billingCodesRoutes, soapNotesRoutes, carePackagesRoutes;
-let doctorRoutes, debugRoutes, macrosRoutes, referralsRoutes, checkoutRoutes, diagnosticCodesRoutes;
+const loadRoute = (path, name) => {
+  try {
+    return require(path);
+  } catch (error) {
+    console.warn(`⚠️ Failed to load ${name} route:`, error.message);
+    return null;
+  }
+};
 
-try {
-  adminRoutes = require('./routes/admin');
-  authRoutes = require('./routes/auth');
-  patientRoutes = require('./routes/patients');
-  appointmentRoutes = require('./routes/appointments');
-  appointmentHistoryRoutes = require('./routes/appointmentHistory');
-  ledgerRoutes = require('./routes/ledger');
-  auditRoutes = require('./routes/audit');
-  billingCodesRoutes = require('./routes/billingCodes');
-  soapNotesRoutes = require('./routes/soapNotes');
-  carePackagesRoutes = require('./routes/carePackages');
-  doctorRoutes = require('./routes/doctor');
-  debugRoutes = require('./debug-endpoints');
-  authDebugRoutes = require('./auth-debug');
-  testUserRoutes = require('./create-test-user');
-  macrosRoutes = require('./routes/macros');
-  referralsRoutes = require('./routes/referrals');
-  checkoutRoutes = require('./routes/checkout');
-  diagnosticCodesRoutes = require('./routes/diagnosticCodes');
-  console.log('✅ All route modules loaded successfully');
-} catch (error) {
-  console.error('⚠️ Error loading some route modules:', error.message);
-  console.log('🔄 Server will continue with available routes');
-}
+const adminRoutes = loadRoute('./routes/admin', 'admin');
+const authRoutes = loadRoute('./routes/auth', 'auth');
+const patientRoutes = loadRoute('./routes/patients', 'patients');
+const appointmentRoutes = loadRoute('./routes/appointments', 'appointments');
+const appointmentHistoryRoutes = loadRoute('./routes/appointmentHistory', 'appointmentHistory');
+const ledgerRoutes = loadRoute('./routes/ledger', 'ledger');
+const auditRoutes = loadRoute('./routes/audit', 'audit');
+const billingCodesRoutes = loadRoute('./routes/billingCodes', 'billingCodes');
+const soapNotesRoutes = loadRoute('./routes/soapNotes', 'soapNotes');
+const carePackagesRoutes = loadRoute('./routes/carePackages', 'carePackages');
+const doctorRoutes = loadRoute('./routes/doctor', 'doctor');
+const macrosRoutes = loadRoute('./routes/macros', 'macros');
+const referralsRoutes = loadRoute('./routes/referrals', 'referrals');
+const checkoutRoutes = loadRoute('./routes/checkout', 'checkout');
+const diagnosticCodesRoutes = loadRoute('./routes/diagnosticCodes', 'diagnosticCodes');
+
+// Optional debug routes
+const debugRoutes = loadRoute('./debug-endpoints', 'debug-endpoints');
+const authDebugRoutes = loadRoute('./auth-debug', 'auth-debug');
+const testUserRoutes = loadRoute('./create-test-user', 'create-test-user');
+
+console.log('✅ Route modules loaded');
 
 // Security middleware (simplified)
 app.use(helmet({ contentSecurityPolicy: false }));

@@ -35,18 +35,62 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Find user by username and clinic - handle ObjectId format
-    console.log('🔍 Looking for user:', { username, clinicId: clinic._id });
-    
+    // Find user by username and clinic - handle multiple clinicId formats
+    console.log('🔍 Looking for user:', { username, clinicId: clinic._id, clinicCode });
+
+    // Try multiple clinicId formats to handle data migration
     const user = await User.findOne({
-      $or: [
-        { clinicId: clinic._id, username },
-        { clinicId: clinic._id, email: username }
+      $and: [
+        {
+          $or: [
+            { username },
+            { email: username }
+          ]
+        },
+        {
+          $or: [
+            { clinicId: clinic._id },
+            { clinicId: clinic._id.toString() },
+            { clinicId: clinicCode },
+            { clinicId: clinicCode.toUpperCase() }
+          ]
+        }
       ],
       isActive: true
     });
-    
+
     console.log('👤 User found:', user ? 'Yes' : 'No');
+    if (user) {
+      console.log('👤 User details:', {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        clinicId: user.clinicId,
+        role: user.role
+      });
+    } else {
+      // Debug: Show what users exist for this clinic
+      const allUsersInClinic = await User.find({
+        $or: [
+          { clinicId: clinic._id },
+          { clinicId: clinic._id.toString() },
+          { clinicId: clinicCode },
+          { clinicId: clinicCode.toUpperCase() }
+        ]
+      }).select('username email clinicId role isActive');
+
+      console.log('🔍 All users in clinic:', allUsersInClinic);
+
+      // Also check if user exists with different clinic
+      const userAnyClinic = await User.findOne({
+        $or: [
+          { username },
+          { email: username }
+        ]
+      }).select('username email clinicId role isActive');
+
+      console.log('🔍 User in any clinic:', userAnyClinic);
+    }
 
     if (!user) {
       return res.status(401).json({

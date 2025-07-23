@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './PatientOverview.css';
+import { API_BASE_URL } from '../../config/api';
 
 const PatientOverview = ({ patient, appointment, token }) => {
   const [patientHistory, setPatientHistory] = useState([]);
@@ -33,7 +34,7 @@ const PatientOverview = ({ patient, appointment, token }) => {
 
   const loadPatientHistory = async () => {
     try {
-      const response = await fetch(`/api/patients/${patient._id}/history`, {
+      const response = await fetch(`${API_BASE_URL}/api/patients/${patient._id}/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -47,7 +48,7 @@ const PatientOverview = ({ patient, appointment, token }) => {
 
   const loadActivePackages = async () => {
     try {
-      const response = await fetch(`/api/care-packages/patient/${patient._id}/active`, {
+      const response = await fetch(`${API_BASE_URL}/api/care-packages/patient/${patient._id}/active`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -61,7 +62,7 @@ const PatientOverview = ({ patient, appointment, token }) => {
 
   const loadProviderNotes = async () => {
     try {
-      const response = await fetch(`/api/patients/${patient._id}/provider-notes`, {
+      const response = await fetch(`${API_BASE_URL}/api/patients/${patient._id}/provider-notes`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -75,7 +76,7 @@ const PatientOverview = ({ patient, appointment, token }) => {
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch(`/api/patients/${patient._id}/documents`, {
+      const response = await fetch(`${API_BASE_URL}/api/patients/${patient._id}/documents`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -89,7 +90,7 @@ const PatientOverview = ({ patient, appointment, token }) => {
 
   const loadPainScaleHistory = async () => {
     try {
-      const response = await fetch(`/api/patients/${patient._id}/pain-scale-history`, {
+      const response = await fetch(`${API_BASE_URL}/api/patients/${patient._id}/pain-scale-history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

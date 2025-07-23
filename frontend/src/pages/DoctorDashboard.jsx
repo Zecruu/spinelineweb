@@ -5,6 +5,7 @@ import CheckedOutPatients from '../components/doctor/CheckedOutPatients';
 import PatientFilters from '../components/doctor/PatientFilters';
 import SOAPNoteInterface from '../components/doctor/SOAPNoteInterface';
 import './DoctorDashboard.css';
+import { API_BASE_URL } from '../config/api';
 
 const DoctorDashboard = ({ token, user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('patient-flow');
@@ -50,7 +51,7 @@ const DoctorDashboard = ({ token, user, onLogout }) => {
         ...filters
       });
 
-      const response = await fetch(`/api/doctor/daily-patients?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/api/doctor/daily-patients?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
