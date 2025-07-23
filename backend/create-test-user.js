@@ -93,4 +93,37 @@ router.post('/create-test-account', async (req, res) => {
   }
 });
 
+// Debug endpoint to list all users and clinics
+router.get('/debug/users-and-clinics', async (req, res) => {
+  try {
+    const users = await User.find({}).select('username email clinicId role isActive').limit(20);
+    const clinics = await Clinic.find({}).select('clinicName clinicCode clinicId').limit(10);
+
+    res.json({
+      success: true,
+      users: users.map(user => ({
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        clinicId: user.clinicId,
+        role: user.role,
+        isActive: user.isActive
+      })),
+      clinics: clinics.map(clinic => ({
+        id: clinic._id,
+        name: clinic.clinicName,
+        code: clinic.clinicCode,
+        clinicId: clinic.clinicId
+      }))
+    });
+  } catch (error) {
+    console.error('❌ Error fetching debug data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch debug data',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
