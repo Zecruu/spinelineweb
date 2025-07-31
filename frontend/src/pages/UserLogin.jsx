@@ -54,67 +54,94 @@ const UserLogin = ({ onLogin }) => {
 
   return (
     <div className="user-login">
-      <div className="login-container">
-        <div className="login-header">
-          <h1>🏥 SpineLine</h1>
-          <h2>User Login</h2>
-          <p>Access your clinic dashboard</p>
+      {/* Left Side - Logo, Welcome, Login Form, Admin Link */}
+      <div className="welcome-section">
+        <div className="welcome-content">
+          <div className="logo-container">
+            <img src="/SpineLineLogo.jpg" alt="SpineLine Logo" className="logo" />
+          </div>
+          <h1 className="welcome-title">Welcome to SpineLine</h1>
+          <p className="welcome-subtitle">Sign in to your account</p>
+
+          <form onSubmit={handleSubmit} className="login-form left-form">
+            {error && <div className="error-message">{error}</div>}
+            <div className="form-group with-icon">
+              <span className="input-icon"><i className="fa fa-user"></i></span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                placeholder="Username"
+                className="form-input"
+                autoComplete="username"
+              />
+            </div>
+            <div className="form-group with-icon">
+              <span className="input-icon"><i className="fa fa-lock"></i></span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Password"
+                className="form-input"
+                autoComplete="current-password"
+              />
+              <span className="input-icon right"><i className="fa fa-eye"></i></span>
+            </div>
+            <div className="form-group with-icon">
+              <span className="input-icon"><i className="fa fa-hospital-o"></i></span>
+              <input
+                type="text"
+                id="clinicCode"
+                name="clinicCode"
+                value={formData.clinicCode}
+                onChange={handleChange}
+                required
+                placeholder="Clinic Code (e.g., TMC001, DRAAM)"
+                className="form-input"
+                style={{ textTransform: 'uppercase' }}
+                autoComplete="off"
+              />
+            </div>
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={loading}
+            >
+              {loading ? 'SIGNING IN...' : 'SIGN IN'}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <a href="#" className="admin-link">Admin Portal →</a>
+          </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && <div className="error-message">{error}</div>}
-          
-          <div className="form-group">
-            <label htmlFor="username">Username or Email</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              placeholder="Enter your username or email"
-            />
+      {/* Right Side - Info/Features */}
+      <div className="info-section">
+        <div className="info-content">
+          <h2 className="spine-title">SpineLine</h2>
+          <p className="platform-subtitle">Medical Platform</p>
+          <h3 className="info-main">Comprehensive Healthcare Management</h3>
+          <p className="description">
+            Streamline your medical practice with our integrated platform for patient management, appointments, and clinical workflows.
+          </p>
+          <div className="version-badge">
+            <span className="version-icon"><i className="fa fa-medkit"></i></span>
+            <span>Medical v1.0.0</span>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password"
-            />
+          <div className="feature-list">
+            <button className="feature-btn"><span className="feature-btn-icon"><i className="fa fa-user-md"></i></span> Patient Management</button>
+            <button className="feature-btn"><span className="feature-btn-icon"><i className="fa fa-calendar"></i></span> Appointment Scheduling</button>
+            <button className="feature-btn"><span className="feature-btn-icon"><i className="fa fa-file-medical"></i></span> Clinical Records</button>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="clinicCode">Clinic Code</label>
-            <input
-              type="text"
-              id="clinicCode"
-              name="clinicCode"
-              value={formData.clinicCode}
-              onChange={handleChange}
-              required
-              placeholder="Enter your clinic code"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            className="login-button"
-            disabled={loading}
-          >
-            {loading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>Need help? Contact your clinic administrator</p>
         </div>
       </div>
     </div>

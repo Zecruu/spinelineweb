@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix User-Clinic Association</title>
+</head>
+<body>
+    <h1>Fix User-Clinic Association</h1>
+    <button onclick="fixUser()">Fix aivinmorales@gmail.com → DRAAIV</button>
+    <div id="result"></div>
+
+    <script>
+        async function fixUser() {
+            try {
+                const response = await fetch('https://spinelineweb-production.up.railway.app/api/fix-user-clinic', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userEmail: 'aivinmorales@gmail.com',
+                        clinicCode: 'DRAAIV'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
