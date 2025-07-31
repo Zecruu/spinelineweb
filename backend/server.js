@@ -62,6 +62,7 @@ const diagnosticCodesRoutes = loadRoute('./routes/diagnosticCodes', 'diagnosticC
 const debugRoutes = loadRoute('./debug-endpoints', 'debug-endpoints');
 const authDebugRoutes = loadRoute('./auth-debug', 'auth-debug');
 const testUserRoutes = loadRoute('./create-test-user', 'create-test-user');
+const fixProductionUserRoutes = loadRoute('./routes/fix-production-user', 'fix-production-user');
 
 console.log('✅ Route modules loaded');
 
@@ -181,6 +182,7 @@ try {
   if (debugRoutes) app.use('/api', debugRoutes);
   if (authDebugRoutes) app.use('/api', authDebugRoutes);
   if (testUserRoutes) app.use('/api', testUserRoutes);
+  if (fixProductionUserRoutes) app.use('/api', fixProductionUserRoutes);
   console.log('✅ API routes registered successfully');
 } catch (error) {
   console.error('⚠️ Error registering some API routes:', error.message);
