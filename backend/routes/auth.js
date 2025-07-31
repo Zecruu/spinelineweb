@@ -20,13 +20,21 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Find clinic by clinic code or clinicId
-    const clinic = await Clinic.findOne({
-      $or: [
-        { clinicCode: clinicCode.toUpperCase() },
-        { clinicId: clinicCode.toUpperCase() }
-      ]
-    });
+    // Set timeout for database operations
+    const QUERY_TIMEOUT = 5000; // 5 seconds
+
+    // Find clinic by clinic code or clinicId with timeout
+    const clinic = await Promise.race([
+      Clinic.findOne({
+        $or: [
+          { clinicCode: clinicCode.toUpperCase() },
+          { clinicId: clinicCode.toUpperCase() }
+        ]
+      }).lean(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Clinic query timeout')), QUERY_TIMEOUT)
+      )
+    ]);
 
     if (!clinic) {
       return res.status(404).json({
@@ -35,29 +43,33 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Find user by username and clinic - handle multiple clinicId formats
     console.log('🔍 Looking for user:', { username, clinicId: clinic._id, clinicCode });
 
-    // Try multiple clinicId formats to handle data migration
-    const user = await User.findOne({
-      $and: [
-        {
-          $or: [
-            { username },
-            { email: username }
-          ]
-        },
-        {
-          $or: [
-            { clinicId: clinic._id },
-            { clinicId: clinic._id.toString() },
-            { clinicId: clinicCode },
-            { clinicId: clinicCode.toUpperCase() }
-          ]
-        }
-      ],
-      isActive: true
-    });
+    // Find user with timeout and simplified query
+    const user = await Promise.race([
+      User.findOne({
+        $and: [
+          {
+            $or: [
+              { username },
+              { email: username }
+            ]
+          },
+          {
+            $or: [
+              { clinicId: clinic._id },
+              { clinicId: clinic._id.toString() },
+              { clinicId: clinicCode },
+              { clinicId: clinicCode.toUpperCase() }
+            ]
+          }
+        ],
+        isActive: true
+      }).lean(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('User query timeout')), QUERY_TIMEOUT)
+      )
+    ]);
 
     console.log('👤 User found:', user ? 'Yes' : 'No');
     if (user) {
@@ -151,6 +163,25 @@ router.post('/login', async (req, res) => {
       name: error.name,
       timestamp: new Date().toISOString()
     });
+    
+    // Handle specific error types
+    if (error.message.includes('timeout')) {
+      return res.status(503).json({
+        status: 'error',
+        message: 'Database connection timeout. Please try again in a moment.',
+        error: 'service_timeout'
+      });
+    }
+    
+    if (error.name === 'MongooseError' || error.name === 'MongoError') {
+      return res.status(503).json({
+        status: 'error',
+        message: 'Database connection issue. Please try again.',
+        error: 'database_error'
+      });
+    }
+    
+    // Generic error response
     res.status(500).json({
       status: 'error',
       message: 'Login failed. Please try again.',
