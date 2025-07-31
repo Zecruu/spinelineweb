@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../config/api';
 import './UserLogin.css';
+import SpineLineLogo from '../assets/SpineLineLogo.jpg';
 
 const UserLogin = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -58,7 +59,7 @@ const UserLogin = ({ onLogin }) => {
       <div className="welcome-section">
         <div className="welcome-content">
           <div className="logo-container">
-            <img src="/SpineLineLogo.jpg" alt="SpineLine Logo" className="logo" />
+            <img src={SpineLineLogo} alt="SpineLine Logo" className="logo" />
           </div>
           <h1 className="welcome-title">Welcome to SpineLine</h1>
           <p className="welcome-subtitle">Sign in to your account</p>
